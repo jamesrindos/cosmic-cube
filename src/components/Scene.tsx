@@ -54,6 +54,118 @@ const KitchenIsland = () => (
   </mesh>
 );
 
+// === LIVING ROOM FURNITURE ===
+
+const TV = () => (
+  <group position={[9.7, 1.5, -4]}>
+    {/* Screen */}
+    <mesh>
+      <boxGeometry args={[0.1, 1.5, 2]} />
+      <meshStandardMaterial color="#0A0A0F" emissive="#00D9FF" emissiveIntensity={0.3} />
+    </mesh>
+    {/* Stand */}
+    <mesh position={[0, -0.9, 0]}>
+      <boxGeometry args={[0.3, 0.2, 0.8]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    {/* Screen glow light */}
+    <pointLight position={[-0.5, 0, 0]} color="#00D9FF" intensity={0.6} distance={5} decay={2} />
+  </group>
+);
+
+const VHSShelf = () => (
+  <group position={[9.6, 0.75, -6.5]}>
+    {/* Frame */}
+    {/* Left side */}
+    <mesh position={[0, 0, -0.55]}>
+      <boxGeometry args={[0.3, 1.5, 0.05]} />
+      <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    {/* Right side */}
+    <mesh position={[0, 0, 0.55]}>
+      <boxGeometry args={[0.3, 1.5, 0.05]} />
+      <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    {/* Shelves */}
+    {[-0.5, 0, 0.5].map((y, i) => (
+      <mesh key={i} position={[0, y, 0]}>
+        <boxGeometry args={[0.3, 0.05, 1.1]} />
+        <meshStandardMaterial color="#16213E" />
+      </mesh>
+    ))}
+    {/* VHS tapes / items on shelves */}
+    {[-0.25, 0.25].map((y, row) =>
+      [-0.35, -0.15, 0.05, 0.25].map((z, col) => (
+        <mesh key={`${row}-${col}`} position={[0, y, z]}>
+          <boxGeometry args={[0.15, 0.2, 0.12]} />
+          <meshStandardMaterial color={["#1a1a3e", "#2a1a3e", "#1a2a3e", "#2a2a3e"][col]} />
+        </mesh>
+      ))
+    )}
+  </group>
+);
+
+const Couch = () => (
+  <group position={[2, 0, -4]}>
+    {/* Seat base */}
+    <mesh position={[0, 0.3, 0]}>
+      <boxGeometry args={[2.5, 0.4, 1.2]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    {/* Backrest */}
+    <mesh position={[0, 0.7, -0.5]}>
+      <boxGeometry args={[2.5, 0.5, 0.2]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    {/* Left arm */}
+    <mesh position={[-1.15, 0.55, 0]}>
+      <boxGeometry args={[0.2, 0.7, 1.2]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    {/* Right arm */}
+    <mesh position={[1.15, 0.55, 0]}>
+      <boxGeometry args={[0.2, 0.7, 1.2]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    {/* Hoodie draped on right arm */}
+    <mesh position={[1.15, 0.95, 0.1]}>
+      <boxGeometry args={[0.35, 0.12, 0.8]} />
+      <meshStandardMaterial color="#9B8AC4" />
+    </mesh>
+    {/* Hoodie sleeve hanging down */}
+    <mesh position={[1.35, 0.65, 0.3]}>
+      <boxGeometry args={[0.12, 0.5, 0.2]} />
+      <meshStandardMaterial color="#9B8AC4" />
+    </mesh>
+    {/* Cushions */}
+    <mesh position={[-0.5, 0.55, 0]}>
+      <boxGeometry args={[1, 0.1, 1]} />
+      <meshStandardMaterial color="#353548" />
+    </mesh>
+    <mesh position={[0.5, 0.55, 0]}>
+      <boxGeometry args={[1, 0.1, 1]} />
+      <meshStandardMaterial color="#353548" />
+    </mesh>
+  </group>
+);
+
+const CoffeeTable = () => (
+  <group position={[5.5, 0, -4]}>
+    {/* Table top */}
+    <mesh position={[0, 0.4, 0]}>
+      <boxGeometry args={[1.5, 0.08, 0.8]} />
+      <meshStandardMaterial color="#3D2E2E" />
+    </mesh>
+    {/* Legs */}
+    {[[-0.6, -0.3], [-0.6, 0.3], [0.6, -0.3], [0.6, 0.3]].map(([x, z], i) => (
+      <mesh key={i} position={[x, 0.2, z]}>
+        <boxGeometry args={[0.08, 0.35, 0.08]} />
+        <meshStandardMaterial color="#2D2020" />
+      </mesh>
+    ))}
+  </group>
+);
+
 const PulsingLight = ({ position, color, intensity }: { position: [number, number, number]; color: string; intensity: number }) => {
   const lightRef = useRef<THREE.PointLight>(null);
   useFrame(({ clock }) => {
@@ -108,6 +220,12 @@ const Apartment = () => {
       <Wall position={[6.5, hy, -12]} size={[7, h, t]} />
 
       <KitchenIsland />
+
+      {/* === LIVING ROOM FURNITURE === */}
+      <TV />
+      <VHSShelf />
+      <Couch />
+      <CoffeeTable />
 
       {/* === HALLWAY === */}
       <Wall position={[1, hy, -13]} size={[t, h, 2]} />
