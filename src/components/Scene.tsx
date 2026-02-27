@@ -190,21 +190,24 @@ const Apartment = () => {
       <GridFloor position={[4, 0.01, -19]} size={[8, 10]} />
 
       {/* === ROOM LIGHTING === */}
-      {/* TV glow in living room */}
-      <PulsingLight position={[5, 1.5, -7.5]} color="#00D9FF" intensity={1.8} />
-      {/* Ambient bounce from TV on floor */}
-      <pointLight position={[5, 0.3, -6]} color="#00D9FF" intensity={0.4} distance={6} decay={2} />
+      {/* Bright living room fill light */}
+      <pointLight position={[5, 2.8, -4]} color="#FFF5E6" intensity={1.2} distance={14} decay={1.5} />
+      {/* TV glow - accent only */}
+      <PulsingLight position={[5, 1.5, -7.5]} color="#00D9FF" intensity={0.6} />
+      <pointLight position={[5, 0.3, -6]} color="#00D9FF" intensity={0.15} distance={4} decay={2} />
 
-      {/* RGB desk glow in bedroom */}
+      {/* Bright kitchen fill */}
+      <pointLight position={[5, 2.8, -10]} color="#FFF5E6" intensity={1.0} distance={12} decay={1.5} />
+      <pointLight position={[6, 0.9, -2]} color="#FFF5E6" intensity={0.3} distance={4} decay={2} />
+
+      {/* RGB desk glow in bedroom - stays moody */}
       <PulsingLight position={[2, 1.5, -20]} color="#7B68EE" intensity={1.5} />
-      {/* Accent strip in bedroom */}
       <pointLight position={[4, 0.2, -22]} color="#9B59B6" intensity={0.3} distance={5} decay={2} />
+      {/* Dim bedroom fill so it's not pitch black */}
+      <pointLight position={[4, 2.5, -19]} color="#FFF5E6" intensity={0.3} distance={10} decay={2} />
 
-      {/* Dim hallway light */}
-      <pointLight position={[2, 2, -13]} color="#7B68EE" intensity={0.3} distance={5} decay={2} />
-
-      {/* Kitchen under-cabinet glow */}
-      <pointLight position={[6, 0.9, -2]} color="#00D9FF" intensity={0.4} distance={4} decay={2} />
+      {/* Hallway */}
+      <pointLight position={[2, 2, -13]} color="#FFF5E6" intensity={0.5} distance={5} decay={2} />
 
       {/* === LIVING ROOM WALLS === */}
       <Wall position={[5, hy, 0]} size={[10, h, t]} />
@@ -246,8 +249,9 @@ const Scene = () => {
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D0F" }}>
       <Canvas camera={{ position: [20, 20, 20], fov: 45 }} shadows>
         <color attach="background" args={["#0D0D0F"]} />
-        <ambientLight color="#7B68EE" intensity={0.3} />
-        <directionalLight position={[10, 20, 10]} intensity={0.2} color="#ffffff" />
+        <ambientLight color="#FFF5E6" intensity={0.7} />
+        <directionalLight position={[-8, 20, 5]} intensity={0.8} color="#ffffff" />
+        <directionalLight position={[10, 15, -10]} intensity={0.3} color="#FFF5E6" />
         <Apartment />
         <OrbitControls
           enableDamping
