@@ -48,10 +48,110 @@ const GridFloor = ({ position, size }: { position: [number, number, number]; siz
 };
 
 const KitchenIsland = () => (
-  <mesh position={[6, 0.4, -2]}>
-    <boxGeometry args={[2, 0.8, 1]} />
-    <meshStandardMaterial color="#0F3460" />
-  </mesh>
+  <group position={[5, 0, -10]}>
+    {/* Counter top */}
+    <mesh position={[0, 0.45, 0]}>
+      <boxGeometry args={[3, 0.1, 1.5]} />
+      <meshStandardMaterial color="#E8E8E8" />
+    </mesh>
+    {/* Base */}
+    <mesh position={[0, 0.2, 0]}>
+      <boxGeometry args={[2.8, 0.4, 1.3]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+  </group>
+);
+
+const Fridge = () => (
+  <group position={[9.3, 0, -11.5]}>
+    {/* Body */}
+    <mesh position={[0, 1, 0]}>
+      <boxGeometry args={[0.9, 2, 0.8]} />
+      <meshStandardMaterial color="#D0D0D0" />
+    </mesh>
+    {/* Handle */}
+    <mesh position={[-0.47, 1.2, 0.15]}>
+      <boxGeometry args={[0.04, 0.6, 0.06]} />
+      <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    <mesh position={[-0.47, 0.4, 0.15]}>
+      <boxGeometry args={[0.04, 0.4, 0.06]} />
+      <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    {/* Door line */}
+    <mesh position={[-0.46, 0.85, 0]}>
+      <boxGeometry args={[0.01, 0.02, 0.78]} />
+      <meshStandardMaterial color="#B0B0B0" />
+    </mesh>
+  </group>
+);
+
+const KitchenCounters = () => (
+  <group>
+    {/* Back wall counter */}
+    <group position={[5, 0, -11.8]}>
+      <mesh position={[0, 0.45, 0]}>
+        <boxGeometry args={[6, 0.1, 0.6]} />
+        <meshStandardMaterial color="#F0F0F0" />
+      </mesh>
+      <mesh position={[0, 0.2, 0]}>
+        <boxGeometry args={[5.8, 0.4, 0.5]} />
+        <meshStandardMaterial color="#2D2D3A" />
+      </mesh>
+    </group>
+    {/* Side wall counter */}
+    <group position={[0.5, 0, -10]}>
+      <mesh position={[0, 0.45, 0]}>
+        <boxGeometry args={[0.6, 0.1, 3]} />
+        <meshStandardMaterial color="#F0F0F0" />
+      </mesh>
+      <mesh position={[0, 0.2, 0]}>
+        <boxGeometry args={[0.5, 0.4, 2.8]} />
+        <meshStandardMaterial color="#2D2D3A" />
+      </mesh>
+    </group>
+
+    {/* Coffee maker */}
+    <group position={[3, 0.5, -11.8]}>
+      <mesh position={[0, 0.15, 0]}>
+        <boxGeometry args={[0.3, 0.3, 0.25]} />
+        <meshStandardMaterial color="#3D3D3D" />
+      </mesh>
+      <mesh position={[0, 0.35, -0.05]}>
+        <boxGeometry args={[0.25, 0.1, 0.15]} />
+        <meshStandardMaterial color="#3D3D3D" />
+      </mesh>
+    </group>
+
+    {/* Microwave */}
+    <group position={[6.5, 0.5, -11.8]}>
+      <mesh position={[0, 0.2, 0]}>
+        <boxGeometry args={[0.6, 0.35, 0.4]} />
+        <meshStandardMaterial color="#3D3D3D" />
+      </mesh>
+      {/* Door */}
+      <mesh position={[-0.31, 0.2, 0]}>
+        <boxGeometry args={[0.01, 0.28, 0.32]} />
+        <meshStandardMaterial color="#4A4A4A" />
+      </mesh>
+    </group>
+
+    {/* Pizza boxes stacked on side counter */}
+    <group position={[0.5, 0.5, -9]}>
+      <mesh position={[0, 0.04, 0]}>
+        <boxGeometry args={[0.5, 0.06, 0.5]} />
+        <meshStandardMaterial color="#E8E8E8" />
+      </mesh>
+      <mesh position={[0, 0.1, 0]}>
+        <boxGeometry args={[0.5, 0.06, 0.5]} />
+        <meshStandardMaterial color="#CC3333" />
+      </mesh>
+      <mesh position={[0, 0.16, 0]}>
+        <boxGeometry args={[0.5, 0.06, 0.5]} />
+        <meshStandardMaterial color="#E8E8E8" />
+      </mesh>
+    </group>
+  </group>
 );
 
 // === LIVING ROOM FURNITURE ===
@@ -223,6 +323,8 @@ const Apartment = () => {
       <Wall position={[6.5, hy, -12]} size={[7, h, t]} />
 
       <KitchenIsland />
+      <Fridge />
+      <KitchenCounters />
 
       {/* === LIVING ROOM FURNITURE === */}
       <TV />
