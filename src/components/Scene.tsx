@@ -1136,7 +1136,8 @@ const MobileLayout = () => {
         background: "#0A0A15",
         border: "4px solid #1A1A1A",
         borderRadius: "8px",
-        aspectRatio: "4/3",
+        minHeight: selectedTape?.content.videoId ? "auto" : "200px",
+        maxHeight: selectedTape?.content.videoId ? "70vh" : "300px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -1160,27 +1161,82 @@ const MobileLayout = () => {
         {selectedTape ? (
           <div style={{
             width: "100%",
-            height: "100%",
             display: "flex",
             flexDirection: "column",
             position: "relative",
           }}>
+            {/* Close button */}
+            <div 
+              onClick={() => setSelectedTape(null)}
+              style={{ 
+                position: "absolute",
+                top: "8px",
+                right: "8px",
+                width: "28px",
+                height: "28px",
+                background: "rgba(0,0,0,0.7)",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: "16px",
+                color: "#FFF",
+                zIndex: 10,
+              }}>
+              ✕
+            </div>
+            
             {/* Video player or content */}
             {selectedTape.content.videoId ? (
-              <iframe
-                src={`https://drive.google.com/file/d/${selectedTape.content.videoId}/preview`}
-                style={{
+              <>
+                {/* 9:16 video container */}
+                <div style={{
                   width: "100%",
-                  height: "100%",
-                  border: "none",
-                }}
-                allow="autoplay"
-                allowFullScreen
-              />
+                  maxWidth: "280px",
+                  margin: "0 auto",
+                  aspectRatio: "9/16",
+                  background: "#000",
+                  borderRadius: "4px",
+                  overflow: "hidden",
+                }}>
+                  <iframe
+                    src={`https://drive.google.com/file/d/${selectedTape.content.videoId}/preview?autoplay=1`}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      border: "none",
+                    }}
+                    allow="autoplay; fullscreen"
+                    allowFullScreen
+                  />
+                </div>
+                {/* Description below video */}
+                <div style={{
+                  padding: "16px",
+                  maxHeight: "120px",
+                  overflow: "auto",
+                }}>
+                  <div style={{ 
+                    fontSize: "18px", 
+                    color: selectedTape.color,
+                    marginBottom: "6px",
+                    fontWeight: "bold",
+                  }}>
+                    {selectedTape.content.title}
+                  </div>
+                  <div style={{ 
+                    fontSize: "12px", 
+                    color: "#AAA", 
+                    lineHeight: "1.4",
+                  }}>
+                    {selectedTape.content.description}
+                  </div>
+                </div>
+              </>
             ) : (
               <div style={{
                 padding: "20px",
-                height: "100%",
                 display: "flex",
                 flexDirection: "column",
               }}>
@@ -1201,7 +1257,6 @@ const MobileLayout = () => {
                   fontSize: "14px", 
                   color: "#CCC", 
                   lineHeight: "1.5",
-                  flex: 1,
                   overflow: "auto",
                 }}>
                   {selectedTape.content.description}
@@ -1240,26 +1295,6 @@ const MobileLayout = () => {
                 )}
               </div>
             )}
-            {/* Close button */}
-            <div 
-              onClick={() => setSelectedTape(null)}
-              style={{ 
-                position: "absolute",
-                top: "8px",
-                right: "8px",
-                width: "28px",
-                height: "28px",
-                background: "rgba(0,0,0,0.7)",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                fontSize: "16px",
-                color: "#FFF",
-              }}>
-              ✕
-            </div>
           </div>
         ) : (
           <div style={{ color: "#333", fontSize: "18px" }}>
