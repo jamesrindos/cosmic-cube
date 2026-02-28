@@ -859,6 +859,48 @@ const BedroomClock = () => (
 
 // === LIVING ROOM ===
 
+// Animated TV Screen with static effect
+const TVScreen = () => {
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const [flickerIntensity, setFlickerIntensity] = useState(0.3);
+  
+  useFrame(({ clock }) => {
+    // Create static/flicker effect
+    const time = clock.getElapsedTime();
+    const flicker = 0.25 + Math.sin(time * 30) * 0.05 + Math.random() * 0.1;
+    setFlickerIntensity(flicker);
+    
+    if (materialRef.current) {
+      // Slight color shift for CRT effect
+      const hue = 185 + Math.sin(time * 2) * 5;
+      materialRef.current.emissive.setHSL(hue / 360, 0.8, 0.3);
+    }
+  });
+  
+  return (
+    <>
+      <mesh position={[-0.55, 0.95, 0]}>
+        <boxGeometry args={[0.08, 0.7, 0.9]} />
+        <meshStandardMaterial 
+          ref={materialRef}
+          color="#0A0A0F" 
+          emissive="#00D9FF" 
+          emissiveIntensity={flickerIntensity} 
+        />
+      </mesh>
+      {/* Scanlines overlay */}
+      <mesh position={[-0.54, 0.95, 0]}>
+        <boxGeometry args={[0.01, 0.68, 0.88]} />
+        <meshStandardMaterial 
+          color="#000000" 
+          transparent 
+          opacity={0.15}
+        />
+      </mesh>
+    </>
+  );
+};
+
 const RetroTV = () => (
   <group position={[9.5, 0, -4]}>
     {/* TV Stand / shelf unit */}
@@ -871,11 +913,8 @@ const RetroTV = () => (
       <boxGeometry args={[1.2, 0.9, 1.2]} />
       <meshStandardMaterial color="#2D2D3A" />
     </mesh>
-    {/* Screen (front face) - slightly recessed */}
-    <mesh position={[-0.55, 0.95, 0]}>
-      <boxGeometry args={[0.08, 0.7, 0.9]} />
-      <meshStandardMaterial color="#0A0A0F" emissive="#00D9FF" emissiveIntensity={0.3} />
-    </mesh>
+    {/* Animated TV Screen */}
+    <TVScreen />
     {/* Screen bezel */}
     <mesh position={[-0.6, 0.95, 0]}>
       <boxGeometry args={[0.02, 0.8, 1.0]} />
@@ -909,7 +948,7 @@ const RetroTV = () => (
       <cylinderGeometry args={[0.015, 0.01, 0.5, 4]} />
       <meshStandardMaterial color="#C0C0C0" />
     </mesh>
-    {/* Screen glow */}
+    {/* Screen glow - pulsing */}
     <pointLight position={[-1, 0.95, 0]} color="#00D9FF" intensity={0.6} distance={5} decay={2} />
   </group>
 );

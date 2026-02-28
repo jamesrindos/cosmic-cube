@@ -25,22 +25,24 @@
 
 ## 🎯 NEXT 6 HOURS
 
-### Hour 1-2: Interactive Foundation
-- [ ] Add click handlers infrastructure (React state + raycasting)
-- [ ] Rubik's cube animation (scramble → solve on click)
-- [ ] Guitar strum animation + position shift on click
+### Hour 1-2: Interactive Foundation ✅
+- [x] Add click handlers infrastructure (React state + raycasting)
+- [x] Rubik's cube animation (scramble → solve on click)
+- [x] Guitar strum animation + position shift on click
+- [x] VHS tape hover effects (glow/highlight, pop out)
 
-### Hour 3-4: VM Desktop Experience
-- [ ] Gaming desk monitor → mini Windows XP desktop
-- [ ] Desktop icons (Steam, ideas.txt, social apps)
-- [ ] Click icon → "window" opens with content
-- [ ] ideas.txt content (from BRIEF)
+### Hour 3-4: VM Desktop Experience ✅
+- [x] Gaming desk monitor → mini Windows XP desktop
+- [x] Desktop icons (Steam, ideas.txt, social apps)
+- [x] Click icon → "window" opens with content
+- [x] ideas.txt content (from BRIEF)
+- [x] XP-style taskbar with Start button + clock
 
 ### Hour 5: Polish & Details
 - [ ] TV screen content (static/test pattern when idle)
-- [ ] VHS tape hover effects (glow/highlight)
-- [ ] Add more wall texture/depth
-- [ ] Improve lighting for better ambiance
+- [ ] Add TV static animation
+- [ ] Improve ambient lighting
+- [ ] Add subtle animations (floating dust? fan shadows?)
 
 ### Hour 6: Documentation & PR
 - [ ] Update OVERNIGHT_CHANGES.md
