@@ -521,6 +521,42 @@ const GamingDesk = () => (
     <pointLight position={[1.5, 1.2, -0.3]} color="#7B68EE" intensity={0.6} distance={4} decay={2} />
     <pointLight position={[0, 1.2, 0.2]} color="#7B68EE" intensity={0.8} distance={4} decay={2} />
 
+    {/* === KEYBOARD & MOUSE === */}
+    {/* Large mousepad/desk mat */}
+    <mesh position={[0, 0.795, 0.1]}>
+      <boxGeometry args={[1.8, 0.01, 0.6]} />
+      <meshStandardMaterial color="#1A1A2E" />
+    </mesh>
+    {/* RGB edge on mousepad */}
+    <mesh position={[0, 0.796, 0.38]}>
+      <boxGeometry args={[1.75, 0.005, 0.02]} />
+      <meshStandardMaterial color="#7B68EE" emissive="#7B68EE" emissiveIntensity={0.3} />
+    </mesh>
+    
+    {/* Mechanical keyboard */}
+    <mesh position={[0, 0.82, 0.15]}>
+      <boxGeometry args={[0.45, 0.03, 0.15]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    {/* Keycaps (simplified) */}
+    <mesh position={[0, 0.835, 0.15]}>
+      <boxGeometry args={[0.42, 0.01, 0.12]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* RGB underglow on keyboard */}
+    <pointLight position={[0, 0.81, 0.15]} color="#7B68EE" intensity={0.2} distance={0.5} decay={2} />
+    
+    {/* Gaming mouse */}
+    <mesh position={[0.35, 0.815, 0.2]}>
+      <boxGeometry args={[0.06, 0.025, 0.1]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Mouse RGB */}
+    <mesh position={[0.35, 0.83, 0.18]}>
+      <boxGeometry args={[0.02, 0.005, 0.04]} />
+      <meshStandardMaterial color="#00D9FF" emissive="#00D9FF" emissiveIntensity={0.4} />
+    </mesh>
+
     {/* === RUBIK'S CUBE (prominent - per BRIEF, solves under a minute) === */}
     <mesh position={[0.5, 0.85, 0.1]}>
       <boxGeometry args={[0.14, 0.14, 0.14]} />
@@ -832,27 +868,46 @@ const BedroomClock = () => (
 );
 
 const Guitar = () => (
-  // Guitar leaning against left wall
+  // Guitar leaning against left wall - dusty cherry red (per BRIEF)
   <group position={[0.3, 0, -20]} rotation={[0, 0.1, 0.12]}>
+    {/* Guitar body - cherry red with slight dust (darker tone) */}
     <mesh position={[0, 0.6, 0]}>
       <boxGeometry args={[0.5, 0.8, 0.12]} />
-      <meshStandardMaterial color="#8B0000" />
+      <meshStandardMaterial color="#A52A2A" />
     </mesh>
+    {/* Guitar body lower bout - dusty cherry */}
     <mesh position={[0, 0.3, 0]}>
       <boxGeometry args={[0.55, 0.4, 0.1]} />
-      <meshStandardMaterial color="#8B0000" />
+      <meshStandardMaterial color="#A52A2A" />
     </mesh>
+    {/* Neck */}
     <mesh position={[0, 1.4, 0]}>
       <boxGeometry args={[0.12, 1.2, 0.06]} />
       <meshStandardMaterial color="#3D2E2E" />
     </mesh>
+    {/* Headstock */}
     <mesh position={[0, 2.05, 0]}>
       <boxGeometry args={[0.16, 0.2, 0.05]} />
       <meshStandardMaterial color="#1A1A1A" />
     </mesh>
+    {/* Sound hole */}
     <mesh position={[0, 0.55, -0.07]}>
       <boxGeometry args={[0.2, 0.2, 0.01]} />
       <meshStandardMaterial color="#0A0A0A" />
+    </mesh>
+    {/* Dust accumulation on top (lighter patches) */}
+    <mesh position={[0.1, 0.7, -0.065]} rotation={[0, 0, 0.2]}>
+      <boxGeometry args={[0.15, 0.1, 0.002]} />
+      <meshStandardMaterial color="#C4A484" transparent opacity={0.3} />
+    </mesh>
+    <mesh position={[-0.08, 0.45, -0.055]} rotation={[0, 0, -0.15]}>
+      <boxGeometry args={[0.1, 0.08, 0.002]} />
+      <meshStandardMaterial color="#C4A484" transparent opacity={0.25} />
+    </mesh>
+    {/* Strings (simplified) */}
+    <mesh position={[0, 1.0, -0.065]}>
+      <boxGeometry args={[0.08, 1.0, 0.005]} />
+      <meshStandardMaterial color="#D4AF37" />
     </mesh>
   </group>
 );
