@@ -128,6 +128,67 @@ const Fridge = () => (
       <boxGeometry args={[0.02, 0.25, 0.2]} />
       <meshStandardMaterial color="#404040" />
     </mesh>
+    
+    {/* === POLAROID PHOTOS / IG MAGNETS (per BRIEF) === */}
+    {/* Polaroid 1 - tilted */}
+    <group position={[0.47, 1.6, 0.2]} rotation={[0, 0, 0.1]}>
+      <mesh>
+        <boxGeometry args={[0.01, 0.12, 0.1]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      {/* Photo area */}
+      <mesh position={[0.006, 0.01, 0]}>
+        <boxGeometry args={[0.002, 0.08, 0.08]} />
+        <meshStandardMaterial color="#5DADE2" />
+      </mesh>
+    </group>
+    {/* Polaroid 2 */}
+    <group position={[0.47, 1.55, -0.1]} rotation={[0, 0, -0.08]}>
+      <mesh>
+        <boxGeometry args={[0.01, 0.12, 0.1]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      <mesh position={[0.006, 0.01, 0]}>
+        <boxGeometry args={[0.002, 0.08, 0.08]} />
+        <meshStandardMaterial color="#E74C3C" />
+      </mesh>
+    </group>
+    {/* Polaroid 3 */}
+    <group position={[0.47, 1.35, 0.25]} rotation={[0, 0, 0.15]}>
+      <mesh>
+        <boxGeometry args={[0.01, 0.12, 0.1]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      <mesh position={[0.006, 0.01, 0]}>
+        <boxGeometry args={[0.002, 0.08, 0.08]} />
+        <meshStandardMaterial color="#27AE60" />
+      </mesh>
+    </group>
+    {/* Polaroid 4 - overlapping */}
+    <group position={[0.47, 1.45, 0.05]} rotation={[0, 0, -0.05]}>
+      <mesh>
+        <boxGeometry args={[0.01, 0.12, 0.1]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      <mesh position={[0.006, 0.01, 0]}>
+        <boxGeometry args={[0.002, 0.08, 0.08]} />
+        <meshStandardMaterial color="#F39C12" />
+      </mesh>
+    </group>
+    
+    {/* Fridge magnets */}
+    <mesh position={[0.48, 1.7, 0.3]}>
+      <cylinderGeometry args={[0.025, 0.025, 0.01, 8]} />
+      <meshStandardMaterial color="#E91E63" />
+    </mesh>
+    <mesh position={[0.48, 1.3, -0.2]}>
+      <cylinderGeometry args={[0.025, 0.025, 0.01, 8]} />
+      <meshStandardMaterial color="#4CAF50" />
+    </mesh>
+    <mesh position={[0.48, 1.5, -0.25]}>
+      <boxGeometry args={[0.01, 0.05, 0.04]} />
+      <meshStandardMaterial color="#2196F3" />
+    </mesh>
   </group>
 );
 
@@ -1433,6 +1494,93 @@ const WallArt = () => (
   </group>
 );
 
+// Ceiling fan in living room (per BRIEF - subtle ceiling fan hum ambiance)
+const CeilingFan = () => {
+  const fanRef = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (fanRef.current) {
+      fanRef.current.rotation.y = clock.elapsedTime * 0.3;
+    }
+  });
+  
+  return (
+    <group position={[5, 2.9, -5]}>
+      {/* Motor housing */}
+      <mesh>
+        <cylinderGeometry args={[0.15, 0.2, 0.15, 8]} />
+        <meshStandardMaterial color="#5C4A3A" />
+      </mesh>
+      {/* Down rod */}
+      <mesh position={[0, 0.15, 0]}>
+        <cylinderGeometry args={[0.02, 0.02, 0.2, 6]} />
+        <meshStandardMaterial color="#5C4A3A" />
+      </mesh>
+      {/* Fan blades - rotating */}
+      <group ref={fanRef}>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <mesh key={i} position={[0, -0.05, 0]} rotation={[0, (i * Math.PI * 2) / 5, 0]}>
+            <mesh position={[0.5, 0, 0]} rotation={[0.1, 0, 0]}>
+              <boxGeometry args={[0.8, 0.02, 0.15]} />
+              <meshStandardMaterial color="#3D2E2E" />
+            </mesh>
+          </mesh>
+        ))}
+      </group>
+      {/* Light fixture */}
+      <mesh position={[0, -0.15, 0]}>
+        <sphereGeometry args={[0.12, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial color="#F5F5F5" side={2} />
+      </mesh>
+    </group>
+  );
+};
+
+// Bedroom floor clutter - clothes, etc (per BRIEF - "lived-in chaos, 24yo")
+const BedroomClutter = () => (
+  <group>
+    {/* T-shirt on floor */}
+    <mesh position={[3, 0.03, -19.5]} rotation={[-Math.PI / 2, 0, 0.3]}>
+      <boxGeometry args={[0.5, 0.4, 0.02]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    {/* Jeans crumpled */}
+    <mesh position={[2.5, 0.05, -20]} rotation={[-0.1, 0.5, 0]}>
+      <boxGeometry args={[0.35, 0.08, 0.6]} />
+      <meshStandardMaterial color="#1A3A5C" />
+    </mesh>
+    {/* Sock 1 */}
+    <mesh position={[4.5, 0.02, -18.5]} rotation={[0, 0.8, 0]}>
+      <boxGeometry args={[0.08, 0.03, 0.15]} />
+      <meshStandardMaterial color="#FFFFFF" />
+    </mesh>
+    {/* Sock 2 (not matching - realistic) */}
+    <mesh position={[4.8, 0.02, -19]} rotation={[0, -0.3, 0]}>
+      <boxGeometry args={[0.08, 0.03, 0.15]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Hoodie draped near bed */}
+    <mesh position={[6, 0.04, -19.5]} rotation={[-0.1, 0.2, 0]}>
+      <boxGeometry args={[0.5, 0.06, 0.6]} />
+      <meshStandardMaterial color="#8B4513" />
+    </mesh>
+    {/* Pillow that fell off bed */}
+    <mesh position={[4, 0.1, -19.8]} rotation={[0.2, 0.4, 0.1]}>
+      <boxGeometry args={[0.35, 0.12, 0.25]} />
+      <meshStandardMaterial color="#E8DCC8" />
+    </mesh>
+    {/* Book on floor */}
+    <mesh position={[3.5, 0.02, -22]} rotation={[0, 0.6, 0]}>
+      <boxGeometry args={[0.18, 0.025, 0.25]} />
+      <meshStandardMaterial color="#8B0000" />
+    </mesh>
+    {/* Water bottle */}
+    <mesh position={[2.8, 0.1, -21]}>
+      <cylinderGeometry args={[0.04, 0.04, 0.2, 8]} />
+      <meshStandardMaterial color="#87CEEB" transparent opacity={0.7} />
+    </mesh>
+  </group>
+);
+
 const PulsingLight = ({ position, color, intensity }: { position: [number, number, number]; color: string; intensity: number }) => {
   const lightRef = useRef<THREE.PointLight>(null);
   useFrame(({ clock }) => {
@@ -1498,6 +1646,7 @@ const Apartment = () => {
       <GamingDesk />
       <GamingChair />
       <Guitar />
+      <BedroomClutter />
 
       {/* === KITCHEN === */}
       <KitchenIsland />
@@ -1516,6 +1665,7 @@ const Apartment = () => {
       <VHSShelf />
       <Couch />
       <CoffeeTable />
+      <CeilingFan />
 
       {/* === WALL DECORATIONS === */}
       <WallArt />
