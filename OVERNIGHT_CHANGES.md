@@ -1,8 +1,8 @@
 # 🏠 Overnight Polish Report - Cosmic Cube
 
 **Branch:** `ace/apartment-polish`  
-**Commits:** 17  
-**Date:** Feb 28, 2026 (Final Update 06:15 UTC)
+**Commits:** 25  
+**Date:** Feb 28, 2026 (Final Update 07:30 UTC)
 
 ---
 
@@ -192,7 +192,7 @@ Other:
 
 ## Summary of All Changes
 
-**Total commits this branch:** 17
+**Total commits this branch:** 25
 
 ### From BRIEF Now Implemented:
 - ✅ Layout matches reference diagram (couch left, TV right)
@@ -214,12 +214,63 @@ Other:
 - ✅ Gaming keyboard + mouse with RGB
 - ✅ Large desk mat/mousepad with RGB edge
 - ✅ Dusty cherry red guitar with strings
+- ✅ **INTERACTIVE** Rubik's cube (click to solve!)
+- ✅ **INTERACTIVE** Guitar (click to strum!)
+- ✅ **INTERACTIVE** VHS tapes (hover effects)
+- ✅ **VM DESKTOP** Windows XP style on monitor
+- ✅ ideas.txt window with actual content
+- ✅ Social links (Twitter, IG, LinkedIn, YouTube)
+- ✅ Steam window with recently played
+- ✅ Animated TV static/CRT effect
+
+---
+
+## Interactive Features Added (07:00 UTC)
+
+### Clickable Rubik's Cube ✅
+- Click to watch it spin and "solve"
+- Color faces swap between scrambled/solved
+- Hover glow effect
+- Scale up on hover
+
+### Clickable Guitar ✅
+- Click to "strum" (wobble animation)
+- Strings glow during strum
+- Decaying oscillation physics
+- Hover color shift
+
+### Interactive VHS Tapes ✅
+- Hover to highlight (glow effect)
+- Pop out slightly when hovered
+- Foundation for future click-to-play
+
+### VM Desktop Experience ✅
+- Windows XP style desktop on center monitor
+- 6 clickable icons:
+  - 🎮 Steam (recently played games)
+  - 📝 ideas.txt (actual content from BRIEF)
+  - 🐦 Twitter (@slimjimm318)
+  - 📸 Instagram (@jamesrindos)
+  - 💼 LinkedIn (profile link)
+  - 📺 YouTube (@jackacetalks)
+- XP-style windows open when clicked
+- Title bar, close button, window chrome
+- Taskbar with Start button + live clock
+- All icons/windows work independently
+
+### Animated TV Screen ✅
+- CRT static/flicker effect
+- Color hue shifting
+- Scanlines overlay
+- Pulsing intensity
+
+---
 
 ### Still Could Add (Future):
-- Interactive Rubik's cube that solves on click
-- Guitar that strums on click
-- VHS tape interactions (click to "play")
+- VHS tape → plays on TV when clicked
 - Sound effects
+- Letterboxd integration
+- Mobile responsive version
 
 ---
 
