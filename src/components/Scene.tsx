@@ -351,10 +351,25 @@ const Nightstand = () => (
     </mesh>
     {/* Lamp glow */}
     <pointLight position={[0, 0.85, 0]} color="#FFF5E6" intensity={0.3} distance={2} decay={2} />
-    {/* Phone on nightstand */}
+    {/* Phone on nightstand - charging */}
     <mesh position={[-0.12, 0.52, 0.1]} rotation={[0, 0.2, 0]}>
       <boxGeometry args={[0.08, 0.01, 0.15]} />
       <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Charging cable */}
+    <mesh position={[-0.12, 0.51, 0.02]}>
+      <boxGeometry args={[0.01, 0.01, 0.1]} />
+      <meshStandardMaterial color="#FFFFFF" />
+    </mesh>
+    {/* Cable going to wall */}
+    <mesh position={[-0.3, 0.3, -0.1]} rotation={[0.3, 0, -0.2]}>
+      <boxGeometry args={[0.01, 0.5, 0.01]} />
+      <meshStandardMaterial color="#FFFFFF" />
+    </mesh>
+    {/* Wall outlet */}
+    <mesh position={[-0.48, 0.3, 0]}>
+      <boxGeometry args={[0.02, 0.08, 0.05]} />
+      <meshStandardMaterial color="#F5F5F5" />
     </mesh>
     {/* Alarm clock */}
     <mesh position={[0.12, 0.54, -0.08]}>
@@ -417,24 +432,87 @@ const GamingDesk = () => (
     <pointLight position={[1.5, 1.2, -0.3]} color="#7B68EE" intensity={0.6} distance={4} decay={2} />
     <pointLight position={[0, 1.2, 0.2]} color="#7B68EE" intensity={0.8} distance={4} decay={2} />
 
-    {/* Rubik's cube */}
+    {/* === RUBIK'S CUBE (prominent - per BRIEF, solves under a minute) === */}
     <mesh position={[0.5, 0.85, 0.1]}>
-      <boxGeometry args={[0.12, 0.12, 0.12]} />
+      <boxGeometry args={[0.14, 0.14, 0.14]} />
       <meshStandardMaterial color="#CC3333" />
     </mesh>
-    {/* Collectible figures */}
-    <mesh position={[-0.6, 0.85, 0.15]}>
-      <boxGeometry args={[0.08, 0.15, 0.08]} />
+    {/* Cube face colors */}
+    <mesh position={[0.57, 0.85, 0.1]}>
+      <boxGeometry args={[0.01, 0.12, 0.12]} />
+      <meshStandardMaterial color="#FFFFFF" />
+    </mesh>
+    <mesh position={[0.5, 0.92, 0.1]}>
+      <boxGeometry args={[0.12, 0.01, 0.12]} />
       <meshStandardMaterial color="#FFD700" />
     </mesh>
-    <mesh position={[-0.45, 0.85, 0.2]}>
-      <boxGeometry args={[0.06, 0.18, 0.06]} />
-      <meshStandardMaterial color="#FF6B35" />
+    <mesh position={[0.5, 0.85, 0.17]}>
+      <boxGeometry args={[0.12, 0.12, 0.01]} />
+      <meshStandardMaterial color="#27AE60" />
     </mesh>
+    
+    {/* === McDONALD'S TOYS (per BRIEF - new + vintage) === */}
+    {/* Happy Meal toy 1 - character figure */}
+    <mesh position={[-0.6, 0.85, 0.15]}>
+      <boxGeometry args={[0.06, 0.12, 0.05]} />
+      <meshStandardMaterial color="#FFD700" />
+    </mesh>
+    <mesh position={[-0.6, 0.94, 0.15]}>
+      <sphereGeometry args={[0.035, 6, 6]} />
+      <meshStandardMaterial color="#FFEB3B" />
+    </mesh>
+    {/* Happy Meal toy 2 - vehicle */}
+    <mesh position={[-0.45, 0.83, 0.2]}>
+      <boxGeometry args={[0.1, 0.05, 0.06]} />
+      <meshStandardMaterial color="#E53935" />
+    </mesh>
+    <mesh position={[-0.43, 0.81, 0.18]}>
+      <cylinderGeometry args={[0.015, 0.015, 0.02, 6]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    <mesh position={[-0.47, 0.81, 0.22]}>
+      <cylinderGeometry args={[0.015, 0.015, 0.02, 6]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Vintage Happy Meal box (tiny) */}
+    <mesh position={[-0.75, 0.82, 0.25]}>
+      <boxGeometry args={[0.06, 0.08, 0.05]} />
+      <meshStandardMaterial color="#E53935" />
+    </mesh>
+    <mesh position={[-0.75, 0.87, 0.25]}>
+      <boxGeometry args={[0.05, 0.02, 0.04]} />
+      <meshStandardMaterial color="#FFD700" />
+    </mesh>
+    
+    {/* === PEZ DISPENSERS (per BRIEF) === */}
+    {/* Pez 1 */}
     <mesh position={[-0.3, 0.85, 0.12]}>
-      <boxGeometry args={[0.07, 0.13, 0.07]} />
+      <boxGeometry args={[0.03, 0.12, 0.025]} />
+      <meshStandardMaterial color="#2196F3" />
+    </mesh>
+    <mesh position={[-0.3, 0.94, 0.12]}>
+      <boxGeometry args={[0.04, 0.05, 0.04]} />
+      <meshStandardMaterial color="#E91E63" />
+    </mesh>
+    {/* Pez 2 */}
+    <mesh position={[-0.25, 0.85, 0.18]}>
+      <boxGeometry args={[0.03, 0.12, 0.025]} />
+      <meshStandardMaterial color="#FF9800" />
+    </mesh>
+    <mesh position={[-0.25, 0.94, 0.18]}>
+      <boxGeometry args={[0.04, 0.05, 0.04]} />
       <meshStandardMaterial color="#4CAF50" />
     </mesh>
+    {/* Pez 3 */}
+    <mesh position={[-0.35, 0.85, 0.2]}>
+      <boxGeometry args={[0.03, 0.12, 0.025]} />
+      <meshStandardMaterial color="#9C27B0" />
+    </mesh>
+    <mesh position={[-0.35, 0.94, 0.2]}>
+      <boxGeometry args={[0.04, 0.05, 0.04]} />
+      <meshStandardMaterial color="#FFD700" />
+    </mesh>
+    
     {/* Energy drink cans */}
     <mesh position={[0.9, 0.83, 0.2]}>
       <cylinderGeometry args={[0.03, 0.03, 0.12, 6]} />
@@ -443,6 +521,16 @@ const GamingDesk = () => (
     <mesh position={[1.0, 0.83, 0.15]}>
       <cylinderGeometry args={[0.03, 0.03, 0.12, 6]} />
       <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    <mesh position={[0.85, 0.83, 0.28]}>
+      <cylinderGeometry args={[0.03, 0.03, 0.12, 6]} />
+      <meshStandardMaterial color="#00BCD4" />
+    </mesh>
+    
+    {/* Stray cable/headphone cord */}
+    <mesh position={[0.7, 0.8, 0.3]} rotation={[0.2, 0.5, 0.1]}>
+      <boxGeometry args={[0.01, 0.25, 0.01]} />
+      <meshStandardMaterial color="#1A1A1A" />
     </mesh>
   </group>
 );
@@ -724,54 +812,119 @@ const RetroTV = () => (
   </group>
 );
 
-const VHSShelf = () => (
-  <group position={[9.6, 0.75, -6.5]}>
-    <mesh position={[0, 0, -0.55]}>
-      <boxGeometry args={[0.3, 1.5, 0.05]} />
-      <meshStandardMaterial color="#3D2E2E" />
-    </mesh>
-    <mesh position={[0, 0, 0.55]}>
-      <boxGeometry args={[0.3, 1.5, 0.05]} />
-      <meshStandardMaterial color="#3D2E2E" />
-    </mesh>
-    {[-0.5, 0, 0.5].map((y, i) => (
-      <mesh key={i} position={[0, y, 0]}>
-        <boxGeometry args={[0.3, 0.05, 1.1]} />
+const VHSShelf = () => {
+  // 14 VHS tapes with brand colors (per BRIEF portfolio)
+  const vhsTapes = [
+    { color: "#FFD700", label: "#1A1A1A" }, // MoziWash (gold/billboard)
+    { color: "#2196F3", label: "#FFFFFF" }, // Audien Hearing (blue)
+    { color: "#FF5722", label: "#FFFFFF" }, // Boldebottle (orange)
+    { color: "#FFEB3B", label: "#1A1A1A" }, // Sunflower Vol 1 (yellow)
+    { color: "#FFC107", label: "#1A1A1A" }, // Sunflower Vol 2 (amber)
+    { color: "#4CAF50", label: "#FFFFFF" }, // Dirtea (green/tea)
+    { color: "#3F51B5", label: "#FFFFFF" }, // DSC (blue)
+    { color: "#9C27B0", label: "#FFFFFF" }, // GetMTE (purple)
+    { color: "#1A1A1A", label: "#FFD700" }, // JB (black/gold)
+    { color: "#E91E63", label: "#FFFFFF" }, // Kalshi (pink)
+    { color: "#FF9800", label: "#8B4513" }, // Moe's (orange/brown)
+    { color: "#795548", label: "#FFFFFF" }, // MudWTR (brown/earthy)
+    { color: "#0D47A1", label: "#E53935" }, // Political (blue/red)
+    { color: "#607D8B", label: "#FFFFFF" }, // Extra slot
+  ];
+
+  return (
+    <group position={[9.6, 0.75, -6.5]}>
+      {/* Shelf frame */}
+      <mesh position={[0, 0, -0.55]}>
+        <boxGeometry args={[0.3, 1.5, 0.05]} />
         <meshStandardMaterial color="#3D2E2E" />
       </mesh>
-    ))}
-    {/* VHS tapes with colorful labels */}
-    {[-0.25, 0.25].map((y, row) =>
-      [-0.4, -0.22, -0.04, 0.14, 0.32].map((z, col) => (
-        <mesh key={`${row}-${col}`} position={[0, y, z]}>
-          <boxGeometry args={[0.15, 0.18, 0.1]} />
-          <meshStandardMaterial color={["#1a1a3e", "#8B0000", "#1a3a2e", "#3e1a3a", "#2a2a1e"][col]} />
+      <mesh position={[0, 0, 0.55]}>
+        <boxGeometry args={[0.3, 1.5, 0.05]} />
+        <meshStandardMaterial color="#3D2E2E" />
+      </mesh>
+      {/* Shelf levels */}
+      {[-0.5, 0, 0.5].map((y, i) => (
+        <mesh key={i} position={[0, y, 0]}>
+          <boxGeometry args={[0.3, 0.05, 1.1]} />
+          <meshStandardMaterial color="#3D2E2E" />
         </mesh>
-      ))
-    )}
-    {/* Game console on bottom shelf */}
-    <mesh position={[0, -0.65, 0]}>
-      <boxGeometry args={[0.25, 0.08, 0.35]} />
-      <meshStandardMaterial color="#1A1A1A" />
-    </mesh>
-    {/* Controller */}
-    <mesh position={[0.02, -0.58, 0.25]}>
-      <boxGeometry args={[0.12, 0.03, 0.08]} />
-      <meshStandardMaterial color="#2D2D2D" />
-    </mesh>
-  </group>
-);
+      ))}
+      
+      {/* VHS tapes - row 1 (top shelf) */}
+      {vhsTapes.slice(0, 7).map((tape, i) => (
+        <group key={`top-${i}`} position={[0, 0.25, -0.4 + i * 0.14]}>
+          {/* Tape body */}
+          <mesh>
+            <boxGeometry args={[0.15, 0.18, 0.1]} />
+            <meshStandardMaterial color="#1A1A1A" />
+          </mesh>
+          {/* Label */}
+          <mesh position={[-0.076, 0, 0]}>
+            <boxGeometry args={[0.01, 0.14, 0.08]} />
+            <meshStandardMaterial color={tape.color} />
+          </mesh>
+          {/* Label stripe */}
+          <mesh position={[-0.078, 0.04, 0]}>
+            <boxGeometry args={[0.005, 0.03, 0.06]} />
+            <meshStandardMaterial color={tape.label} />
+          </mesh>
+        </group>
+      ))}
+      
+      {/* VHS tapes - row 2 (middle shelf) */}
+      {vhsTapes.slice(7, 14).map((tape, i) => (
+        <group key={`mid-${i}`} position={[0, -0.25, -0.4 + i * 0.14]}>
+          {/* Tape body */}
+          <mesh>
+            <boxGeometry args={[0.15, 0.18, 0.1]} />
+            <meshStandardMaterial color="#1A1A1A" />
+          </mesh>
+          {/* Label */}
+          <mesh position={[-0.076, 0, 0]}>
+            <boxGeometry args={[0.01, 0.14, 0.08]} />
+            <meshStandardMaterial color={tape.color} />
+          </mesh>
+          {/* Label stripe */}
+          <mesh position={[-0.078, 0.04, 0]}>
+            <boxGeometry args={[0.005, 0.03, 0.06]} />
+            <meshStandardMaterial color={tape.label} />
+          </mesh>
+        </group>
+      ))}
+      
+      {/* Game console on bottom shelf */}
+      <mesh position={[0, -0.65, 0]}>
+        <boxGeometry args={[0.25, 0.08, 0.35]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      {/* Controller */}
+      <mesh position={[0.02, -0.58, 0.25]}>
+        <boxGeometry args={[0.12, 0.03, 0.08]} />
+        <meshStandardMaterial color="#2D2D2D" />
+      </mesh>
+      {/* Controller cable */}
+      <mesh position={[-0.05, -0.6, 0.1]} rotation={[0, 0.3, 0]}>
+        <boxGeometry args={[0.01, 0.01, 0.2]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+    </group>
+  );
+};
 
 const Couch = () => (
-  <group position={[7.5, 0, -4]} rotation={[0, -Math.PI / 2, 0]}>
+  // Couch on LEFT side of living room, facing TV on right (per reference diagram)
+  <group position={[1.5, 0, -4]} rotation={[0, Math.PI / 2, 0]}>
+    {/* Main seat */}
     <mesh position={[0, 0.3, 0]}>
       <boxGeometry args={[2.5, 0.4, 1.2]} />
       <meshStandardMaterial color="#2D2D3A" />
     </mesh>
+    {/* Backrest - against left wall */}
     <mesh position={[0, 0.7, -0.5]}>
       <boxGeometry args={[2.5, 0.5, 0.2]} />
       <meshStandardMaterial color="#2D2D3A" />
     </mesh>
+    {/* Armrests */}
     <mesh position={[-1.15, 0.55, 0]}>
       <boxGeometry args={[0.2, 0.7, 1.2]} />
       <meshStandardMaterial color="#2D2D3A" />
@@ -780,7 +933,7 @@ const Couch = () => (
       <boxGeometry args={[0.2, 0.7, 1.2]} />
       <meshStandardMaterial color="#2D2D3A" />
     </mesh>
-    {/* Hoodie */}
+    {/* Hoodie draped over armrest */}
     <mesh position={[1.15, 0.95, 0.1]}>
       <boxGeometry args={[0.35, 0.12, 0.8]} />
       <meshStandardMaterial color="#9B8AC4" />
@@ -794,10 +947,15 @@ const Couch = () => (
       <boxGeometry args={[1, 0.1, 1]} />
       <meshStandardMaterial color="#353548" />
     </mesh>
-    {/* Throw pillow */}
+    {/* Throw pillow - orange */}
     <mesh position={[-0.8, 0.65, 0.15]} rotation={[0.1, 0.3, 0.15]}>
       <boxGeometry args={[0.35, 0.25, 0.1]} />
       <meshStandardMaterial color="#E67E22" />
+    </mesh>
+    {/* Throw pillow - teal */}
+    <mesh position={[0.6, 0.68, 0.2]} rotation={[0.05, -0.2, 0.1]}>
+      <boxGeometry args={[0.3, 0.22, 0.1]} />
+      <meshStandardMaterial color="#1ABC9C" />
     </mesh>
     {/* Throw blanket draped */}
     <mesh position={[0.3, 0.58, 0.45]} rotation={[0.4, 0, 0.1]}>
@@ -808,36 +966,73 @@ const Couch = () => (
 );
 
 const CoffeeTable = () => (
-  <group position={[8.2, 0, -4]}>
+  // Coffee table in CENTER of living room (between couch and TV)
+  <group position={[5, 0, -4]}>
+    {/* Table top */}
     <mesh position={[0, 0.4, 0]}>
-      <boxGeometry args={[0.8, 0.08, 1.5]} />
+      <boxGeometry args={[1.2, 0.08, 1.8]} />
       <meshStandardMaterial color="#3D2E2E" />
     </mesh>
-    {[[-0.3, -0.6], [-0.3, 0.6], [0.3, -0.6], [0.3, 0.6]].map(([x, z], i) => (
+    {/* Table legs */}
+    {[[-0.5, -0.75], [-0.5, 0.75], [0.5, -0.75], [0.5, 0.75]].map(([x, z], i) => (
       <mesh key={i} position={[x, 0.2, z]}>
         <boxGeometry args={[0.08, 0.35, 0.08]} />
         <meshStandardMaterial color="#2D2020" />
       </mesh>
     ))}
     {/* Remote control */}
-    <mesh position={[0.15, 0.46, 0.2]} rotation={[0, 0.3, 0]}>
+    <mesh position={[0.35, 0.46, 0.3]} rotation={[0, 0.3, 0]}>
       <boxGeometry args={[0.15, 0.02, 0.05]} />
       <meshStandardMaterial color="#1A1A1A" />
     </mesh>
     {/* Coffee mug */}
-    <mesh position={[-0.2, 0.48, -0.3]}>
+    <mesh position={[-0.3, 0.48, -0.5]}>
       <cylinderGeometry args={[0.04, 0.035, 0.08, 8]} />
       <meshStandardMaterial color="#E8E0D0" />
     </mesh>
     {/* Coaster */}
-    <mesh position={[-0.2, 0.44, -0.3]}>
+    <mesh position={[-0.3, 0.44, -0.5]}>
       <cylinderGeometry args={[0.06, 0.06, 0.01, 8]} />
       <meshStandardMaterial color="#5C4A3A" />
     </mesh>
-    {/* Magazine/book */}
-    <mesh position={[0.1, 0.45, -0.4]} rotation={[0, -0.2, 0]}>
-      <boxGeometry args={[0.2, 0.02, 0.28]} />
-      <meshStandardMaterial color="#CC3333" />
+    
+    {/* INVINCIBLE coffee table book (per BRIEF) */}
+    <group position={[-0.1, 0.45, 0.2]}>
+      {/* Book */}
+      <mesh rotation={[0, 0.15, 0]}>
+        <boxGeometry args={[0.35, 0.04, 0.45]} />
+        <meshStandardMaterial color="#FFD700" />
+      </mesh>
+      {/* Red accent on cover (Invincible logo area) */}
+      <mesh position={[0, 0.022, 0]} rotation={[0, 0.15, 0]}>
+        <boxGeometry args={[0.2, 0.002, 0.25]} />
+        <meshStandardMaterial color="#E74C3C" />
+      </mesh>
+    </group>
+    
+    {/* Letterboxd notebook (per BRIEF) */}
+    <group position={[0.25, 0.45, -0.2]}>
+      {/* Notebook */}
+      <mesh rotation={[0, -0.25, 0]}>
+        <boxGeometry args={[0.18, 0.025, 0.25]} />
+        <meshStandardMaterial color="#1A1A2E" />
+      </mesh>
+      {/* Orange Letterboxd stripe */}
+      <mesh position={[0, 0.014, 0]} rotation={[0, -0.25, 0]}>
+        <boxGeometry args={[0.04, 0.002, 0.24]} />
+        <meshStandardMaterial color="#FF8000" />
+      </mesh>
+      {/* Pen on top */}
+      <mesh position={[0.12, 0.04, 0]} rotation={[0, -0.1, 0]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.15, 6]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+    </group>
+    
+    {/* Another book stacked */}
+    <mesh position={[-0.15, 0.48, 0.15]} rotation={[0, 0.4, 0]}>
+      <boxGeometry args={[0.22, 0.025, 0.3]} />
+      <meshStandardMaterial color="#2D3436" />
     </mesh>
   </group>
 );
@@ -898,42 +1093,230 @@ const FrontDoor = () => (
         <meshStandardMaterial color="#A0A0A0" />
       </mesh>
     </group>
+    
+    {/* === CONTACT STICKY NOTE on door (per BRIEF) === */}
+    {/* "out for a walk. leave me an email at jamesrindos1@gmail.com" */}
+    <group position={[0.08, 1.5, 0.08]}>
+      {/* Yellow sticky note */}
+      <mesh rotation={[0, 0, 0.05]}>
+        <boxGeometry args={[0.2, 0.15, 0.005]} />
+        <meshStandardMaterial color="#FFEB3B" />
+      </mesh>
+      {/* "Writing" lines on note */}
+      <mesh position={[0, 0.03, 0.003]} rotation={[0, 0, 0.05]}>
+        <boxGeometry args={[0.15, 0.008, 0.001]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      <mesh position={[0, 0.01, 0.003]} rotation={[0, 0, 0.05]}>
+        <boxGeometry args={[0.14, 0.008, 0.001]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      <mesh position={[0, -0.01, 0.003]} rotation={[0, 0, 0.05]}>
+        <boxGeometry args={[0.16, 0.008, 0.001]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      <mesh position={[0, -0.03, 0.003]} rotation={[0, 0, 0.05]}>
+        <boxGeometry args={[0.12, 0.008, 0.001]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      <mesh position={[-0.02, -0.05, 0.003]} rotation={[0, 0, 0.05]}>
+        <boxGeometry args={[0.1, 0.008, 0.001]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+    </group>
   </group>
 );
 
-// Wall decorations
+// Wall decorations - specific posters from BRIEF
 const WallArt = () => (
   <group>
-    {/* Bedroom poster - gaming/anime style */}
-    <group position={[4, 1.8, -24.9]}>
+    {/* === BEDROOM WALL POSTERS (back wall) === */}
+    
+    {/* Scott Pilgrim vs the World poster */}
+    <group position={[2.5, 1.8, -24.9]}>
       <mesh>
-        <boxGeometry args={[1.2, 1.6, 0.02]} />
-        <meshStandardMaterial color="#1A1A2E" />
+        <boxGeometry args={[0.9, 1.3, 0.02]} />
+        <meshStandardMaterial color="#1A1A1A" />
       </mesh>
-      {/* Poster art - abstract shapes */}
-      <mesh position={[0, 0.2, 0.02]}>
-        <boxGeometry args={[0.8, 0.6, 0.01]} />
-        <meshStandardMaterial color="#E94560" />
+      {/* Pink/magenta dominant colors */}
+      <mesh position={[0, 0.1, 0.015]}>
+        <boxGeometry args={[0.75, 0.5, 0.01]} />
+        <meshStandardMaterial color="#E91E63" />
       </mesh>
-      <mesh position={[-0.2, -0.3, 0.02]}>
-        <boxGeometry args={[0.3, 0.4, 0.01]} />
-        <meshStandardMaterial color="#533483" />
+      <mesh position={[0, -0.35, 0.015]}>
+        <boxGeometry args={[0.75, 0.4, 0.01]} />
+        <meshStandardMaterial color="#2196F3" />
       </mesh>
-      <mesh position={[0.25, -0.35, 0.02]}>
-        <boxGeometry args={[0.4, 0.3, 0.01]} />
-        <meshStandardMaterial color="#0F3460" />
+      <mesh position={[0.15, 0.35, 0.02]}>
+        <boxGeometry args={[0.3, 0.2, 0.01]} />
+        <meshStandardMaterial color="#FFEB3B" />
       </mesh>
     </group>
 
-    {/* Bedroom poster 2 - smaller */}
-    <group position={[6.5, 1.6, -24.9]}>
+    {/* Into the Spider-Verse poster */}
+    <group position={[4, 1.8, -24.9]}>
       <mesh>
-        <boxGeometry args={[0.8, 1.0, 0.02]} />
-        <meshStandardMaterial color="#2D2D3A" />
+        <boxGeometry args={[0.9, 1.3, 0.02]} />
+        <meshStandardMaterial color="#0D0D0F" />
       </mesh>
-      <mesh position={[0, 0, 0.02]}>
-        <boxGeometry args={[0.6, 0.8, 0.01]} />
-        <meshStandardMaterial color="#7B68EE" emissive="#7B68EE" emissiveIntensity={0.1} />
+      {/* Red/blue Spider-Man colors */}
+      <mesh position={[0, 0.2, 0.015]}>
+        <boxGeometry args={[0.4, 0.6, 0.01]} />
+        <meshStandardMaterial color="#E53935" />
+      </mesh>
+      <mesh position={[-0.2, -0.2, 0.015]}>
+        <boxGeometry args={[0.35, 0.4, 0.01]} />
+        <meshStandardMaterial color="#1E88E5" />
+      </mesh>
+      {/* Halftone dots effect */}
+      {[[-0.25, 0.4], [0.25, 0.35], [-0.15, -0.45], [0.3, -0.4]].map(([x, y], i) => (
+        <mesh key={i} position={[x, y, 0.02]}>
+          <circleGeometry args={[0.05, 6]} />
+          <meshStandardMaterial color="#FF4081" />
+        </mesh>
+      ))}
+    </group>
+
+    {/* Whiplash poster */}
+    <group position={[5.5, 1.8, -24.9]}>
+      <mesh>
+        <boxGeometry args={[0.8, 1.2, 0.02]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      {/* Yellow/gold dominant */}
+      <mesh position={[0, 0, 0.015]}>
+        <boxGeometry args={[0.65, 0.9, 0.01]} />
+        <meshStandardMaterial color="#F9A825" />
+      </mesh>
+      {/* Cymbal silhouette */}
+      <mesh position={[0, 0.15, 0.02]} rotation={[0, 0, 0]}>
+        <circleGeometry args={[0.2, 12]} />
+        <meshStandardMaterial color="#5D4037" />
+      </mesh>
+    </group>
+
+    {/* Babylon poster - smaller */}
+    <group position={[6.8, 1.6, -24.9]}>
+      <mesh>
+        <boxGeometry args={[0.7, 1.0, 0.02]} />
+        <meshStandardMaterial color="#0D0D0F" />
+      </mesh>
+      {/* Gold/art deco style */}
+      <mesh position={[0, 0, 0.015]}>
+        <boxGeometry args={[0.55, 0.8, 0.01]} />
+        <meshStandardMaterial color="#D4AF37" />
+      </mesh>
+      <mesh position={[0, 0.2, 0.02]}>
+        <boxGeometry args={[0.4, 0.25, 0.01]} />
+        <meshStandardMaterial color="#8B0000" />
+      </mesh>
+    </group>
+
+    {/* === LEFT WALL (bedroom) - Music posters === */}
+    
+    {/* Tyler the Creator poster */}
+    <group position={[0.06, 1.8, -22]}>
+      <mesh>
+        <boxGeometry args={[0.02, 1.0, 0.8]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      {/* Colorful IGOR/CMIYGL vibes */}
+      <mesh position={[0.015, 0, 0]}>
+        <boxGeometry args={[0.01, 0.8, 0.6]} />
+        <meshStandardMaterial color="#E91E63" />
+      </mesh>
+      <mesh position={[0.02, 0.2, 0.15]}>
+        <boxGeometry args={[0.01, 0.35, 0.25]} />
+        <meshStandardMaterial color="#4CAF50" />
+      </mesh>
+      <mesh position={[0.02, -0.15, -0.1]}>
+        <boxGeometry args={[0.01, 0.3, 0.2]} />
+        <meshStandardMaterial color="#FF9800" />
+      </mesh>
+    </group>
+
+    {/* Elliott Smith poster */}
+    <group position={[0.06, 1.5, -20]}>
+      <mesh>
+        <boxGeometry args={[0.02, 0.8, 0.6]} />
+        <meshStandardMaterial color="#F5F5DC" />
+      </mesh>
+      {/* Muted, melancholic tones */}
+      <mesh position={[0.015, 0, 0]}>
+        <boxGeometry args={[0.01, 0.6, 0.45]} />
+        <meshStandardMaterial color="#708090" />
+      </mesh>
+    </group>
+
+    {/* Djo poster (Joe Keery's band) */}
+    <group position={[0.06, 1.8, -23.5]}>
+      <mesh>
+        <boxGeometry args={[0.02, 0.9, 0.7]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      {/* Retro synth-wave colors */}
+      <mesh position={[0.015, 0.1, 0]}>
+        <boxGeometry args={[0.01, 0.4, 0.55]} />
+        <meshStandardMaterial color="#FF6B6B" />
+      </mesh>
+      <mesh position={[0.02, -0.2, 0]}>
+        <boxGeometry args={[0.01, 0.3, 0.5]} />
+        <meshStandardMaterial color="#4ECDC4" />
+      </mesh>
+    </group>
+
+    {/* Geese (band) poster */}
+    <group position={[7.94, 1.6, -22]}>
+      <mesh>
+        <boxGeometry args={[0.02, 0.8, 0.6]} />
+        <meshStandardMaterial color="#2D2D2D" />
+      </mesh>
+      {/* Raw, energetic rock aesthetic */}
+      <mesh position={[-0.015, 0, 0]}>
+        <boxGeometry args={[0.01, 0.6, 0.45]} />
+        <meshStandardMaterial color="#8B4513" />
+      </mesh>
+      <mesh position={[-0.02, 0.15, 0.1]}>
+        <boxGeometry args={[0.01, 0.25, 0.2]} />
+        <meshStandardMaterial color="#DAA520" />
+      </mesh>
+    </group>
+
+    {/* Critical Role poster */}
+    <group position={[7.94, 1.6, -23.5]}>
+      <mesh>
+        <boxGeometry args={[0.02, 1.0, 0.7]} />
+        <meshStandardMaterial color="#1A1A2E" />
+      </mesh>
+      {/* D&D fantasy colors - red, gold, dark */}
+      <mesh position={[-0.015, 0.2, 0]}>
+        <boxGeometry args={[0.01, 0.5, 0.55]} />
+        <meshStandardMaterial color="#8B0000" />
+      </mesh>
+      <mesh position={[-0.02, 0, 0.15]}>
+        <boxGeometry args={[0.01, 0.35, 0.2]} />
+        <meshStandardMaterial color="#FFD700" />
+      </mesh>
+      <mesh position={[-0.02, -0.25, -0.1]}>
+        <boxGeometry args={[0.01, 0.2, 0.25]} />
+        <meshStandardMaterial color="#4B0082" />
+      </mesh>
+    </group>
+
+    {/* Marty Supreme poster (new movie) - smaller, above desk area */}
+    <group position={[1.5, 2.2, -17.1]}>
+      <mesh rotation={[0, Math.PI / 4, 0]}>
+        <boxGeometry args={[0.6, 0.8, 0.02]} />
+        <meshStandardMaterial color="#0D0D0F" />
+      </mesh>
+      {/* Timothée Chalamet vibes - muted, stylish */}
+      <mesh position={[0, 0, 0.015]} rotation={[0, Math.PI / 4, 0]}>
+        <boxGeometry args={[0.45, 0.6, 0.01]} />
+        <meshStandardMaterial color="#2F4F4F" />
+      </mesh>
+      <mesh position={[0, 0.2, 0.02]} rotation={[0, Math.PI / 4, 0]}>
+        <boxGeometry args={[0.25, 0.2, 0.01]} />
+        <meshStandardMaterial color="#CD853F" />
       </mesh>
     </group>
 
@@ -1137,15 +1520,43 @@ const Apartment = () => {
       {/* === WALL DECORATIONS === */}
       <WallArt />
 
-      {/* === RUG under coffee table === */}
-      <mesh position={[7.8, 0.02, -4]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[3, 2.5]} />
+      {/* === AREA RUG in living room (between couch and TV) === */}
+      <mesh position={[5.5, 0.02, -4]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[6, 4]} />
         <meshStandardMaterial color="#4A3728" side={2} />
       </mesh>
-      {/* Rug border */}
-      <mesh position={[7.8, 0.025, -4]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.1, 1.4, 4]} />
-        <meshStandardMaterial color="#6B4423" side={2} />
+      {/* Rug pattern - geometric */}
+      <mesh position={[5.5, 0.025, -4]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[5, 3]} />
+        <meshStandardMaterial color="#5C4433" side={2} />
+      </mesh>
+      <mesh position={[5.5, 0.027, -4]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[4, 2]} />
+        <meshStandardMaterial color="#6B5243" side={2} />
+      </mesh>
+      
+      {/* === PIZZA BOX on floor by couch (lived-in chaos per BRIEF) === */}
+      <group position={[2.8, 0, -2.5]}>
+        <mesh position={[0, 0.04, 0]} rotation={[0, 0.15, 0]}>
+          <boxGeometry args={[0.5, 0.06, 0.5]} />
+          <meshStandardMaterial color="#D2691E" />
+        </mesh>
+        {/* Pizza box lid slightly open */}
+        <mesh position={[0, 0.08, -0.22]} rotation={[0.3, 0.15, 0]}>
+          <boxGeometry args={[0.48, 0.02, 0.48]} />
+          <meshStandardMaterial color="#D2691E" />
+        </mesh>
+        {/* Grease stain on top */}
+        <mesh position={[0.05, 0.09, -0.15]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.08, 6]} />
+          <meshStandardMaterial color="#8B4513" transparent opacity={0.4} />
+        </mesh>
+      </group>
+      
+      {/* Another pizza box stacked */}
+      <mesh position={[2.75, 0.12, -2.45]} rotation={[0, 0.4, 0]}>
+        <boxGeometry args={[0.45, 0.04, 0.45]} />
+        <meshStandardMaterial color="#CD853F" />
       </mesh>
 
       {/* === BEDROOM RUG === */}
