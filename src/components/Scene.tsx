@@ -1,5 +1,6 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Html } from "@react-three/drei";
+import { OrbitControls, Html, Loader } from "@react-three/drei";
+import { Suspense } from "react";
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
@@ -1860,13 +1861,70 @@ const SceneContent = () => {
   );
 };
 
+// Loading screen component
+const LoadingScreen = () => (
+  <Html center>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "'VT323', monospace",
+        color: "#7B68EE",
+        fontSize: "24px",
+        textShadow: "0 0 10px #7B68EE",
+      }}
+    >
+      <div style={{ marginBottom: "16px" }}>Loading apartment...</div>
+      <div
+        style={{
+          width: "200px",
+          height: "4px",
+          background: "#1A1A2E",
+          borderRadius: "2px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: "60%",
+            height: "100%",
+            background: "linear-gradient(90deg, #7B68EE, #00D9FF)",
+            borderRadius: "2px",
+            animation: "pulse 1s ease-in-out infinite",
+          }}
+        />
+      </div>
+    </div>
+  </Html>
+);
+
 const Scene = () => {
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D0F" }}>
       <ApartmentProvider>
         <Canvas camera={{ position: [20, 20, 20], fov: 45 }} shadows>
-          <SceneContent />
+          <Suspense fallback={<LoadingScreen />}>
+            <SceneContent />
+          </Suspense>
         </Canvas>
+        <Loader
+          containerStyles={{
+            background: "#0D0D0F",
+          }}
+          innerStyles={{
+            background: "#7B68EE",
+          }}
+          barStyles={{
+            background: "#00D9FF",
+          }}
+          dataStyles={{
+            color: "#7B68EE",
+            fontFamily: "'VT323', monospace",
+            fontSize: "14px",
+          }}
+        />
       </ApartmentProvider>
     </div>
   );
