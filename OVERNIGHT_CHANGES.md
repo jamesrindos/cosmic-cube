@@ -1,8 +1,8 @@
 # 🏠 Overnight Polish Report - Cosmic Cube
 
 **Branch:** `ace/apartment-polish`  
-**Commits:** 14  
-**Date:** Feb 28, 2026 (Updated 06:00 UTC)
+**Commits:** 17  
+**Date:** Feb 28, 2026 (Final Update 06:15 UTC)
 
 ---
 
@@ -174,9 +174,25 @@ Other:
 
 ---
 
+## Final Polish Pass (06:15 UTC)
+
+### Gaming Desk Upgrade
+- Large desk mat/mousepad with RGB edge lighting
+- Mechanical keyboard with visible keycaps
+- RGB underglow effect on keyboard
+- Gaming mouse with cyan RGB accent
+
+### Guitar Enhancement
+- Updated to proper "dusty cherry red" (#A52A2A) per BRIEF
+- Added dust accumulation patches (transparent layers)
+- Added simplified guitar strings
+- Properly documented as "dusty" in code comments
+
+---
+
 ## Summary of All Changes
 
-**Total commits this branch:** 14
+**Total commits this branch:** 17
 
 ### From BRIEF Now Implemented:
 - ✅ Layout matches reference diagram (couch left, TV right)
@@ -195,6 +211,9 @@ Other:
 - ✅ Window curtains
 - ✅ Phone charging cable
 - ✅ Floor clutter (clothes, socks, etc.)
+- ✅ Gaming keyboard + mouse with RGB
+- ✅ Large desk mat/mousepad with RGB edge
+- ✅ Dusty cherry red guitar with strings
 
 ### Still Could Add (Future):
 - Interactive Rubik's cube that solves on click
