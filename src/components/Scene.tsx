@@ -7,7 +7,7 @@ import * as THREE from "three";
 // TV + TAPES PORTFOLIO - POLISHED VERSION
 // ============================================
 
-// VHS Tape data - from James's brief (real projects, real descriptions, real videos)
+// VHS Tape data - from James's brief (real projects, real descriptions, local videos)
 const tapeData = [
   { id: "about", label: "ABOUT ME", color: "#FFFFFF", accent: "#E91E63", spine: "#F5F5F5", isSpecial: true, content: {
     title: "James Rindos",
@@ -24,19 +24,19 @@ const tapeData = [
     title: "MUD/WTR",
     subtitle: "AI Video",
     description: "my favorite video i've made probably ever? just so fucking cool. opened my eyes to what was possible with ai video despite veo being out for only a few weeks. i've directed i think 4 more like it with similar characters. but this one will always take the cake.",
-    videoId: "1vV0oq5rcdwBmX2D2Dug2jAR2FbfmZ82B",
+    videoId: "1vV0oq5rcdwBmX2D2Dug2jAR2FbfmZ82B", // Too large for auto-download
   }},
   { id: "moziwash", label: "MOZIWASH", color: "#FFD700", accent: "#1A1A1A", spine: "#FFD700", content: {
     title: "MoziWash",
     subtitle: "First Billboard",
     description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
-    videoId: "1UppWH1ogSkYyQNu7L_qKSgyVH3aPnnqE",
+    videoSrc: "/videos/moziwash.mp4",
   }},
   { id: "kalshi", label: "KALSHI", color: "#E91E63", accent: "#FFFFFF", spine: "#E91E63", content: {
     title: "Kalshi",
     subtitle: "Wimbledon Spec Ad",
     description: "what a blast. my friend nate and i locked ourselves in a room the day before wimbledon and made this ad for kalshi as a spec ad. we were spamming our connect while she was seeing a movie until she passed it on to her higher ups. was really cool to follow up pj ace's great work on his kalshi ads with this wimbledon spot.",
-    videoId: "1qRSclwNGQY_OdgTLpJzwFR9khmDvriK4",
+    videoSrc: "/videos/kalshi.mp4",
   }},
   { id: "political", label: "POLITICAL", color: "#0D47A1", accent: "#E53935", spine: "#0D47A1", content: {
     title: "Political Media",
@@ -47,55 +47,55 @@ const tapeData = [
     title: "Sunflower Vol 1",
     subtitle: "Sobriety Remix",
     description: "this brand asked for like 40 videos in a month on top of everything else i was creating. when i was tapped out of new concepts i turned to remixing some of my favorite iconic ad campaigns around sobriety. really like how this one came out!",
-    videoId: "1vBmKKFC8bYgqxpDZRUQjcjdkPU_hGU0c",
+    videoSrc: "/videos/sunflower1.mp4",
   }},
   { id: "sunflower2", label: "SUNFLWR 2", color: "#FF9800", accent: "#1A1A1A", spine: "#FF9800", content: {
     title: "Sunflower Vol 2",
     subtitle: "Pixar Style",
     description: "people in the office told me this one hit emotionally but i just think the art style carried.",
-    videoId: "1QXVhcY0tce_jy9ZynpJL5er9odGaeilm",
+    videoSrc: "/videos/sunflower2.mp4",
   }},
   { id: "bigface", label: "BIGFACE", color: "#1A1A1A", accent: "#FFD700", spine: "#1A1A1A", content: {
     title: "BigFace",
     subtitle: "48 Hour Sprint",
     description: "another sleepless 48 hour period. did a ton of brand research. spent a ton of time making it look and sound like HIM but in a way that farms aura.",
-    videoId: "1wO6TgSS1yQ-oDBR0AJHM31lYXPQXZgmD",
+    videoSrc: "/videos/bigface.mp4",
   }},
   { id: "audien", label: "AUDIEN", color: "#2196F3", accent: "#FFFFFF", spine: "#2196F3", content: {
     title: "Audien Hearing",
     subtitle: "AI CTV Ads",
     description: "this hearing aid company saw early potential for ai ctv ads and this is just one of many many ideas that we experimented with.",
-    videoId: "1XgjwOGHxjrf_eKy6Butf8M2uDlH8O9EK",
+    videoSrc: "/videos/audien.mp4",
   }},
   { id: "dirtea", label: "DIRTEA", color: "#4CAF50", accent: "#FFFFFF", spine: "#4CAF50", content: {
     title: "Dirtea",
     subtitle: "UK → US Launch",
     description: "nootropics brand in the UK looking to take a big swing with a US launch. was able to help out with one of their instagram reels. this seems simple enough but unfortunately took so much time with the tools that i had at my disposal lol. the physics were so hard to nail down!!",
-    videoId: "10ng83Dz1fikTrCJentJs-VVhWjS2mlRh",
+    videoSrc: "/videos/dirtea.mp4",
   }},
   { id: "moes", label: "MOE'S", color: "#FF5722", accent: "#FFFFFF", spine: "#FF5722", content: {
     title: "Moe's",
     subtitle: "Veo Spec Ad",
     description: "another spec ad. weird one. veo had been out for maybe a week. and i was rawdogging these prompts trying to get these animals to act like people and look somewhat consistent in between scenes. what a nightmare. kind of holds up though.",
-    videoId: "1pzndk4ltD_g9tLOyUkUV1VFIop_WIVDm",
+    videoSrc: "/videos/moes.mp4",
   }},
   { id: "boldebottle", label: "BOLDE", color: "#9C27B0", accent: "#FFFFFF", spine: "#9C27B0", content: {
     title: "BoldeBottle",
     subtitle: "NanoBanana Pro",
     description: "got this assignment right around the launch of nanobanana pro. learned that providing start frame and end frame is absolutely the move. they paid me with one of their shaker cups. i haven't used it yet though.",
-    videoId: "1CyvtfAykkHmDIuZ1l9xFLNC_5VUJzK4d",
+    videoId: "1CyvtfAykkHmDIuZ1l9xFLNC_5VUJzK4d", // Too large for auto-download
   }},
   { id: "dsc", label: "DSC", color: "#3F51B5", accent: "#FFFFFF", spine: "#3F51B5", content: {
     title: "DSC",
     subtitle: "Twin Lacrosse Players",
     description: "weird one. named the characters after my brothers, twin lacrosse players. don't think its a winner at all but it makes me laugh.",
-    videoId: "1si8ma8CQ6toLZuct49P8cyKYRfryOf15",
+    videoId: "1si8ma8CQ6toLZuct49P8cyKYRfryOf15", // Too large for auto-download
   }},
   { id: "getmte", label: "MTE", color: "#00BCD4", accent: "#FFFFFF", spine: "#00BCD4", content: {
     title: "GetMTE",
     subtitle: "Repurposed Ad",
     description: "one of my friends was making this ad and got let go, so i was tasked with repurposing it. i guess i think the hook came out cool.",
-    videoId: "1bL6PvXyp0AUtQyfOTTI9QNRlYjPYyZBE",
+    videoSrc: "/videos/getmte.mp4",
   }},
 ];
 
@@ -1188,9 +1188,52 @@ const MobileLayout = () => {
             </div>
             
             {/* Video player or content */}
-            {selectedTape.content.videoId ? (
+            {selectedTape.content.videoSrc ? (
               <>
-                {/* Play button that opens Drive */}
+                {/* Local video player */}
+                <div style={{
+                  width: "100%",
+                  maxWidth: "300px",
+                  margin: "0 auto",
+                  aspectRatio: "9/16",
+                  background: "#000",
+                  borderRadius: "4px",
+                  overflow: "hidden",
+                }}>
+                  <video
+                    src={selectedTape.content.videoSrc}
+                    autoPlay
+                    controls
+                    playsInline
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
+                {/* Description */}
+                <div style={{ padding: "12px 16px" }}>
+                  <div style={{ 
+                    fontSize: "18px", 
+                    color: selectedTape.color,
+                    marginBottom: "4px",
+                    fontWeight: "bold",
+                  }}>
+                    {selectedTape.content.title}
+                  </div>
+                  <div style={{ 
+                    fontSize: "12px", 
+                    color: "#AAA", 
+                    lineHeight: "1.4",
+                  }}>
+                    {selectedTape.content.description}
+                  </div>
+                </div>
+              </>
+            ) : selectedTape.content.videoId ? (
+              <>
+                {/* Drive link for large files */}
                 <a 
                   href={`https://drive.google.com/file/d/${selectedTape.content.videoId}/view`}
                   target="_blank"
@@ -1224,15 +1267,12 @@ const MobileLayout = () => {
                   <div style={{
                     fontSize: "14px",
                     color: "#888",
-                    marginBottom: "8px",
                   }}>
-                    TAP TO WATCH
+                    TAP TO WATCH ON DRIVE
                   </div>
                 </a>
                 {/* Description */}
-                <div style={{
-                  padding: "0 20px 20px",
-                }}>
+                <div style={{ padding: "0 20px 20px" }}>
                   <div style={{ 
                     fontSize: "20px", 
                     color: selectedTape.color,
@@ -1241,11 +1281,6 @@ const MobileLayout = () => {
                   }}>
                     {selectedTape.content.title}
                   </div>
-                  {selectedTape.content.subtitle && (
-                    <div style={{ fontSize: "12px", color: "#666", marginBottom: "8px" }}>
-                      {selectedTape.content.subtitle}
-                    </div>
-                  )}
                   <div style={{ 
                     fontSize: "13px", 
                     color: "#AAA", 
