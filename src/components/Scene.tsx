@@ -1907,30 +1907,64 @@ const LoadingScreen = () => (
         justifyContent: "center",
         fontFamily: "'VT323', monospace",
         color: "#7B68EE",
-        fontSize: "24px",
-        textShadow: "0 0 10px #7B68EE",
+        textAlign: "center",
       }}
     >
-      <div style={{ marginBottom: "16px" }}>Loading apartment...</div>
+      {/* Retro TV icon */}
+      <div style={{
+        fontSize: "48px",
+        marginBottom: "16px",
+        animation: "bounce 1s ease-in-out infinite",
+      }}>📺</div>
+      
+      <div style={{ 
+        fontSize: "28px",
+        marginBottom: "8px",
+        textShadow: "0 0 15px #7B68EE",
+      }}>
+        James's Apartment
+      </div>
+      
+      <div style={{ 
+        fontSize: "14px", 
+        color: "#888",
+        marginBottom: "20px",
+      }}>
+        Loading...
+      </div>
+      
+      {/* Progress bar */}
       <div
         style={{
           width: "200px",
-          height: "4px",
-          background: "#1A1A2E",
-          borderRadius: "2px",
+          height: "6px",
+          background: "rgba(123, 104, 238, 0.2)",
+          borderRadius: "3px",
           overflow: "hidden",
         }}
       >
         <div
           style={{
-            width: "60%",
+            width: "100%",
             height: "100%",
-            background: "linear-gradient(90deg, #7B68EE, #00D9FF)",
-            borderRadius: "2px",
-            animation: "pulse 1s ease-in-out infinite",
+            background: "linear-gradient(90deg, #7B68EE, #00D9FF, #7B68EE)",
+            backgroundSize: "200% 100%",
+            borderRadius: "3px",
+            animation: "shimmer 1.5s ease-in-out infinite",
           }}
         />
       </div>
+      
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
     </div>
   </Html>
 );
