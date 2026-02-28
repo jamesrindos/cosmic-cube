@@ -8,6 +8,16 @@ export const InvincibleBook = ({ position }: { position: [number, number, number
   const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const groupRef = useRef<THREE.Group>(null);
+  
+  // Cursor change on hover
+  const handlePointerOver = () => {
+    setIsHovered(true);
+    document.body.style.cursor = "pointer";
+  };
+  const handlePointerOut = () => {
+    setIsHovered(false);
+    document.body.style.cursor = "auto";
+  };
 
   useFrame(() => {
     if (groupRef.current) {
@@ -21,8 +31,8 @@ export const InvincibleBook = ({ position }: { position: [number, number, number
     <group
       ref={groupRef}
       position={position}
-      onPointerOver={() => setIsHovered(true)}
-      onPointerOut={() => setIsHovered(false)}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
       onClick={(e) => {
         e.stopPropagation();
         setIsOpen(!isOpen);
@@ -76,6 +86,17 @@ export const LetterboxdNotebook = ({ position }: { position: [number, number, nu
   const [isHovered, setIsHovered] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const groupRef = useRef<THREE.Group>(null);
+  
+  // Cursor change on hover
+  const handlePointerOver = () => {
+    setIsHovered(true);
+    document.body.style.cursor = "pointer";
+  };
+  const handlePointerOut = () => {
+    setIsHovered(false);
+    setShowReviews(false);
+    document.body.style.cursor = "auto";
+  };
 
   const recentReviews = [
     { film: "Bugonia", rating: "★★★★★" },
@@ -95,11 +116,8 @@ export const LetterboxdNotebook = ({ position }: { position: [number, number, nu
     <group
       ref={groupRef}
       position={position}
-      onPointerOver={() => setIsHovered(true)}
-      onPointerOut={() => {
-        setIsHovered(false);
-        setShowReviews(false);
-      }}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
       onClick={(e) => {
         e.stopPropagation();
         setShowReviews(!showReviews);

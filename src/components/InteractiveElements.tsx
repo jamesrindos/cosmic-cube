@@ -207,8 +207,8 @@ export const InteractiveGuitar = ({ position }: { position: [number, number, num
       position={position} 
       rotation={[0, 0.1, 0.12]}
       onClick={handleClick}
-      onPointerOver={() => setIsHovered(true)}
-      onPointerOut={() => setIsHovered(false)}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
     >
       {/* Guitar body - dusty cherry red */}
       <mesh position={[0, 0.6, 0]}>
@@ -277,6 +277,16 @@ interface VHSTapeProps {
 export const InteractiveVHSTape = ({ position, color, labelColor, projectName, onSelect }: VHSTapeProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const meshRef = useRef<THREE.Mesh>(null);
+  
+  // Cursor change on hover
+  const handlePointerOver = () => {
+    setIsHovered(true);
+    document.body.style.cursor = "pointer";
+  };
+  const handlePointerOut = () => {
+    setIsHovered(false);
+    document.body.style.cursor = "auto";
+  };
 
   useFrame(() => {
     if (meshRef.current) {
@@ -289,8 +299,8 @@ export const InteractiveVHSTape = ({ position, color, labelColor, projectName, o
   return (
     <group 
       position={position}
-      onPointerOver={() => setIsHovered(true)}
-      onPointerOut={() => setIsHovered(false)}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
       onClick={(e) => {
         e.stopPropagation();
         onSelect?.();

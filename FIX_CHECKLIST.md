@@ -172,3 +172,11 @@
 - [x] Pushed to GitHub
 - [x] Git commit: 5a30471
 
+### Session 1 Progress: 06:57-07:01 UTC
+- [x] James reviewed - camera angles wrong
+- [x] Fixed all 5 camera presets with proper isometric views
+- [x] Git commit: fe9fb39
+- [x] Pushed to GitHub
+
+**Continuing overnight work...**
+
