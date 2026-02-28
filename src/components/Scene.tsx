@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { InteractiveRubiksCube, InteractiveGuitar, InteractiveVHSTape } from "./InteractiveElements";
+import { VMDesktop } from "./VMDesktop";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -489,11 +490,13 @@ const GamingDesk = () => (
       </mesh>
     ))}
 
-    {/* Center monitor (larger) */}
+    {/* Center monitor (larger) - with VM Desktop */}
     <mesh position={[0, 1.25, -0.4]}>
       <boxGeometry args={[0.9, 0.55, 0.04]} />
-      <meshStandardMaterial color="#0A0A0F" emissive="#7B68EE" emissiveIntensity={0.5} />
+      <meshStandardMaterial color="#0A0A0F" />
     </mesh>
+    {/* VM Desktop rendered on center monitor */}
+    <VMDesktop position={[0, 1.25, -0.38]} />
     <mesh position={[0, 0.95, -0.35]}>
       <boxGeometry args={[0.15, 0.05, 0.1]} />
       <meshStandardMaterial color="#1A1A1A" />
