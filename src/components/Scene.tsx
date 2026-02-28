@@ -564,6 +564,29 @@ const Bathroom = () => (
 
     {/* Bathroom light */}
     <pointLight position={[0, 2.2, 0]} color="#FFFFFF" intensity={0.5} distance={4} decay={2} />
+    
+    {/* Laundry basket */}
+    <group position={[-0.3, 0, 1]}>
+      <mesh position={[0, 0.2, 0]}>
+        <cylinderGeometry args={[0.2, 0.18, 0.4, 8]} />
+        <meshStandardMaterial color="#D4A574" />
+      </mesh>
+      {/* Clothes sticking out */}
+      <mesh position={[0.05, 0.35, 0]}>
+        <boxGeometry args={[0.15, 0.1, 0.2]} />
+        <meshStandardMaterial color="#5DADE2" />
+      </mesh>
+      <mesh position={[-0.08, 0.38, 0.05]}>
+        <boxGeometry args={[0.12, 0.08, 0.15]} />
+        <meshStandardMaterial color="#E74C3C" />
+      </mesh>
+    </group>
+    
+    {/* Towel on hook */}
+    <mesh position={[0.8, 1.2, 1.4]}>
+      <boxGeometry args={[0.4, 0.6, 0.03]} />
+      <meshStandardMaterial color="#F5E6D3" />
+    </mesh>
   </group>
 );
 
@@ -705,11 +728,11 @@ const VHSShelf = () => (
   <group position={[9.6, 0.75, -6.5]}>
     <mesh position={[0, 0, -0.55]}>
       <boxGeometry args={[0.3, 1.5, 0.05]} />
-      <meshStandardMaterial color="#C0C0C0" />
+      <meshStandardMaterial color="#3D2E2E" />
     </mesh>
     <mesh position={[0, 0, 0.55]}>
       <boxGeometry args={[0.3, 1.5, 0.05]} />
-      <meshStandardMaterial color="#C0C0C0" />
+      <meshStandardMaterial color="#3D2E2E" />
     </mesh>
     {[-0.5, 0, 0.5].map((y, i) => (
       <mesh key={i} position={[0, y, 0]}>
@@ -717,14 +740,25 @@ const VHSShelf = () => (
         <meshStandardMaterial color="#3D2E2E" />
       </mesh>
     ))}
+    {/* VHS tapes with colorful labels */}
     {[-0.25, 0.25].map((y, row) =>
-      [-0.35, -0.15, 0.05, 0.25].map((z, col) => (
+      [-0.4, -0.22, -0.04, 0.14, 0.32].map((z, col) => (
         <mesh key={`${row}-${col}`} position={[0, y, z]}>
-          <boxGeometry args={[0.15, 0.2, 0.12]} />
-          <meshStandardMaterial color={["#1a1a3e", "#2a1a3e", "#1a2a3e", "#2a2a3e"][col]} />
+          <boxGeometry args={[0.15, 0.18, 0.1]} />
+          <meshStandardMaterial color={["#1a1a3e", "#8B0000", "#1a3a2e", "#3e1a3a", "#2a2a1e"][col]} />
         </mesh>
       ))
     )}
+    {/* Game console on bottom shelf */}
+    <mesh position={[0, -0.65, 0]}>
+      <boxGeometry args={[0.25, 0.08, 0.35]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Controller */}
+    <mesh position={[0.02, -0.58, 0.25]}>
+      <boxGeometry args={[0.12, 0.03, 0.08]} />
+      <meshStandardMaterial color="#2D2D2D" />
+    </mesh>
   </group>
 );
 
@@ -1087,6 +1121,12 @@ const Apartment = () => {
       <Fridge />
       <KitchenCabinets />
       <Stove />
+      
+      {/* Kitchen trash can */}
+      <mesh position={[9.2, 0.25, -10]}>
+        <cylinderGeometry args={[0.15, 0.12, 0.5, 8]} />
+        <meshStandardMaterial color="#404040" />
+      </mesh>
 
       {/* === LIVING ROOM === */}
       <RetroTV />
