@@ -50,8 +50,8 @@ const tapeData = [
     subtitle: "Pixar Style",
     description: "people in the office told me this one hit emotionally but i just think the art style carried.",
   }},
-  { id: "jb", label: "JB", color: "#1A1A1A", accent: "#FFD700", spine: "#1A1A1A", content: {
-    title: "JB",
+  { id: "bigface", label: "BIGFACE", color: "#1A1A1A", accent: "#FFD700", spine: "#1A1A1A", content: {
+    title: "BigFace",
     subtitle: "48 Hour Sprint",
     description: "another sleepless 48 hour period. did a ton of brand research. spent a ton of time making it look and sound like HIM but in a way that farms aura.",
   }},
