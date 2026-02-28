@@ -154,72 +154,87 @@ const Stove = () => (
 
 const BedroomWindows = () => (
   <group>
-    {/* Two tall parallel windows on left wall of bedroom */}
-    {[-20, -22].map((z, i) => (
-      <group key={i} position={[0.06, 1.5, z]}>
-        {/* Window frame */}
+    {/* Two windows on RIGHT wall of bedroom (matching Sims reference) */}
+    {[-20, -22.5].map((z, i) => (
+      <group key={i} position={[7.94, 1.5, z]}>
+        {/* Window frame - glass */}
         <mesh>
-          <boxGeometry args={[0.05, 1.8, 0.9]} />
-          <meshStandardMaterial color="#4A6A7A" opacity={0.3} transparent />
+          <boxGeometry args={[0.05, 1.4, 0.9]} />
+          <meshStandardMaterial color="#87CEEB" opacity={0.4} transparent />
         </mesh>
         {/* Window frame border */}
-        <mesh position={[0.03, 0, 0]}>
-          <boxGeometry args={[0.02, 1.9, 1.0]} />
+        <mesh position={[-0.03, 0, 0]}>
+          <boxGeometry args={[0.02, 1.5, 1.0]} />
           <meshStandardMaterial color="#D0D0D0" />
         </mesh>
         {/* Center divider horizontal */}
-        <mesh position={[0.04, 0, 0]}>
+        <mesh position={[-0.04, 0, 0]}>
           <boxGeometry args={[0.02, 0.04, 0.9]} />
           <meshStandardMaterial color="#D0D0D0" />
         </mesh>
         {/* Center divider vertical */}
-        <mesh position={[0.04, 0, 0]}>
-          <boxGeometry args={[0.02, 1.8, 0.04]} />
+        <mesh position={[-0.04, 0, 0]}>
+          <boxGeometry args={[0.02, 1.4, 0.04]} />
           <meshStandardMaterial color="#D0D0D0" />
         </mesh>
         {/* Soft light from windows */}
-        <pointLight position={[1, 0, 0]} color="#FFF8E8" intensity={0.3} distance={6} decay={2} />
+        <pointLight position={[-1, 0, 0]} color="#FFF8E8" intensity={0.4} distance={6} decay={2} />
       </group>
     ))}
   </group>
 );
 
 const Bed = () => (
-  <group position={[2.5, 0, -21]}>
-    {/* Frame - bigger */}
+  // Bed against RIGHT wall, headboard facing left (matching Sims reference)
+  <group position={[5.5, 0, -21]} rotation={[0, -Math.PI / 2, 0]}>
+    {/* Frame */}
     <mesh position={[0, 0.15, 0]}>
-      <boxGeometry args={[3.5, 0.3, 4.5]} />
-      <meshStandardMaterial color="#1A1A1A" />
+      <boxGeometry args={[2.2, 0.3, 3.5]} />
+      <meshStandardMaterial color="#8B7355" />
     </mesh>
     {/* Mattress */}
     <mesh position={[0, 0.35, 0]}>
-      <boxGeometry args={[3.3, 0.15, 4.3]} />
+      <boxGeometry args={[2.0, 0.15, 3.3]} />
       <meshStandardMaterial color="#F5F5F5" />
     </mesh>
-    {/* Headboard */}
-    <mesh position={[0, 0.7, -2.2]}>
-      <boxGeometry args={[3.5, 0.8, 0.12]} />
-      <meshStandardMaterial color="#1A1A1A" />
+    {/* Headboard - wooden */}
+    <mesh position={[0, 0.7, -1.7]}>
+      <boxGeometry args={[2.2, 0.8, 0.1]} />
+      <meshStandardMaterial color="#5C4A3A" />
     </mesh>
-    {/* Blanket - askew */}
-    <mesh position={[0.15, 0.45, 0.4]} rotation={[0, 0.08, 0]}>
-      <boxGeometry args={[3.0, 0.08, 2.8]} />
-      <meshStandardMaterial color="#2D3A5C" />
+    {/* Blanket - Van Gogh Starry Night inspired swirl pattern (simplified) */}
+    <mesh position={[0.1, 0.45, 0.3]} rotation={[0, 0.05, 0]}>
+      <boxGeometry args={[1.8, 0.08, 2.2]} />
+      <meshStandardMaterial color="#1E3A5F" />
+    </mesh>
+    {/* Blanket swirl accents */}
+    <mesh position={[-0.3, 0.47, 0.2]} rotation={[0, 0.3, 0]}>
+      <boxGeometry args={[0.4, 0.02, 0.6]} />
+      <meshStandardMaterial color="#F4D03F" />
+    </mesh>
+    <mesh position={[0.4, 0.47, 0.5]} rotation={[0, -0.2, 0]}>
+      <boxGeometry args={[0.3, 0.02, 0.5]} />
+      <meshStandardMaterial color="#5DADE2" />
+    </mesh>
+    <mesh position={[0, 0.47, -0.2]} rotation={[0, 0.1, 0]}>
+      <boxGeometry args={[0.5, 0.02, 0.4]} />
+      <meshStandardMaterial color="#F4D03F" />
     </mesh>
     {/* Pillows */}
-    <mesh position={[-0.6, 0.5, -1.7]} rotation={[0, 0.15, 0]}>
-      <boxGeometry args={[0.8, 0.16, 0.5]} />
-      <meshStandardMaterial color="#D8D8D8" />
+    <mesh position={[-0.4, 0.5, -1.3]} rotation={[0, 0.1, 0]}>
+      <boxGeometry args={[0.5, 0.14, 0.4]} />
+      <meshStandardMaterial color="#F5E6D3" />
     </mesh>
-    <mesh position={[0.5, 0.48, -1.6]} rotation={[0, -0.1, 0]}>
-      <boxGeometry args={[0.8, 0.16, 0.5]} />
-      <meshStandardMaterial color="#D8D8D8" />
+    <mesh position={[0.4, 0.48, -1.25]} rotation={[0, -0.1, 0]}>
+      <boxGeometry args={[0.5, 0.14, 0.4]} />
+      <meshStandardMaterial color="#F5E6D3" />
     </mesh>
   </group>
 );
 
 const Nightstand = () => (
-  <group position={[4.8, 0, -22.5]}>
+  // Nightstand on LEFT side of bed now (bed moved to right wall)
+  <group position={[3.2, 0, -21]}>
     {/* Main body */}
     <mesh position={[0, 0.25, 0]}>
       <boxGeometry args={[0.5, 0.5, 0.4]} />
@@ -270,7 +285,8 @@ const Nightstand = () => (
 );
 
 const GamingDesk = () => (
-  <group position={[1.5, 0, -18.5]} rotation={[0, Math.PI, 0]}>
+  // Gaming desk in bottom-left corner of bedroom, near hallway entrance
+  <group position={[1.2, 0, -18]} rotation={[0, Math.PI / 4, 0]}>
     {/* Desktop */}
     <mesh position={[0, 0.75, 0]}>
       <boxGeometry args={[2.5, 0.08, 1]} />
@@ -348,7 +364,7 @@ const GamingDesk = () => (
 );
 
 const GamingChair = () => (
-  <group position={[1.5, 0, -19.8]} rotation={[0, Math.PI, 0]}>
+  <group position={[2.2, 0, -19]} rotation={[0, Math.PI / 4, 0]}>
     {/* Seat */}
     <mesh position={[0, 0.45, 0]}>
       <boxGeometry args={[0.5, 0.08, 0.5]} />
@@ -385,8 +401,142 @@ const GamingChair = () => (
   </group>
 );
 
+// === BATHROOM (in hallway area) ===
+
+const Bathroom = () => (
+  <group position={[0.5, 0, -14]}>
+    {/* Bathroom floor - tile effect */}
+    <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[2, 3]} />
+      <meshStandardMaterial color="#E8E8E8" />
+    </mesh>
+    
+    {/* Toilet */}
+    <group position={[0.3, 0, -0.8]}>
+      {/* Bowl */}
+      <mesh position={[0, 0.2, 0]}>
+        <boxGeometry args={[0.4, 0.35, 0.5]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      {/* Tank */}
+      <mesh position={[0, 0.45, -0.2]}>
+        <boxGeometry args={[0.35, 0.4, 0.2]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      {/* Seat */}
+      <mesh position={[0, 0.38, 0.05]}>
+        <boxGeometry args={[0.38, 0.03, 0.35]} />
+        <meshStandardMaterial color="#F0F0F0" />
+      </mesh>
+    </group>
+
+    {/* Sink */}
+    <group position={[0.3, 0, 0.5]}>
+      {/* Pedestal */}
+      <mesh position={[0, 0.35, 0]}>
+        <boxGeometry args={[0.15, 0.7, 0.15]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      {/* Basin */}
+      <mesh position={[0, 0.72, 0]}>
+        <boxGeometry args={[0.45, 0.08, 0.35]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      {/* Faucet */}
+      <mesh position={[0, 0.82, -0.1]}>
+        <boxGeometry args={[0.06, 0.12, 0.06]} />
+        <meshStandardMaterial color="#C0C0C0" />
+      </mesh>
+      {/* Mirror above sink */}
+      <mesh position={[-0.48, 1.3, 0]}>
+        <boxGeometry args={[0.02, 0.6, 0.5]} />
+        <meshStandardMaterial color="#A8D8EA" />
+      </mesh>
+    </group>
+
+    {/* Washer/Dryer stack */}
+    <group position={[-0.6, 0, 0]}>
+      {/* Washer (bottom) */}
+      <mesh position={[0, 0.35, 0]}>
+        <boxGeometry args={[0.6, 0.65, 0.55]} />
+        <meshStandardMaterial color="#E0E0E0" />
+      </mesh>
+      {/* Washer door */}
+      <mesh position={[0.31, 0.35, 0]}>
+        <cylinderGeometry args={[0.2, 0.2, 0.02, 12]} />
+        <meshStandardMaterial color="#B0B0B0" />
+      </mesh>
+      {/* Dryer (top) */}
+      <mesh position={[0, 1.0, 0]}>
+        <boxGeometry args={[0.6, 0.6, 0.55]} />
+        <meshStandardMaterial color="#E0E0E0" />
+      </mesh>
+      {/* Dryer door */}
+      <mesh position={[0.31, 1.0, 0]}>
+        <cylinderGeometry args={[0.18, 0.18, 0.02, 12]} />
+        <meshStandardMaterial color="#B0B0B0" />
+      </mesh>
+    </group>
+
+    {/* Bathroom light */}
+    <pointLight position={[0, 2.2, 0]} color="#FFFFFF" intensity={0.5} distance={4} decay={2} />
+  </group>
+);
+
+// Speaker/stereo near bed (from Sims reference)
+const BedroomStereo = () => (
+  <group position={[3.5, 0, -23]}>
+    {/* Speaker cabinet */}
+    <mesh position={[0, 0.4, 0]}>
+      <boxGeometry args={[0.4, 0.8, 0.35]} />
+      <meshStandardMaterial color="#2D2D2D" />
+    </mesh>
+    {/* Speaker cone */}
+    <mesh position={[-0.21, 0.5, 0]}>
+      <cylinderGeometry args={[0.12, 0.12, 0.02, 12]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    <mesh position={[-0.21, 0.25, 0]}>
+      <cylinderGeometry args={[0.08, 0.08, 0.02, 12]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* LED indicator */}
+    <mesh position={[-0.21, 0.7, 0]}>
+      <boxGeometry args={[0.01, 0.02, 0.06]} />
+      <meshStandardMaterial color="#00FF00" emissive="#00FF00" emissiveIntensity={0.5} />
+    </mesh>
+  </group>
+);
+
+// Round wall clock in bedroom (from Sims reference)
+const BedroomClock = () => (
+  <group position={[7.94, 2, -19.5]}>
+    {/* Clock face */}
+    <mesh rotation={[0, -Math.PI / 2, 0]}>
+      <cylinderGeometry args={[0.25, 0.25, 0.03, 16]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Clock face inner */}
+    <mesh position={[-0.02, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
+      <cylinderGeometry args={[0.22, 0.22, 0.02, 16]} />
+      <meshStandardMaterial color="#F5F5F5" />
+    </mesh>
+    {/* Hour hand */}
+    <mesh position={[-0.025, 0.05, 0]} rotation={[0, 0, 0.3]}>
+      <boxGeometry args={[0.02, 0.1, 0.01]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Minute hand */}
+    <mesh position={[-0.025, 0, 0.06]} rotation={[Math.PI / 4, 0, 0]}>
+      <boxGeometry args={[0.015, 0.14, 0.01]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+  </group>
+);
+
 const Guitar = () => (
-  <group position={[0.4, 0, -23.5]} rotation={[0, 0.2, 0.15]}>
+  // Guitar leaning against left wall
+  <group position={[0.3, 0, -20]} rotation={[0, 0.1, 0.12]}>
     <mesh position={[0, 0.6, 0]}>
       <boxGeometry args={[0.5, 0.8, 0.12]} />
       <meshStandardMaterial color="#8B0000" />
@@ -669,7 +819,7 @@ const WallArt = () => (
       </mesh>
     </group>
 
-    {/* Living room - framed photo */}
+    {/* Living room - framed photo on left wall */}
     <group position={[0.06, 1.8, -4]}>
       {/* Frame */}
       <mesh>
@@ -680,6 +830,33 @@ const WallArt = () => (
       <mesh position={[0.03, 0, 0]}>
         <boxGeometry args={[0.01, 0.65, 0.85]} />
         <meshStandardMaterial color="#E8DCC8" />
+      </mesh>
+    </group>
+
+    {/* RED PAINTING on right wall (matching Sims reference) */}
+    <group position={[9.94, 1.6, -3]}>
+      {/* Frame */}
+      <mesh>
+        <boxGeometry args={[0.05, 1.0, 0.8]} />
+        <meshStandardMaterial color="#2D2020" />
+      </mesh>
+      {/* Canvas - vibrant red/orange abstract */}
+      <mesh position={[-0.03, 0, 0]}>
+        <boxGeometry args={[0.01, 0.85, 0.65]} />
+        <meshStandardMaterial color="#E74C3C" />
+      </mesh>
+      {/* Abstract shapes on canvas */}
+      <mesh position={[-0.04, 0.15, 0.1]}>
+        <boxGeometry args={[0.01, 0.3, 0.25]} />
+        <meshStandardMaterial color="#F39C12" />
+      </mesh>
+      <mesh position={[-0.04, -0.1, -0.15]}>
+        <boxGeometry args={[0.01, 0.25, 0.2]} />
+        <meshStandardMaterial color="#27AE60" />
+      </mesh>
+      <mesh position={[-0.04, 0.25, -0.2]}>
+        <boxGeometry args={[0.01, 0.15, 0.15]} />
+        <meshStandardMaterial color="#F4D03F" />
       </mesh>
     </group>
 
@@ -805,10 +982,15 @@ const Apartment = () => {
       {/* === FRONT DOOR at end of hallway === */}
       <FrontDoor />
 
+      {/* === BATHROOM === */}
+      <Bathroom />
+
       {/* === BEDROOM === */}
       <BedroomWindows />
       <Bed />
       <Nightstand />
+      <BedroomStereo />
+      <BedroomClock />
       <GamingDesk />
       <GamingChair />
       <Guitar />
