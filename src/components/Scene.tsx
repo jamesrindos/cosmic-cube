@@ -9,8 +9,9 @@ import { VMDesktop } from "./VMDesktop";
 import { ApartmentProvider, useApartment, projectData } from "../context/ApartmentContext";
 import { DustParticles, LightBeamParticles } from "./Particles";
 import { InvincibleBook, LetterboxdNotebook } from "./CoffeeTableItems";
-import { HelpOverlay, InteractiveLegend } from "./HelpOverlay";
+import { InteractiveLegend } from "./HelpOverlay";
 import { CameraController, CameraNavigation, CameraPreset } from "./CameraController";
+import { RoomClickZones } from "./RoomClickZones";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -1872,7 +1873,13 @@ const Apartment = () => {
 };
 
 // Inner scene content that uses context
-const SceneContent = ({ activePreset }: { activePreset: CameraPreset }) => {
+const SceneContent = ({ 
+  activePreset, 
+  onNavigate 
+}: { 
+  activePreset: CameraPreset;
+  onNavigate: (preset: CameraPreset) => void;
+}) => {
   return (
     <>
       <color attach="background" args={["#1A1A2E"]} />
@@ -1883,6 +1890,7 @@ const SceneContent = ({ activePreset }: { activePreset: CameraPreset }) => {
       {/* Fill light from below to reduce harsh shadows */}
       <hemisphereLight args={["#FFF8F0", "#8B7355", 0.6]} />
       <Apartment />
+      <RoomClickZones onNavigate={onNavigate} />
       <CameraController activePreset={activePreset} />
     </>
   );
@@ -1935,7 +1943,7 @@ const Scene = () => {
       <ApartmentProvider>
         <Canvas camera={{ position: [18, 16, 8], fov: 45 }} shadows>
           <Suspense fallback={<LoadingScreen />}>
-            <SceneContent activePreset={activePreset} />
+            <SceneContent activePreset={activePreset} onNavigate={setActivePreset} />
           </Suspense>
         </Canvas>
         <Loader

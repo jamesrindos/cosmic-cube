@@ -151,4 +151,8 @@
 - [x] Fixed poster z-fighting - increased depth offsets
 - [x] Increased lighting for Sims-style brightness
 - [x] Added hemisphere light for softer shadows
+- [x] Connected VHS tape selection to TV display with project info
+- [x] Improved InteractiveLegend UI - starts expanded, better styling
+- [x] Build succeeds with no errors
+- [x] Git commit: 2850be4
 
