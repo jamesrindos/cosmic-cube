@@ -7,12 +7,12 @@ import * as THREE from "three";
 // TV + TAPES PORTFOLIO - POLISHED VERSION
 // ============================================
 
-// VHS Tape data - full portfolio
+// VHS Tape data - About Me only (add your real projects here)
 const tapeData = [
   { id: "about", label: "ABOUT ME", color: "#FFFFFF", accent: "#E91E63", spine: "#F5F5F5", isSpecial: true, content: {
     title: "James Rindos",
     subtitle: "Creative Technologist",
-    description: "Building at the intersection of AI and video. Previously led AI video production at Icon, creating hundreds of UGC-style ads that drove millions in revenue. Now building tools that make content creation feel like magic.",
+    description: "Building at the intersection of AI and video.",
     links: { 
       twitter: { handle: "@slimjimm318", url: "https://twitter.com/slimjimm318" },
       linkedin: { handle: "james-rindos", url: "https://linkedin.com/in/james-rindos-489a29245" },
@@ -20,65 +20,21 @@ const tapeData = [
       email: "jamesrindos1@gmail.com"
     }
   }},
-  { id: "moziwash", label: "MOZIWASH", color: "#FFD700", accent: "#1A1A1A", spine: "#FFD700", content: {
-    title: "MoziWash",
-    subtitle: "AI-Generated UGC Campaign",
-    description: "Car care brand campaign. 12 AI-generated UGC videos. 2M+ views across platforms. Proved that AI-generated content could match human creator performance.",
+  // Add your real projects below - these are placeholders
+  { id: "project1", label: "PROJECT 1", color: "#2196F3", accent: "#FFFFFF", spine: "#2196F3", content: {
+    title: "Project Title",
+    subtitle: "Project Type",
+    description: "Add your project description here.",
   }},
-  { id: "audien", label: "AUDIEN", color: "#2196F3", accent: "#FFFFFF", spine: "#2196F3", content: {
-    title: "Audien Hearing",
-    subtitle: "Direct Response Ads",
-    description: "Performance-focused video ads for hearing aid brand. Optimized for conversions with clear CTAs and testimonial-style content.",
+  { id: "project2", label: "PROJECT 2", color: "#E91E63", accent: "#FFFFFF", spine: "#E91E63", content: {
+    title: "Project Title",
+    subtitle: "Project Type",
+    description: "Add your project description here.",
   }},
-  { id: "kalshi", label: "KALSHI", color: "#E91E63", accent: "#FFFFFF", spine: "#E91E63", content: {
-    title: "Kalshi",
-    subtitle: "Prediction Markets",
-    description: "Building automated trading systems for the prediction market platform. Exploring the intersection of markets and AI.",
-  }},
-  { id: "mudwtr", label: "MUD\\WTR", color: "#795548", accent: "#FFFFFF", spine: "#795548", content: {
-    title: "MUD\\WTR",
-    subtitle: "UGC at Scale",
-    description: "Coffee alternative brand. Built a pipeline for UGC-style video content production. Dozens of videos, consistent brand voice.",
-  }},
-  { id: "boldebottle", label: "BOLDE", color: "#FF5722", accent: "#FFFFFF", spine: "#FF5722", content: {
-    title: "BoldeBottle",
-    subtitle: "Product Content",
-    description: "Fitness bottle brand. Product demos and lifestyle content showcasing durability and design.",
-  }},
-  { id: "dirtea", label: "DIRTEA", color: "#4CAF50", accent: "#FFFFFF", spine: "#4CAF50", content: {
-    title: "Dirtea",
-    subtitle: "Wellness Video",
-    description: "Mushroom tea brand. Wellness-focused video campaigns emphasizing benefits and lifestyle fit.",
-  }},
-  { id: "dsc", label: "DSC", color: "#3F51B5", accent: "#FFFFFF", spine: "#3F51B5", content: {
-    title: "Dollar Shave Club",
-    subtitle: "Brand Campaign",
-    description: "Iconic brand's continued creative. Maintaining the irreverent voice while driving subscriptions.",
-  }},
-  { id: "getmte", label: "MTE", color: "#9C27B0", accent: "#FFFFFF", spine: "#9C27B0", content: {
-    title: "GetMTE",
-    subtitle: "Energy Brand",
-    description: "Clean energy drink alternative. Lifestyle and product-focused content.",
-  }},
-  { id: "sunflower", label: "SUNFLWR", color: "#FFC107", accent: "#1A1A1A", spine: "#FFC107", content: {
-    title: "Sunflower",
-    subtitle: "Brand Content",
-    description: "Multi-video campaign series. Bright, optimistic creative.",
-  }},
-  { id: "political", label: "POLITICAL", color: "#0D47A1", accent: "#E53935", spine: "#0D47A1", content: {
-    title: "Political Media",
-    subtitle: "Campaign Ads",
-    description: "Political advertising and campaign content. Persuasion-focused creative for high-stakes races.",
-  }},
-  { id: "moes", label: "MOE'S", color: "#FF9800", accent: "#1A1A1A", spine: "#FF9800", content: {
-    title: "Moe's Southwest",
-    subtitle: "Restaurant Promo",
-    description: "QSR promotional content. Food-focused video driving foot traffic.",
-  }},
-  { id: "jb", label: "JB", color: "#1A1A1A", accent: "#FFD700", spine: "#1A1A1A", content: {
-    title: "JB Projects",
-    subtitle: "Various",
-    description: "Collection of branded content work.",
+  { id: "project3", label: "PROJECT 3", color: "#4CAF50", accent: "#FFFFFF", spine: "#4CAF50", content: {
+    title: "Project Title",
+    subtitle: "Project Type",
+    description: "Add your project description here.",
   }},
 ];
 
@@ -253,25 +209,6 @@ const VHSTape = ({
           distance={1.5} 
           decay={2} 
         />
-      )}
-      
-      {/* "BE KIND REWIND" sticker on some tapes */}
-      {(tape.id === "moziwash" || tape.id === "mudwtr") && (
-        <Html position={[-0.2, -0.4, 0.12]} transform style={{ pointerEvents: "none" }}>
-          <div style={{
-            background: "#FFD700",
-            color: "#000",
-            fontSize: "5px",
-            fontFamily: "Arial, sans-serif",
-            fontWeight: "bold",
-            padding: "2px 4px",
-            borderRadius: "1px",
-            transform: "rotate(-5deg)",
-            whiteSpace: "nowrap",
-          }}>
-            BE KIND REWIND
-          </div>
-        </Html>
       )}
       
       {/* Tape label text - always visible */}
@@ -452,6 +389,17 @@ const CRTTV = ({
       <mesh position={[0, 0.2, 1.85]}>
         <planeGeometry args={[3.58, 2.68]} />
         <meshBasicMaterial color="#000000" transparent opacity={0.08} />
+      </mesh>
+      
+      {/* Screen glare/reflection highlight */}
+      <mesh position={[-0.8, 0.8, 1.86]} rotation={[0, 0, 0.3]}>
+        <planeGeometry args={[1.5, 0.3]} />
+        <meshBasicMaterial 
+          color="#FFFFFF" 
+          transparent 
+          opacity={0.03}
+          blending={THREE.AdditiveBlending}
+        />
       </mesh>
       
       {/* Screen content */}
@@ -738,7 +686,7 @@ const TVStand = () => (
   </group>
 );
 
-// Tape Shelf Component - Two rows
+// Tape Shelf Component - Single row for now
 const TapeShelf = ({ 
   selectedTapeId,
   insertingTapeId,
@@ -748,56 +696,35 @@ const TapeShelf = ({
   insertingTapeId: string | null;
   onSelectTape: (tape: typeof tapeData[0]) => void;
 }) => {
-  const topRowTapes = tapeData.slice(0, 7);
-  const bottomRowTapes = tapeData.slice(7);
-
   return (
     <group position={[0, -3.2, 1.5]}>
       {/* Shelf unit back */}
       <mesh position={[0, 0.5, -0.4]} receiveShadow>
-        <boxGeometry args={[7, 3, 0.1]} />
+        <boxGeometry args={[5, 2, 0.1]} />
         <meshStandardMaterial color="#1A1008" roughness={0.85} />
       </mesh>
       
-      {/* Top shelf */}
-      <mesh position={[0, 1.2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[7, 0.12, 0.9]} />
-        <meshStandardMaterial color="#2A1A10" roughness={0.7} />
-      </mesh>
-      
-      {/* Bottom shelf */}
-      <mesh position={[0, -0.1, 0]} castShadow receiveShadow>
-        <boxGeometry args={[7, 0.12, 0.9]} />
+      {/* Shelf surface */}
+      <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
+        <boxGeometry args={[5, 0.12, 0.9]} />
         <meshStandardMaterial color="#2A1A10" roughness={0.7} />
       </mesh>
       
       {/* Side panels */}
-      <mesh position={[-3.45, 0.5, 0]}>
-        <boxGeometry args={[0.1, 2.8, 0.9]} />
+      <mesh position={[-2.45, 0.5, 0]}>
+        <boxGeometry args={[0.1, 1.8, 0.9]} />
         <meshStandardMaterial color="#1A1008" roughness={0.8} />
       </mesh>
-      <mesh position={[3.45, 0.5, 0]}>
-        <boxGeometry args={[0.1, 2.8, 0.9]} />
+      <mesh position={[2.45, 0.5, 0]}>
+        <boxGeometry args={[0.1, 1.8, 0.9]} />
         <meshStandardMaterial color="#1A1008" roughness={0.8} />
       </mesh>
       
-      {/* Top row tapes - About Me in center, highlighted */}
-      {topRowTapes.map((tape, i) => (
+      {/* Tapes - centered */}
+      {tapeData.map((tape, i) => (
         <VHSTape
           key={tape.id}
-          position={[-2.7 + i * 0.9, 1.85, 0]}
-          tape={tape}
-          isSelected={selectedTapeId === tape.id}
-          isInserting={insertingTapeId === tape.id}
-          onSelect={() => onSelectTape(tape)}
-        />
-      ))}
-      
-      {/* Bottom row tapes */}
-      {bottomRowTapes.map((tape, i) => (
-        <VHSTape
-          key={tape.id}
-          position={[-2.25 + i * 0.9, 0.55, 0]}
+          position={[-1.35 + i * 0.9, 1.25, 0]}
           tape={tape}
           isSelected={selectedTapeId === tape.id}
           isInserting={insertingTapeId === tape.id}
@@ -1142,7 +1069,7 @@ const Scene = () => {
         </div>
       </div>
       
-      {/* Instructions */}
+      {/* Instructions - hide on mobile */}
       <div
         style={{
           position: "fixed",
@@ -1151,13 +1078,39 @@ const Scene = () => {
           transform: "translateX(-50%)",
           fontFamily: "'VT323', monospace",
           fontSize: "14px",
-          color: "#333",
+          color: "#444",
           textAlign: "center",
           letterSpacing: "1px",
         }}
+        className="desktop-only"
       >
-        SELECT A TAPE • DRAG TO ORBIT • SCROLL TO ZOOM
+        SELECT A TAPE TO PLAY • DRAG TO ORBIT • SCROLL TO ZOOM • ESC TO EJECT
       </div>
+      
+      {/* Mobile touch hint */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          fontFamily: "'VT323', monospace",
+          fontSize: "12px",
+          color: "#444",
+          textAlign: "center",
+          display: "none",
+        }}
+        className="mobile-only"
+      >
+        TAP A TAPE • PINCH TO ZOOM
+      </div>
+      
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-only { display: none !important; }
+          .mobile-only { display: block !important; }
+        }
+      `}</style>
       
       {/* Social links */}
       <div
