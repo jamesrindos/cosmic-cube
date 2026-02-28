@@ -1,8 +1,8 @@
 # 🏠 Overnight Polish Report - Cosmic Cube
 
 **Branch:** `ace/apartment-polish`  
-**Commits:** 46  
-**Date:** Feb 28, 2026 (Final Update 08:15 UTC)
+**Commits:** 49  
+**Date:** Feb 28, 2026 (Final Update 08:30 UTC)
 
 ---
 
@@ -192,7 +192,7 @@ Other:
 
 ## Summary of All Changes
 
-**Total commits this branch:** 46
+**Total commits this branch:** 49
 
 ### From BRIEF Now Implemented:
 - ✅ Layout matches reference diagram (couch left, TV right)
@@ -231,6 +231,10 @@ Other:
 - ✅ Suspense/lazy loading
 - ✅ VT323 retro font
 - ✅ Cursor styling (grab/grabbing)
+- ✅ **INTERACTIVE** Invincible book (hover tooltip)
+- ✅ **INTERACTIVE** Letterboxd notebook (click for reviews!)
+- ✅ Help overlay (auto-shows, then fades)
+- ✅ Interactive legend (expandable list)
 
 ---
 
@@ -331,9 +335,39 @@ All 14 portfolio descriptions from BRIEF:
 
 ---
 
+---
+
+## Interactive Coffee Table (08:20 UTC)
+
+### Invincible Book
+- Hover to see tooltip
+- Float animation on hover
+- Golden glow effect
+
+### Letterboxd Notebook
+- Hover shows Letterboxd logo colors
+- **Click to see recent film watches!**
+- Shows actual ratings from @slimjim318
+- Recent: Bugonia ★★★★★, Avatar F&A ★★★★, Anaconda ★★★
+
+---
+
+## Help UI (08:30 UTC)
+
+### Help Overlay (bottom center)
+- Auto-shows on load for 5 seconds
+- Explains: "Click objects • Drag to orbit • Scroll to zoom"
+- Dismissible, reappears on hover
+
+### Interactive Legend (top right)
+- Expandable list of all interactive objects
+- Shows what each one does
+- 🧊 Rubik's Cube, 🎸 Guitar, 📼 VHS Tapes, 📺 TV, 📚 Books, 💻 Monitor
+
+---
+
 ### Still Could Add (Future):
 - Sound effects (clicks, strums, TV static)
-- Letterboxd integration in notebook
 - Camera animations on object focus
 - Mobile responsive version
 
