@@ -12,6 +12,7 @@ export const InteractiveRubiksCube = ({ position }: { position: [number, number,
   const [isSolving, setIsSolving] = useState(false);
   const [solveProgress, setSolveProgress] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [clickPulse, setClickPulse] = useState(0);
 
   useFrame((_, delta) => {
     if (isSolving && groupRef.current) {
@@ -31,6 +32,11 @@ export const InteractiveRubiksCube = ({ position }: { position: [number, number,
         return next;
       });
     }
+    
+    // Decay click pulse
+    if (clickPulse > 0) {
+      setClickPulse((prev) => Math.max(0, prev - delta * 3));
+    }
   });
 
   const handleClick = (e: THREE.Event) => {
@@ -38,11 +44,12 @@ export const InteractiveRubiksCube = ({ position }: { position: [number, number,
     if (!isSolving) {
       setIsSolving(true);
       setSolveProgress(0);
+      setClickPulse(1); // Trigger pulse
     }
   };
 
-  // Scale up slightly when hovered
-  const scale = isHovered ? 1.15 : 1;
+  // Scale up slightly when hovered or clicked
+  const scale = (isHovered ? 1.15 : 1) + clickPulse * 0.1;
 
   return (
     <group 
@@ -125,9 +132,15 @@ export const InteractiveRubiksCube = ({ position }: { position: [number, number,
         </>
       )}
       
-      {/* Hover glow effect */}
-      {isHovered && (
-        <pointLight position={[0, 0, 0]} color="#FFD700" intensity={0.3} distance={0.5} decay={2} />
+      {/* Hover/click glow effect */}
+      {(isHovered || clickPulse > 0) && (
+        <pointLight 
+          position={[0, 0, 0]} 
+          color="#FFD700" 
+          intensity={0.3 + clickPulse * 0.5} 
+          distance={0.5 + clickPulse * 0.3} 
+          decay={2} 
+        />
       )}
     </group>
   );
