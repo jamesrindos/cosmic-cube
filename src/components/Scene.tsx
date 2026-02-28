@@ -1097,8 +1097,221 @@ const LoadingScreen = () => (
   </Html>
 );
 
-// Main Scene
-const Scene = () => {
+// Mobile Layout - 2D scrollable tapes
+const MobileLayout = () => {
+  const [selectedTape, setSelectedTape] = useState<typeof tapeData[0] | null>(null);
+
+  return (
+    <div style={{
+      width: "100vw",
+      minHeight: "100vh",
+      background: "#050403",
+      fontFamily: "'VT323', monospace",
+      color: "#FFF",
+      overflowX: "hidden",
+    }}>
+      {/* Header */}
+      <div style={{ padding: "24px", paddingBottom: "16px" }}>
+        <div style={{ fontSize: "28px", letterSpacing: "2px" }}>JAMES RINDOS</div>
+        <div style={{ fontSize: "12px", color: "#666", letterSpacing: "3px", marginTop: "4px" }}>
+          CREATIVE PORTFOLIO
+        </div>
+      </div>
+      
+      {/* TV Screen */}
+      <div style={{
+        margin: "0 16px",
+        background: "#0A0A15",
+        border: "4px solid #1A1A1A",
+        borderRadius: "8px",
+        aspectRatio: "4/3",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Scanlines */}
+        <div style={{
+          position: "absolute",
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: `repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0,0,0,0.1) 2px,
+            rgba(0,0,0,0.1) 4px
+          )`,
+          pointerEvents: "none",
+        }}/>
+        
+        {selectedTape ? (
+          <div style={{
+            padding: "20px",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }} onClick={() => setSelectedTape(null)}>
+            <div style={{ 
+              fontSize: "24px", 
+              color: selectedTape.color,
+              marginBottom: "8px",
+              textShadow: `0 0 10px ${selectedTape.color}`,
+            }}>
+              {selectedTape.content.title}
+            </div>
+            {selectedTape.content.subtitle && (
+              <div style={{ fontSize: "14px", color: "#888", marginBottom: "16px" }}>
+                {selectedTape.content.subtitle}
+              </div>
+            )}
+            <div style={{ 
+              fontSize: "14px", 
+              color: "#CCC", 
+              lineHeight: "1.5",
+              flex: 1,
+              overflow: "auto",
+            }}>
+              {selectedTape.content.description}
+            </div>
+            {selectedTape.content.links && (
+              <div style={{ 
+                marginTop: "16px", 
+                display: "flex", 
+                flexWrap: "wrap", 
+                gap: "10px",
+              }}>
+                {Object.entries(selectedTape.content.links).map(([key, value]) => (
+                  <a
+                    key={key}
+                    href={typeof value === 'object' ? value.url : `mailto:${value}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      color: selectedTape.color,
+                      fontSize: "12px",
+                      padding: "6px 10px",
+                      border: `1px solid ${selectedTape.color}50`,
+                      borderRadius: "4px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    {key === 'twitter' && '𝕏 '}
+                    {key === 'linkedin' && '💼 '}
+                    {key === 'youtube' && '▶ '}
+                    {key === 'email' && '✉ '}
+                    {typeof value === 'object' ? value.handle : value}
+                  </a>
+                ))}
+              </div>
+            )}
+            <div style={{ 
+              fontSize: "10px", 
+              color: "#444", 
+              marginTop: "12px",
+              textAlign: "center",
+            }}>
+              TAP TO CLOSE
+            </div>
+          </div>
+        ) : (
+          <div style={{ color: "#333", fontSize: "18px" }}>
+            SELECT A TAPE ▼
+          </div>
+        )}
+      </div>
+      
+      {/* Tape carousel */}
+      <div style={{
+        padding: "24px 0",
+        overflowX: "auto",
+        WebkitOverflowScrolling: "touch",
+      }}>
+        <div style={{
+          display: "flex",
+          gap: "12px",
+          padding: "0 16px",
+          width: "max-content",
+        }}>
+          {tapeData.map((tape) => (
+            <div
+              key={tape.id}
+              onClick={() => setSelectedTape(tape)}
+              style={{
+                width: "70px",
+                height: "100px",
+                background: tape.isSpecial ? "#F0F0F0" : "#0F0F0F",
+                borderRadius: "4px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                border: selectedTape?.id === tape.id ? `2px solid ${tape.color}` : "2px solid transparent",
+                boxShadow: selectedTape?.id === tape.id ? `0 0 15px ${tape.color}50` : "none",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+            >
+              {/* Label */}
+              <div style={{
+                background: tape.color,
+                width: "55px",
+                height: "70px",
+                borderRadius: "2px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "4px",
+              }}>
+                <div style={{
+                  fontSize: "8px",
+                  fontWeight: "bold",
+                  color: tape.accent,
+                  textAlign: "center",
+                  wordBreak: "break-word",
+                }}>
+                  {tape.label}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {/* Scroll hint */}
+      <div style={{
+        textAlign: "center",
+        fontSize: "11px",
+        color: "#333",
+        padding: "0 16px 16px",
+      }}>
+        ← SCROLL FOR MORE TAPES →
+      </div>
+      
+      {/* Social links */}
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "24px",
+        padding: "24px",
+        borderTop: "1px solid #1A1A1A",
+      }}>
+        <a href="https://twitter.com/slimjimm318" target="_blank" rel="noopener noreferrer" 
+           style={{ color: "#666", textDecoration: "none", fontSize: "20px" }}>𝕏</a>
+        <a href="https://linkedin.com/in/james-rindos-489a29245" target="_blank" rel="noopener noreferrer"
+           style={{ color: "#666", textDecoration: "none", fontSize: "16px" }}>LinkedIn</a>
+        <a href="https://youtube.com/@jackacetalks" target="_blank" rel="noopener noreferrer"
+           style={{ color: "#666", textDecoration: "none", fontSize: "16px" }}>YouTube</a>
+      </div>
+    </div>
+  );
+};
+
+// Desktop Layout - 3D scene
+const DesktopLayout = () => {
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#050403" }}>
       <Canvas 
@@ -1139,7 +1352,7 @@ const Scene = () => {
         </div>
       </div>
       
-      {/* Instructions - hide on mobile */}
+      {/* Instructions */}
       <div
         style={{
           position: "fixed",
@@ -1152,35 +1365,9 @@ const Scene = () => {
           textAlign: "center",
           letterSpacing: "1px",
         }}
-        className="desktop-only"
       >
         SELECT A TAPE TO PLAY • DRAG TO ORBIT • SCROLL TO ZOOM • ESC TO EJECT
       </div>
-      
-      {/* Mobile touch hint */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          fontFamily: "'VT323', monospace",
-          fontSize: "12px",
-          color: "#444",
-          textAlign: "center",
-          display: "none",
-        }}
-        className="mobile-only"
-      >
-        TAP A TAPE • PINCH TO ZOOM
-      </div>
-      
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-only { display: none !important; }
-          .mobile-only { display: block !important; }
-        }
-      `}</style>
       
       {/* Social links */}
       <div
@@ -1215,6 +1402,20 @@ const Scene = () => {
       </div>
     </div>
   );
+};
+
+// Main Scene - responsive
+const Scene = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile ? <MobileLayout /> : <DesktopLayout />;
 };
 
 export default Scene;
