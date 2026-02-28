@@ -224,6 +224,26 @@ const VHSTape = ({
         />
       )}
       
+      {/* Tape label text - always visible */}
+      <Html
+        position={[0, 0.32, 0.13]}
+        transform
+        style={{ pointerEvents: "none" }}
+      >
+        <div style={{
+          fontSize: "8px",
+          fontFamily: "'VT323', monospace",
+          color: tape.accent,
+          textAlign: "center",
+          width: "55px",
+          letterSpacing: "1px",
+          fontWeight: "bold",
+          textShadow: tape.accent === "#FFFFFF" ? "0 0 2px rgba(0,0,0,0.5)" : "none",
+        }}>
+          {tape.label}
+        </div>
+      </Html>
+      
       {/* Hover tooltip */}
       {hovered && !isInserting && (
         <Html position={[0, 0.8, 0.3]} style={{ pointerEvents: "none" }}>
@@ -674,6 +694,51 @@ const TapeShelf = ({
   );
 };
 
+// Floating dust particles
+const DustParticles = () => {
+  const particlesRef = useRef<THREE.Points>(null);
+  const count = 100;
+  
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 15;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 10 + 3;
+  }
+  
+  useFrame(({ clock }) => {
+    if (particlesRef.current) {
+      const pos = particlesRef.current.geometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < count; i++) {
+        const idx = i * 3;
+        pos[idx + 1] += Math.sin(clock.elapsedTime * 0.3 + i) * 0.001;
+        pos[idx] += Math.cos(clock.elapsedTime * 0.2 + i * 0.5) * 0.0005;
+      }
+      particlesRef.current.geometry.attributes.position.needsUpdate = true;
+    }
+  });
+  
+  return (
+    <points ref={particlesRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={count}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.03}
+        color="#FFE4C4"
+        transparent
+        opacity={0.3}
+        sizeAttenuation
+      />
+    </points>
+  );
+};
+
 // Environment elements
 const Environment = () => (
   <group>
@@ -768,6 +833,7 @@ const SceneContent = () => {
         onSelectTape={handleSelectTape}
       />
       <Environment />
+      <DustParticles />
       
       {/* Camera controls */}
       <OrbitControls 
@@ -786,25 +852,117 @@ const SceneContent = () => {
   );
 };
 
-// Loading screen
+// Loading screen - VHS tracking effect
 const LoadingScreen = () => (
   <Html center>
     <div style={{
       fontFamily: "'VT323', monospace",
       color: "#00CCFF",
-      fontSize: "24px",
       textAlign: "center",
+      position: "relative",
+      width: "300px",
+      height: "200px",
+      background: "#0A0A0A",
+      border: "3px solid #1A1A1A",
+      borderRadius: "4px",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
     }}>
+      {/* VHS tracking lines */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0,204,255,0.03) 2px,
+          rgba(0,204,255,0.03) 4px
+        )`,
+        animation: "scanlines 8s linear infinite",
+        pointerEvents: "none",
+      }}/>
+      
+      {/* Static noise overlay */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.05,
+        background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><filter id=\"n\"><feTurbulence baseFrequency=\"0.8\" /></filter><rect width=\"100%\" height=\"100%\" filter=\"url(%23n)\" /></svg>')",
+        animation: "noise 0.2s steps(10) infinite",
+        pointerEvents: "none",
+      }}/>
+      
       <div style={{ 
-        marginBottom: "15px", 
-        fontSize: "48px",
+        fontSize: "64px",
+        marginBottom: "10px",
         animation: "pulse 1.5s ease-in-out infinite",
+        filter: "drop-shadow(0 0 10px #00CCFF)",
       }}>📼</div>
-      <div>LOADING...</div>
+      
+      <div style={{ fontSize: "24px", letterSpacing: "4px" }}>LOADING</div>
+      
+      <div style={{
+        marginTop: "15px",
+        width: "150px",
+        height: "4px",
+        background: "#1A1A1A",
+        borderRadius: "2px",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          width: "50%",
+          height: "100%",
+          background: "linear-gradient(90deg, #00CCFF, #00FFFF)",
+          animation: "loading 1.5s ease-in-out infinite",
+          borderRadius: "2px",
+        }}/>
+      </div>
+      
+      <div style={{
+        position: "absolute",
+        bottom: "10px",
+        right: "15px",
+        fontSize: "12px",
+        color: "#333",
+      }}>
+        PLAY ▶
+      </div>
+      
       <style>{`
         @keyframes pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.7; transform: scale(0.95); }
+          50% { opacity: 0.8; transform: scale(0.98); }
+        }
+        @keyframes loading {
+          0% { transform: translateX(-100%); }
+          50% { transform: translateX(100%); }
+          100% { transform: translateX(200%); }
+        }
+        @keyframes scanlines {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(4px); }
+        }
+        @keyframes noise {
+          0%, 100% { transform: translate(0, 0); }
+          10% { transform: translate(-1%, -1%); }
+          20% { transform: translate(1%, 1%); }
+          30% { transform: translate(-1%, 1%); }
+          40% { transform: translate(1%, -1%); }
+          50% { transform: translate(-1%, 0); }
+          60% { transform: translate(1%, 0); }
+          70% { transform: translate(0, 1%); }
+          80% { transform: translate(0, -1%); }
+          90% { transform: translate(1%, 1%); }
         }
       `}</style>
     </div>
