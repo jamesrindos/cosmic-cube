@@ -729,6 +729,29 @@ const WallArt = () => (
         <meshStandardMaterial color="#80DEEA" />
       </mesh>
     </group>
+
+    {/* Wall clock in hallway */}
+    <group position={[2.94, 2, -14]}>
+      {/* Clock face */}
+      <mesh rotation={[0, -Math.PI / 2, 0]}>
+        <cylinderGeometry args={[0.25, 0.25, 0.04, 16]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      {/* Clock rim */}
+      <mesh rotation={[0, -Math.PI / 2, 0]}>
+        <torusGeometry args={[0.25, 0.02, 8, 16]} />
+        <meshStandardMaterial color="#2D2D3A" />
+      </mesh>
+      {/* Clock hands (simplified) */}
+      <mesh position={[0.03, 0.08, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <boxGeometry args={[0.02, 0.12, 0.01]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+      <mesh position={[0.03, 0, 0.05]} rotation={[0, -Math.PI / 2, Math.PI / 3]}>
+        <boxGeometry args={[0.015, 0.15, 0.01]} />
+        <meshStandardMaterial color="#1A1A1A" />
+      </mesh>
+    </group>
   </group>
 );
 
