@@ -1190,45 +1190,66 @@ const MobileLayout = () => {
             {/* Video player or content */}
             {selectedTape.content.videoId ? (
               <>
-                {/* 9:16 video container */}
+                {/* Play button that opens Drive */}
+                <a 
+                  href={`https://drive.google.com/file/d/${selectedTape.content.videoId}/view`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "40px 20px",
+                    textDecoration: "none",
+                  }}
+                >
+                  <div style={{
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "50%",
+                    background: selectedTape.color,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "16px",
+                    boxShadow: `0 0 30px ${selectedTape.color}50`,
+                  }}>
+                    <span style={{ 
+                      fontSize: "36px", 
+                      marginLeft: "6px",
+                      color: selectedTape.accent,
+                    }}>▶</span>
+                  </div>
+                  <div style={{
+                    fontSize: "14px",
+                    color: "#888",
+                    marginBottom: "8px",
+                  }}>
+                    TAP TO WATCH
+                  </div>
+                </a>
+                {/* Description */}
                 <div style={{
-                  width: "100%",
-                  maxWidth: "280px",
-                  margin: "0 auto",
-                  aspectRatio: "9/16",
-                  background: "#000",
-                  borderRadius: "4px",
-                  overflow: "hidden",
-                }}>
-                  <iframe
-                    src={`https://drive.google.com/file/d/${selectedTape.content.videoId}/preview?autoplay=1`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      border: "none",
-                    }}
-                    allow="autoplay; fullscreen"
-                    allowFullScreen
-                  />
-                </div>
-                {/* Description below video */}
-                <div style={{
-                  padding: "16px",
-                  maxHeight: "120px",
-                  overflow: "auto",
+                  padding: "0 20px 20px",
                 }}>
                   <div style={{ 
-                    fontSize: "18px", 
+                    fontSize: "20px", 
                     color: selectedTape.color,
-                    marginBottom: "6px",
+                    marginBottom: "8px",
                     fontWeight: "bold",
                   }}>
                     {selectedTape.content.title}
                   </div>
+                  {selectedTape.content.subtitle && (
+                    <div style={{ fontSize: "12px", color: "#666", marginBottom: "8px" }}>
+                      {selectedTape.content.subtitle}
+                    </div>
+                  )}
                   <div style={{ 
-                    fontSize: "12px", 
+                    fontSize: "13px", 
                     color: "#AAA", 
-                    lineHeight: "1.4",
+                    lineHeight: "1.5",
                   }}>
                     {selectedTape.content.description}
                   </div>
