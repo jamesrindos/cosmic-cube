@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { Html, Loader } from "@react-three/drei";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
@@ -1969,11 +1969,68 @@ const LoadingScreen = () => (
   </Html>
 );
 
+// Mobile detection hook
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  return isMobile;
+};
+
 const Scene = () => {
   const [activePreset, setActivePreset] = useState<CameraPreset>("overview");
+  const isMobile = useIsMobile();
 
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D0F" }}>
+      {/* Mobile warning */}
+      {isMobile && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(13, 13, 15, 0.95)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            padding: "20px",
+            textAlign: "center",
+            fontFamily: "'VT323', monospace",
+          }}
+        >
+          <div style={{ fontSize: "48px", marginBottom: "16px" }}>🖥️</div>
+          <div style={{ fontSize: "24px", color: "#FFFFFF", marginBottom: "8px" }}>
+            Best Viewed on Desktop
+          </div>
+          <div style={{ fontSize: "14px", color: "#888", maxWidth: "300px" }}>
+            This interactive 3D portfolio experience is optimized for desktop browsers with a mouse.
+          </div>
+          <a
+            href="mailto:jamesrindos1@gmail.com"
+            style={{
+              marginTop: "24px",
+              color: "#7B68EE",
+              fontSize: "14px",
+              textDecoration: "none",
+            }}
+          >
+            📧 jamesrindos1@gmail.com
+          </a>
+        </div>
+      )}
       <ApartmentProvider>
         <Canvas camera={{ position: [18, 16, 8], fov: 45 }} shadows>
           <Suspense fallback={<LoadingScreen />}>
