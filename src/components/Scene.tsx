@@ -1996,6 +1996,32 @@ const Scene = () => {
             fontSize: "14px",
           }}
         />
+        {/* Title/Branding - top left */}
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            left: "20px",
+            fontFamily: "'VT323', monospace",
+            zIndex: 1000,
+          }}
+        >
+          <div style={{ 
+            fontSize: "24px", 
+            color: "#FFFFFF",
+            textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+          }}>
+            James Rindos
+          </div>
+          <div style={{ 
+            fontSize: "12px", 
+            color: "#7B68EE",
+            marginTop: "2px",
+          }}>
+            Creative Portfolio
+          </div>
+        </div>
+        
         {/* Camera Navigation */}
         <CameraNavigation 
           activePreset={activePreset} 
