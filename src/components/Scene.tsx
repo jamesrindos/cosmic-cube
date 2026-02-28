@@ -7,12 +7,12 @@ import * as THREE from "three";
 // TV + TAPES PORTFOLIO - POLISHED VERSION
 // ============================================
 
-// VHS Tape data - About Me only (add your real projects here)
+// VHS Tape data - from James's brief (real projects, real descriptions)
 const tapeData = [
   { id: "about", label: "ABOUT ME", color: "#FFFFFF", accent: "#E91E63", spine: "#F5F5F5", isSpecial: true, content: {
     title: "James Rindos",
     subtitle: "Creative Technologist",
-    description: "Building at the intersection of AI and video.",
+    description: "Transparently, I'm in a bit of a discovery phase. Last year I was building AI creative and agent-based systems, everything from Instagram ads to Times Square billboards. The year before that I was in political media, producing campaign content for presidents, senators, congresspeople. But I haven't found love yet. Whatever we work on together, I want us to win.",
     links: { 
       twitter: { handle: "@slimjimm318", url: "https://twitter.com/slimjimm318" },
       linkedin: { handle: "james-rindos", url: "https://linkedin.com/in/james-rindos-489a29245" },
@@ -20,21 +20,70 @@ const tapeData = [
       email: "jamesrindos1@gmail.com"
     }
   }},
-  // Add your real projects below - these are placeholders
-  { id: "project1", label: "PROJECT 1", color: "#2196F3", accent: "#FFFFFF", spine: "#2196F3", content: {
-    title: "Project Title",
-    subtitle: "Project Type",
-    description: "Add your project description here.",
+  { id: "mudwtr", label: "MUD/WTR", color: "#795548", accent: "#FFFFFF", spine: "#795548", content: {
+    title: "MUD/WTR",
+    subtitle: "AI Video",
+    description: "my favorite video i've made probably ever? just so fucking cool. opened my eyes to what was possible with ai video despite veo being out for only a few weeks. i've directed i think 4 more like it with similar characters. but this one will always take the cake.",
   }},
-  { id: "project2", label: "PROJECT 2", color: "#E91E63", accent: "#FFFFFF", spine: "#E91E63", content: {
-    title: "Project Title",
-    subtitle: "Project Type",
-    description: "Add your project description here.",
+  { id: "moziwash", label: "MOZIWASH", color: "#FFD700", accent: "#1A1A1A", spine: "#FFD700", content: {
+    title: "MoziWash",
+    subtitle: "First Billboard",
+    description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
   }},
-  { id: "project3", label: "PROJECT 3", color: "#4CAF50", accent: "#FFFFFF", spine: "#4CAF50", content: {
-    title: "Project Title",
-    subtitle: "Project Type",
-    description: "Add your project description here.",
+  { id: "kalshi", label: "KALSHI", color: "#E91E63", accent: "#FFFFFF", spine: "#E91E63", content: {
+    title: "Kalshi",
+    subtitle: "Wimbledon Spec Ad",
+    description: "what a blast. my friend nate and i locked ourselves in a room the day before wimbledon and made this ad for kalshi as a spec ad. we were spamming our connect while she was seeing a movie until she passed it on to her higher ups. was really cool to follow up pj ace's great work on his kalshi ads with this wimbledon spot.",
+  }},
+  { id: "political", label: "POLITICAL", color: "#0D47A1", accent: "#E53935", spine: "#0D47A1", content: {
+    title: "Political Media",
+    subtitle: "Biden • DNC • Campaigns",
+    description: "i worked with mzl media and z tribeca for a year producing political campaign content for presidents, senators, congresspeople. incredible experience!!",
+  }},
+  { id: "sunflower1", label: "SUNFLWR 1", color: "#FFC107", accent: "#1A1A1A", spine: "#FFC107", content: {
+    title: "Sunflower Vol 1",
+    subtitle: "Sobriety Remix",
+    description: "this brand asked for like 40 videos in a month on top of everything else i was creating. when i was tapped out of new concepts i turned to remixing some of my favorite iconic ad campaigns around sobriety. really like how this one came out!",
+  }},
+  { id: "sunflower2", label: "SUNFLWR 2", color: "#FF9800", accent: "#1A1A1A", spine: "#FF9800", content: {
+    title: "Sunflower Vol 2",
+    subtitle: "Pixar Style",
+    description: "people in the office told me this one hit emotionally but i just think the art style carried.",
+  }},
+  { id: "jb", label: "JB", color: "#1A1A1A", accent: "#FFD700", spine: "#1A1A1A", content: {
+    title: "JB",
+    subtitle: "48 Hour Sprint",
+    description: "another sleepless 48 hour period. did a ton of brand research. spent a ton of time making it look and sound like HIM but in a way that farms aura.",
+  }},
+  { id: "audien", label: "AUDIEN", color: "#2196F3", accent: "#FFFFFF", spine: "#2196F3", content: {
+    title: "Audien Hearing",
+    subtitle: "AI CTV Ads",
+    description: "this hearing aid company saw early potential for ai ctv ads and this is just one of many many ideas that we experimented with.",
+  }},
+  { id: "dirtea", label: "DIRTEA", color: "#4CAF50", accent: "#FFFFFF", spine: "#4CAF50", content: {
+    title: "Dirtea",
+    subtitle: "UK → US Launch",
+    description: "nootropics brand in the UK looking to take a big swing with a US launch. was able to help out with one of their instagram reels. this seems simple enough but unfortunately took so much time with the tools that i had at my disposal lol. the physics were so hard to nail down!!",
+  }},
+  { id: "moes", label: "MOE'S", color: "#FF5722", accent: "#FFFFFF", spine: "#FF5722", content: {
+    title: "Moe's",
+    subtitle: "Veo Spec Ad",
+    description: "another spec ad. weird one. veo had been out for maybe a week. and i was rawdogging these prompts trying to get these animals to act like people and look somewhat consistent in between scenes. what a nightmare. kind of holds up though.",
+  }},
+  { id: "boldebottle", label: "BOLDE", color: "#9C27B0", accent: "#FFFFFF", spine: "#9C27B0", content: {
+    title: "BoldeBottle",
+    subtitle: "NanoBanana Pro",
+    description: "got this assignment right around the launch of nanobanana pro. learned that providing start frame and end frame is absolutely the move. they paid me with one of their shaker cups. i haven't used it yet though.",
+  }},
+  { id: "dsc", label: "DSC", color: "#3F51B5", accent: "#FFFFFF", spine: "#3F51B5", content: {
+    title: "DSC",
+    subtitle: "Twin Lacrosse Players",
+    description: "weird one. named the characters after my brothers, twin lacrosse players. don't think its a winner at all but it makes me laugh.",
+  }},
+  { id: "getmte", label: "MTE", color: "#00BCD4", accent: "#FFFFFF", spine: "#00BCD4", content: {
+    title: "GetMTE",
+    subtitle: "Repurposed Ad",
+    description: "one of my friends was making this ad and got let go, so i was tasked with repurposing it. i guess i think the hook came out cool.",
   }},
 ];
 
@@ -686,7 +735,7 @@ const TVStand = () => (
   </group>
 );
 
-// Tape Shelf Component - Single row for now
+// Tape Shelf Component - Two rows for 14 tapes
 const TapeShelf = ({ 
   selectedTapeId,
   insertingTapeId,
@@ -696,35 +745,56 @@ const TapeShelf = ({
   insertingTapeId: string | null;
   onSelectTape: (tape: typeof tapeData[0]) => void;
 }) => {
+  const topRowTapes = tapeData.slice(0, 7);
+  const bottomRowTapes = tapeData.slice(7);
+
   return (
     <group position={[0, -3.2, 1.5]}>
       {/* Shelf unit back */}
       <mesh position={[0, 0.5, -0.4]} receiveShadow>
-        <boxGeometry args={[5, 2, 0.1]} />
+        <boxGeometry args={[7, 3, 0.1]} />
         <meshStandardMaterial color="#1A1008" roughness={0.85} />
       </mesh>
       
-      {/* Shelf surface */}
-      <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
-        <boxGeometry args={[5, 0.12, 0.9]} />
+      {/* Top shelf */}
+      <mesh position={[0, 1.2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[7, 0.12, 0.9]} />
+        <meshStandardMaterial color="#2A1A10" roughness={0.7} />
+      </mesh>
+      
+      {/* Bottom shelf */}
+      <mesh position={[0, -0.1, 0]} castShadow receiveShadow>
+        <boxGeometry args={[7, 0.12, 0.9]} />
         <meshStandardMaterial color="#2A1A10" roughness={0.7} />
       </mesh>
       
       {/* Side panels */}
-      <mesh position={[-2.45, 0.5, 0]}>
-        <boxGeometry args={[0.1, 1.8, 0.9]} />
+      <mesh position={[-3.45, 0.5, 0]}>
+        <boxGeometry args={[0.1, 2.8, 0.9]} />
         <meshStandardMaterial color="#1A1008" roughness={0.8} />
       </mesh>
-      <mesh position={[2.45, 0.5, 0]}>
-        <boxGeometry args={[0.1, 1.8, 0.9]} />
+      <mesh position={[3.45, 0.5, 0]}>
+        <boxGeometry args={[0.1, 2.8, 0.9]} />
         <meshStandardMaterial color="#1A1008" roughness={0.8} />
       </mesh>
       
-      {/* Tapes - centered */}
-      {tapeData.map((tape, i) => (
+      {/* Top row tapes */}
+      {topRowTapes.map((tape, i) => (
         <VHSTape
           key={tape.id}
-          position={[-1.35 + i * 0.9, 1.25, 0]}
+          position={[-2.7 + i * 0.9, 1.85, 0]}
+          tape={tape}
+          isSelected={selectedTapeId === tape.id}
+          isInserting={insertingTapeId === tape.id}
+          onSelect={() => onSelectTape(tape)}
+        />
+      ))}
+      
+      {/* Bottom row tapes */}
+      {bottomRowTapes.map((tape, i) => (
+        <VHSTape
+          key={tape.id}
+          position={[-2.7 + i * 0.9, 0.55, 0]}
           tape={tape}
           isSelected={selectedTapeId === tape.id}
           isInserting={insertingTapeId === tape.id}
