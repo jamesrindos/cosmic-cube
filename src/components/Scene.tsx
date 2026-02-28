@@ -1,8 +1,9 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { InteractiveRubiksCube, InteractiveGuitar, InteractiveVHSTape } from "./InteractiveElements";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -557,24 +558,8 @@ const GamingDesk = () => (
       <meshStandardMaterial color="#00D9FF" emissive="#00D9FF" emissiveIntensity={0.4} />
     </mesh>
 
-    {/* === RUBIK'S CUBE (prominent - per BRIEF, solves under a minute) === */}
-    <mesh position={[0.5, 0.85, 0.1]}>
-      <boxGeometry args={[0.14, 0.14, 0.14]} />
-      <meshStandardMaterial color="#CC3333" />
-    </mesh>
-    {/* Cube face colors */}
-    <mesh position={[0.57, 0.85, 0.1]}>
-      <boxGeometry args={[0.01, 0.12, 0.12]} />
-      <meshStandardMaterial color="#FFFFFF" />
-    </mesh>
-    <mesh position={[0.5, 0.92, 0.1]}>
-      <boxGeometry args={[0.12, 0.01, 0.12]} />
-      <meshStandardMaterial color="#FFD700" />
-    </mesh>
-    <mesh position={[0.5, 0.85, 0.17]}>
-      <boxGeometry args={[0.12, 0.12, 0.01]} />
-      <meshStandardMaterial color="#27AE60" />
-    </mesh>
+    {/* === INTERACTIVE RUBIK'S CUBE (click to solve!) === */}
+    <InteractiveRubiksCube position={[0.5, 0.85, 0.1]} />
     
     {/* === McDONALD'S TOYS (per BRIEF - new + vintage) === */}
     {/* Happy Meal toy 1 - character figure */}
@@ -867,50 +852,7 @@ const BedroomClock = () => (
   </group>
 );
 
-const Guitar = () => (
-  // Guitar leaning against left wall - dusty cherry red (per BRIEF)
-  <group position={[0.3, 0, -20]} rotation={[0, 0.1, 0.12]}>
-    {/* Guitar body - cherry red with slight dust (darker tone) */}
-    <mesh position={[0, 0.6, 0]}>
-      <boxGeometry args={[0.5, 0.8, 0.12]} />
-      <meshStandardMaterial color="#A52A2A" />
-    </mesh>
-    {/* Guitar body lower bout - dusty cherry */}
-    <mesh position={[0, 0.3, 0]}>
-      <boxGeometry args={[0.55, 0.4, 0.1]} />
-      <meshStandardMaterial color="#A52A2A" />
-    </mesh>
-    {/* Neck */}
-    <mesh position={[0, 1.4, 0]}>
-      <boxGeometry args={[0.12, 1.2, 0.06]} />
-      <meshStandardMaterial color="#3D2E2E" />
-    </mesh>
-    {/* Headstock */}
-    <mesh position={[0, 2.05, 0]}>
-      <boxGeometry args={[0.16, 0.2, 0.05]} />
-      <meshStandardMaterial color="#1A1A1A" />
-    </mesh>
-    {/* Sound hole */}
-    <mesh position={[0, 0.55, -0.07]}>
-      <boxGeometry args={[0.2, 0.2, 0.01]} />
-      <meshStandardMaterial color="#0A0A0A" />
-    </mesh>
-    {/* Dust accumulation on top (lighter patches) */}
-    <mesh position={[0.1, 0.7, -0.065]} rotation={[0, 0, 0.2]}>
-      <boxGeometry args={[0.15, 0.1, 0.002]} />
-      <meshStandardMaterial color="#C4A484" transparent opacity={0.3} />
-    </mesh>
-    <mesh position={[-0.08, 0.45, -0.055]} rotation={[0, 0, -0.15]}>
-      <boxGeometry args={[0.1, 0.08, 0.002]} />
-      <meshStandardMaterial color="#C4A484" transparent opacity={0.25} />
-    </mesh>
-    {/* Strings (simplified) */}
-    <mesh position={[0, 1.0, -0.065]}>
-      <boxGeometry args={[0.08, 1.0, 0.005]} />
-      <meshStandardMaterial color="#D4AF37" />
-    </mesh>
-  </group>
-);
+// Guitar component moved to InteractiveElements.tsx as InteractiveGuitar
 
 // === LIVING ROOM ===
 
@@ -972,21 +914,23 @@ const RetroTV = () => (
 const VHSShelf = () => {
   // 14 VHS tapes with brand colors (per BRIEF portfolio)
   const vhsTapes = [
-    { color: "#FFD700", label: "#1A1A1A" }, // MoziWash (gold/billboard)
-    { color: "#2196F3", label: "#FFFFFF" }, // Audien Hearing (blue)
-    { color: "#FF5722", label: "#FFFFFF" }, // Boldebottle (orange)
-    { color: "#FFEB3B", label: "#1A1A1A" }, // Sunflower Vol 1 (yellow)
-    { color: "#FFC107", label: "#1A1A1A" }, // Sunflower Vol 2 (amber)
-    { color: "#4CAF50", label: "#FFFFFF" }, // Dirtea (green/tea)
-    { color: "#3F51B5", label: "#FFFFFF" }, // DSC (blue)
-    { color: "#9C27B0", label: "#FFFFFF" }, // GetMTE (purple)
-    { color: "#1A1A1A", label: "#FFD700" }, // JB (black/gold)
-    { color: "#E91E63", label: "#FFFFFF" }, // Kalshi (pink)
-    { color: "#FF9800", label: "#8B4513" }, // Moe's (orange/brown)
-    { color: "#795548", label: "#FFFFFF" }, // MudWTR (brown/earthy)
-    { color: "#0D47A1", label: "#E53935" }, // Political (blue/red)
-    { color: "#607D8B", label: "#FFFFFF" }, // Extra slot
+    { color: "#FFD700", label: "#1A1A1A", name: "MoziWash" },
+    { color: "#2196F3", label: "#FFFFFF", name: "Audien" },
+    { color: "#FF5722", label: "#FFFFFF", name: "Boldebottle" },
+    { color: "#FFEB3B", label: "#1A1A1A", name: "Sunflower1" },
+    { color: "#FFC107", label: "#1A1A1A", name: "Sunflower2" },
+    { color: "#4CAF50", label: "#FFFFFF", name: "Dirtea" },
+    { color: "#3F51B5", label: "#FFFFFF", name: "DSC" },
+    { color: "#9C27B0", label: "#FFFFFF", name: "GetMTE" },
+    { color: "#1A1A1A", label: "#FFD700", name: "JB" },
+    { color: "#E91E63", label: "#FFFFFF", name: "Kalshi" },
+    { color: "#FF9800", label: "#8B4513", name: "Moes" },
+    { color: "#795548", label: "#FFFFFF", name: "MudWTR" },
+    { color: "#0D47A1", label: "#E53935", name: "Political" },
+    { color: "#607D8B", label: "#FFFFFF", name: "Extra" },
   ];
+  
+  const [selectedTape, setSelectedTape] = useState<string | null>(null);
 
   return (
     <group position={[9.6, 0.75, -6.5]}>
@@ -1007,46 +951,28 @@ const VHSShelf = () => {
         </mesh>
       ))}
       
-      {/* VHS tapes - row 1 (top shelf) */}
+      {/* Interactive VHS tapes - row 1 (top shelf) */}
       {vhsTapes.slice(0, 7).map((tape, i) => (
-        <group key={`top-${i}`} position={[0, 0.25, -0.4 + i * 0.14]}>
-          {/* Tape body */}
-          <mesh>
-            <boxGeometry args={[0.15, 0.18, 0.1]} />
-            <meshStandardMaterial color="#1A1A1A" />
-          </mesh>
-          {/* Label */}
-          <mesh position={[-0.076, 0, 0]}>
-            <boxGeometry args={[0.01, 0.14, 0.08]} />
-            <meshStandardMaterial color={tape.color} />
-          </mesh>
-          {/* Label stripe */}
-          <mesh position={[-0.078, 0.04, 0]}>
-            <boxGeometry args={[0.005, 0.03, 0.06]} />
-            <meshStandardMaterial color={tape.label} />
-          </mesh>
-        </group>
+        <InteractiveVHSTape
+          key={`top-${i}`}
+          position={[0, 0.25, -0.4 + i * 0.14]}
+          color={tape.color}
+          labelColor={tape.label}
+          projectName={tape.name}
+          onSelect={() => setSelectedTape(tape.name)}
+        />
       ))}
       
-      {/* VHS tapes - row 2 (middle shelf) */}
+      {/* Interactive VHS tapes - row 2 (middle shelf) */}
       {vhsTapes.slice(7, 14).map((tape, i) => (
-        <group key={`mid-${i}`} position={[0, -0.25, -0.4 + i * 0.14]}>
-          {/* Tape body */}
-          <mesh>
-            <boxGeometry args={[0.15, 0.18, 0.1]} />
-            <meshStandardMaterial color="#1A1A1A" />
-          </mesh>
-          {/* Label */}
-          <mesh position={[-0.076, 0, 0]}>
-            <boxGeometry args={[0.01, 0.14, 0.08]} />
-            <meshStandardMaterial color={tape.color} />
-          </mesh>
-          {/* Label stripe */}
-          <mesh position={[-0.078, 0.04, 0]}>
-            <boxGeometry args={[0.005, 0.03, 0.06]} />
-            <meshStandardMaterial color={tape.label} />
-          </mesh>
-        </group>
+        <InteractiveVHSTape
+          key={`mid-${i}`}
+          position={[0, -0.25, -0.4 + i * 0.14]}
+          color={tape.color}
+          labelColor={tape.label}
+          projectName={tape.name}
+          onSelect={() => setSelectedTape(tape.name)}
+        />
       ))}
       
       {/* Game console on bottom shelf */}
@@ -1741,7 +1667,8 @@ const Apartment = () => {
       <BedroomClock />
       <GamingDesk />
       <GamingChair />
-      <Guitar />
+      {/* Interactive Guitar - click to strum! */}
+      <InteractiveGuitar position={[0.3, 0, -20]} />
       <BedroomClutter />
 
       {/* === KITCHEN === */}
