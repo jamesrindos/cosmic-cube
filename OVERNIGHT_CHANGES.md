@@ -1,8 +1,8 @@
 # 🏠 Overnight Polish Report - Cosmic Cube
 
 **Branch:** `ace/apartment-polish`  
-**Commits:** 10  
-**Date:** Feb 28, 2026 (Updated 05:30 UTC)
+**Commits:** 14  
+**Date:** Feb 28, 2026 (Updated 06:00 UTC)
 
 ---
 
@@ -137,6 +137,70 @@ Other:
 - **Pizza boxes** by couch (one open, one stacked)
 - **Phone charger** cable running to wall outlet
 - **Contact sticky note** on door (per BRIEF)
+
+---
+
+## Third Polish Pass (06:00 UTC)
+
+### Fridge Upgrade
+- 4 polaroid photos (IG aesthetic per BRIEF)
+- Colorful magnets holding photos
+- Photos at different angles for natural feel
+
+### Living Room
+- **Spinning ceiling fan** with 5 blades (animated!)
+- Light fixture hanging from fan
+- Adds ambient depth to the space
+
+### Bedroom Window Curtains
+- Curtain rods above each window
+- Dark curtains (partially open) on both sides
+- Fold details for 3D depth
+
+### Bathroom Mirror
+- Wooden frame
+- Reflective material with proper metalness
+- Subtle glow effect
+- Post-it note on corner (detail)
+
+### Bedroom Floor Clutter (lived-in chaos, 24yo vibe)
+- T-shirt crumpled on floor
+- Jeans tossed
+- Mismatched socks (realistic!)
+- Hoodie near bed
+- Pillow that fell off
+- Book on floor
+- Water bottle
+
+---
+
+## Summary of All Changes
+
+**Total commits this branch:** 14
+
+### From BRIEF Now Implemented:
+- ✅ Layout matches reference diagram (couch left, TV right)
+- ✅ All 10 specific wall posters (Scott Pilgrim, Spider-Verse, Whiplash, Babylon, Marty Supreme, Tyler, Elliott Smith, Djo, Geese, Critical Role)
+- ✅ 14 branded VHS tapes with portfolio colors
+- ✅ Invincible coffee table book + Letterboxd notebook
+- ✅ McDonald's toys + Pez dispensers on desk
+- ✅ Rubik's cube with colored faces
+- ✅ Pizza boxes (lived-in chaos)
+- ✅ Fridge polaroid photos (IG magnets)
+- ✅ Ceiling fan (sound design ambiance note)
+- ✅ Contact sticky note on door
+- ✅ Van Gogh Starry Night bedding
+- ✅ Dark/black fridge per reference
+- ✅ Bathroom with washer/dryer
+- ✅ Window curtains
+- ✅ Phone charging cable
+- ✅ Floor clutter (clothes, socks, etc.)
+
+### Still Could Add (Future):
+- Interactive Rubik's cube that solves on click
+- Guitar that strums on click
+- VHS tape interactions (click to "play")
+- Sound effects
 
 ---
 
