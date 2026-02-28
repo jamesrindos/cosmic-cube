@@ -322,6 +322,34 @@ const BedroomWindows = () => (
           <boxGeometry args={[0.02, 1.4, 0.04]} />
           <meshStandardMaterial color="#D0D0D0" />
         </mesh>
+        
+        {/* === CURTAINS === */}
+        {/* Curtain rod */}
+        <mesh position={[-0.15, 0.85, 0]}>
+          <cylinderGeometry args={[0.02, 0.02, 1.2, 6]} />
+          <meshStandardMaterial color="#1A1A1A" />
+        </mesh>
+        {/* Left curtain - slightly open */}
+        <mesh position={[-0.12, 0.1, -0.45]}>
+          <boxGeometry args={[0.04, 1.4, 0.35]} />
+          <meshStandardMaterial color="#2D2D3A" />
+        </mesh>
+        {/* Curtain folds (left) */}
+        <mesh position={[-0.1, 0.1, -0.38]}>
+          <boxGeometry args={[0.02, 1.35, 0.08]} />
+          <meshStandardMaterial color="#3D3D4A" />
+        </mesh>
+        {/* Right curtain - slightly open */}
+        <mesh position={[-0.12, 0.1, 0.45]}>
+          <boxGeometry args={[0.04, 1.4, 0.35]} />
+          <meshStandardMaterial color="#2D2D3A" />
+        </mesh>
+        {/* Curtain folds (right) */}
+        <mesh position={[-0.1, 0.1, 0.38]}>
+          <boxGeometry args={[0.02, 1.35, 0.08]} />
+          <meshStandardMaterial color="#3D3D4A" />
+        </mesh>
+        
         {/* Soft light from windows */}
         <pointLight position={[-1, 0, 0]} color="#FFF8E8" intensity={0.4} distance={6} decay={2} />
       </group>
@@ -680,10 +708,23 @@ const Bathroom = () => (
         <boxGeometry args={[0.06, 0.12, 0.06]} />
         <meshStandardMaterial color="#C0C0C0" />
       </mesh>
-      {/* Mirror above sink */}
+      {/* === BATHROOM MIRROR (potential About section per BRIEF) === */}
+      {/* Mirror frame */}
+      <mesh position={[-0.5, 1.3, 0]}>
+        <boxGeometry args={[0.04, 0.7, 0.6]} />
+        <meshStandardMaterial color="#3D2E2E" />
+      </mesh>
+      {/* Mirror surface - reflective blue tint */}
       <mesh position={[-0.48, 1.3, 0]}>
-        <boxGeometry args={[0.02, 0.6, 0.5]} />
-        <meshStandardMaterial color="#A8D8EA" />
+        <boxGeometry args={[0.01, 0.6, 0.5]} />
+        <meshStandardMaterial color="#B8D4E3" metalness={0.8} roughness={0.2} />
+      </mesh>
+      {/* Subtle reflection glow */}
+      <pointLight position={[-0.3, 1.3, 0]} color="#B8D4E3" intensity={0.1} distance={1} decay={2} />
+      {/* Post-it note on mirror corner */}
+      <mesh position={[-0.47, 1.5, 0.2]} rotation={[0, 0, 0.08]}>
+        <boxGeometry args={[0.01, 0.08, 0.08]} />
+        <meshStandardMaterial color="#FFEB3B" />
       </mesh>
     </group>
 
