@@ -1,143 +1,245 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Html, OrbitControls, Environment, useTexture } from "@react-three/drei";
-import { Suspense, useState, useRef } from "react";
+import { Html, OrbitControls, Float } from "@react-three/drei";
+import { Suspense, useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 
 // ============================================
-// MINIMAL TV + TAPES PORTFOLIO
-// Stripped down, focused, intentional
+// TV + TAPES PORTFOLIO - POLISHED VERSION
 // ============================================
 
-// VHS Tape data - portfolio projects + About Me
+// VHS Tape data - full portfolio
 const tapeData = [
-  { id: "about", label: "ABOUT ME", color: "#E8E8E8", accent: "#1A1A1A", content: {
+  { id: "about", label: "ABOUT ME", color: "#FFFFFF", accent: "#E91E63", spine: "#F5F5F5", isSpecial: true, content: {
     title: "James Rindos",
-    description: "Creative technologist building at the intersection of AI and video. Previously led AI video production at Icon. Now building tools that make content creation feel like magic.",
-    links: { twitter: "@slimjimm318", linkedin: "james-rindos-489a29245", email: "jamesrindos1@gmail.com" }
+    subtitle: "Creative Technologist",
+    description: "Building at the intersection of AI and video. Previously led AI video production at Icon, creating hundreds of UGC-style ads that drove millions in revenue. Now building tools that make content creation feel like magic.",
+    links: { 
+      twitter: { handle: "@slimjimm318", url: "https://twitter.com/slimjimm318" },
+      linkedin: { handle: "james-rindos", url: "https://linkedin.com/in/james-rindos-489a29245" },
+      youtube: { handle: "@jackacetalks", url: "https://youtube.com/@jackacetalks" },
+      email: "jamesrindos1@gmail.com"
+    }
   }},
-  { id: "moziwash", label: "MOZIWASH", color: "#FFD700", accent: "#1A1A1A", content: {
-    title: "MoziWash Campaign",
-    description: "AI-generated UGC campaign for car care brand. 12 videos, 2M+ views.",
+  { id: "moziwash", label: "MOZIWASH", color: "#FFD700", accent: "#1A1A1A", spine: "#FFD700", content: {
+    title: "MoziWash",
+    subtitle: "AI-Generated UGC Campaign",
+    description: "Car care brand campaign. 12 AI-generated UGC videos. 2M+ views across platforms. Proved that AI-generated content could match human creator performance.",
   }},
-  { id: "audien", label: "AUDIEN", color: "#2196F3", accent: "#FFFFFF", content: {
+  { id: "audien", label: "AUDIEN", color: "#2196F3", accent: "#FFFFFF", spine: "#2196F3", content: {
     title: "Audien Hearing",
-    description: "Direct response video ads for hearing aid brand. Performance-focused creative.",
+    subtitle: "Direct Response Ads",
+    description: "Performance-focused video ads for hearing aid brand. Optimized for conversions with clear CTAs and testimonial-style content.",
   }},
-  { id: "kalshi", label: "KALSHI", color: "#E91E63", accent: "#FFFFFF", content: {
+  { id: "kalshi", label: "KALSHI", color: "#E91E63", accent: "#FFFFFF", spine: "#E91E63", content: {
     title: "Kalshi",
-    description: "Prediction market platform. Building automated trading systems.",
+    subtitle: "Prediction Markets",
+    description: "Building automated trading systems for the prediction market platform. Exploring the intersection of markets and AI.",
   }},
-  { id: "mudwtr", label: "MUD\\WTR", color: "#795548", accent: "#FFFFFF", content: {
+  { id: "mudwtr", label: "MUD\\WTR", color: "#795548", accent: "#FFFFFF", spine: "#795548", content: {
     title: "MUD\\WTR",
-    description: "Coffee alternative brand. UGC-style video content at scale.",
+    subtitle: "UGC at Scale",
+    description: "Coffee alternative brand. Built a pipeline for UGC-style video content production. Dozens of videos, consistent brand voice.",
   }},
-  { id: "boldebottle", label: "BOLDE", color: "#FF5722", accent: "#FFFFFF", content: {
+  { id: "boldebottle", label: "BOLDE", color: "#FF5722", accent: "#FFFFFF", spine: "#FF5722", content: {
     title: "BoldeBottle",
-    description: "Fitness bottle brand. Product demo and lifestyle content.",
+    subtitle: "Product Content",
+    description: "Fitness bottle brand. Product demos and lifestyle content showcasing durability and design.",
   }},
-  { id: "dirtea", label: "DIRTEA", color: "#4CAF50", accent: "#FFFFFF", content: {
+  { id: "dirtea", label: "DIRTEA", color: "#4CAF50", accent: "#FFFFFF", spine: "#4CAF50", content: {
     title: "Dirtea",
-    description: "Mushroom tea brand. Wellness-focused video campaigns.",
+    subtitle: "Wellness Video",
+    description: "Mushroom tea brand. Wellness-focused video campaigns emphasizing benefits and lifestyle fit.",
   }},
-  { id: "political", label: "POLITICAL", color: "#0D47A1", accent: "#E53935", content: {
+  { id: "dsc", label: "DSC", color: "#3F51B5", accent: "#FFFFFF", spine: "#3F51B5", content: {
+    title: "Dollar Shave Club",
+    subtitle: "Brand Campaign",
+    description: "Iconic brand's continued creative. Maintaining the irreverent voice while driving subscriptions.",
+  }},
+  { id: "getmte", label: "MTE", color: "#9C27B0", accent: "#FFFFFF", spine: "#9C27B0", content: {
+    title: "GetMTE",
+    subtitle: "Energy Brand",
+    description: "Clean energy drink alternative. Lifestyle and product-focused content.",
+  }},
+  { id: "sunflower", label: "SUNFLWR", color: "#FFC107", accent: "#1A1A1A", spine: "#FFC107", content: {
+    title: "Sunflower",
+    subtitle: "Brand Content",
+    description: "Multi-video campaign series. Bright, optimistic creative.",
+  }},
+  { id: "political", label: "POLITICAL", color: "#0D47A1", accent: "#E53935", spine: "#0D47A1", content: {
     title: "Political Media",
-    description: "Campaign ads and political content production.",
+    subtitle: "Campaign Ads",
+    description: "Political advertising and campaign content. Persuasion-focused creative for high-stakes races.",
+  }},
+  { id: "moes", label: "MOE'S", color: "#FF9800", accent: "#1A1A1A", spine: "#FF9800", content: {
+    title: "Moe's Southwest",
+    subtitle: "Restaurant Promo",
+    description: "QSR promotional content. Food-focused video driving foot traffic.",
+  }},
+  { id: "jb", label: "JB", color: "#1A1A1A", accent: "#FFD700", spine: "#1A1A1A", content: {
+    title: "JB Projects",
+    subtitle: "Various",
+    description: "Collection of branded content work.",
   }},
 ];
 
-// VHS Tape Component
+// Animated static noise for TV
+const StaticNoise = ({ intensity = 0.3 }: { intensity: number }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const materialRef = useRef<THREE.MeshBasicMaterial>(null);
+  
+  useFrame(({ clock }) => {
+    if (materialRef.current) {
+      const t = clock.elapsedTime;
+      const noise = Math.sin(t * 50) * 0.1 + Math.random() * 0.2;
+      materialRef.current.opacity = intensity * (0.5 + noise);
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 0, 0.01]}>
+      <planeGeometry args={[3.3, 2.4]} />
+      <meshBasicMaterial 
+        ref={materialRef}
+        color="#FFFFFF" 
+        transparent 
+        opacity={0.1}
+        blending={THREE.AdditiveBlending}
+      />
+    </mesh>
+  );
+};
+
+// VHS Tape Component - Enhanced
 const VHSTape = ({ 
   position, 
   tape, 
   isSelected,
+  isInserting,
   onSelect 
 }: { 
   position: [number, number, number];
   tape: typeof tapeData[0];
   isSelected: boolean;
+  isInserting: boolean;
   onSelect: () => void;
 }) => {
   const [hovered, setHovered] = useState(false);
-  const meshRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null);
+  const [animProgress, setAnimProgress] = useState(0);
   
-  useFrame(() => {
-    if (meshRef.current) {
-      // Pop out when hovered
-      const targetZ = hovered ? 0.15 : 0;
-      meshRef.current.position.z += (targetZ - meshRef.current.position.z) * 0.1;
+  useFrame((_, delta) => {
+    if (groupRef.current) {
+      // Hover pop-out effect
+      const targetZ = hovered && !isInserting ? 0.2 : 0;
+      groupRef.current.position.z += (targetZ - groupRef.current.position.z) * 0.15;
       
-      // Glow when selected
-      const targetEmissive = isSelected ? 0.3 : (hovered ? 0.15 : 0);
-      // Applied via material below
+      // Insertion animation
+      if (isInserting) {
+        setAnimProgress(prev => Math.min(1, prev + delta * 2));
+      } else if (animProgress > 0 && !isSelected) {
+        setAnimProgress(prev => Math.max(0, prev - delta * 3));
+      }
     }
   });
 
+  // Calculate position offset for insertion animation
+  const insertionOffset = isInserting || isSelected ? animProgress * 8 : 0;
+  const insertionY = isInserting || isSelected ? animProgress * 4 : 0;
+
+  if (isSelected && animProgress > 0.8) {
+    return null; // Hide tape when fully inserted
+  }
+
   return (
     <group 
-      ref={meshRef}
-      position={position}
+      ref={groupRef}
+      position={[position[0], position[1] + insertionY, position[2] - insertionOffset]}
+      rotation={[isInserting ? -animProgress * 0.3 : 0, 0, 0]}
       onPointerOver={() => { setHovered(true); document.body.style.cursor = "pointer"; }}
       onPointerOut={() => { setHovered(false); document.body.style.cursor = "auto"; }}
-      onClick={(e) => { e.stopPropagation(); onSelect(); }}
+      onClick={(e) => { e.stopPropagation(); if (!isInserting) onSelect(); }}
     >
       {/* Tape case */}
-      <mesh>
-        <boxGeometry args={[0.8, 1.2, 0.25]} />
+      <mesh castShadow>
+        <boxGeometry args={[0.75, 1.15, 0.22]} />
         <meshStandardMaterial 
-          color="#1A1A1A" 
-          roughness={0.3}
-          metalness={0.1}
+          color={tape.isSpecial ? "#F0F0F0" : "#0F0F0F"}
+          roughness={0.4}
+          metalness={0.05}
         />
       </mesh>
       
-      {/* Label - front */}
-      <mesh position={[0, 0, 0.126]}>
-        <boxGeometry args={[0.7, 1.0, 0.01]} />
+      {/* Front label */}
+      <mesh position={[0, 0.05, 0.112]}>
+        <boxGeometry args={[0.65, 0.9, 0.01]} />
         <meshStandardMaterial 
           color={tape.color}
           emissive={tape.color}
-          emissiveIntensity={isSelected ? 0.4 : (hovered ? 0.2 : 0)}
-          roughness={0.4}
+          emissiveIntensity={isSelected ? 0.5 : (hovered ? 0.25 : 0.05)}
+          roughness={0.5}
         />
       </mesh>
       
-      {/* Label text stripe */}
-      <mesh position={[0, 0.3, 0.13]}>
-        <boxGeometry args={[0.6, 0.15, 0.01]} />
-        <meshStandardMaterial color={tape.accent} roughness={0.5} />
+      {/* Label text area */}
+      <mesh position={[0, 0.32, 0.118]}>
+        <boxGeometry args={[0.55, 0.18, 0.005]} />
+        <meshStandardMaterial color={tape.accent} roughness={0.6} />
       </mesh>
       
       {/* Tape window */}
-      <mesh position={[0, -0.2, 0.13]}>
-        <boxGeometry args={[0.5, 0.35, 0.01]} />
-        <meshStandardMaterial color="#0A0A0A" roughness={0.2} metalness={0.3} />
+      <mesh position={[0, -0.18, 0.115]}>
+        <boxGeometry args={[0.45, 0.32, 0.01]} />
+        <meshStandardMaterial color="#050505" roughness={0.15} metalness={0.4} />
       </mesh>
       
-      {/* Tape reels visible through window */}
-      <mesh position={[-0.12, -0.2, 0.12]} rotation={[Math.PI/2, 0, 0]}>
-        <cylinderGeometry args={[0.08, 0.08, 0.02, 16]} />
-        <meshStandardMaterial color="#2A2A2A" roughness={0.3} />
+      {/* Tape reels */}
+      <mesh position={[-0.1, -0.18, 0.11]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.07, 0.07, 0.015, 20]} />
+        <meshStandardMaterial color="#1A1A1A" roughness={0.3} metalness={0.2} />
       </mesh>
-      <mesh position={[0.12, -0.2, 0.12]} rotation={[Math.PI/2, 0, 0]}>
-        <cylinderGeometry args={[0.08, 0.08, 0.02, 16]} />
-        <meshStandardMaterial color="#2A2A2A" roughness={0.3} />
+      <mesh position={[0.1, -0.18, 0.11]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.07, 0.07, 0.015, 20]} />
+        <meshStandardMaterial color="#1A1A1A" roughness={0.3} metalness={0.2} />
       </mesh>
+      
+      {/* Spine label (visible from side) */}
+      <mesh position={[0.376, 0.05, 0]}>
+        <boxGeometry args={[0.01, 0.9, 0.18]} />
+        <meshStandardMaterial 
+          color={tape.spine}
+          emissive={tape.spine}
+          emissiveIntensity={hovered ? 0.15 : 0}
+          roughness={0.5}
+        />
+      </mesh>
+      
+      {/* Special glow for About Me tape */}
+      {tape.isSpecial && (
+        <pointLight 
+          position={[0, 0, 0.3]} 
+          color="#E91E63" 
+          intensity={hovered ? 0.5 : 0.2} 
+          distance={1.5} 
+          decay={2} 
+        />
+      )}
       
       {/* Hover tooltip */}
-      {hovered && (
-        <Html position={[0, 0.8, 0.2]} style={{ pointerEvents: "none" }}>
+      {hovered && !isInserting && (
+        <Html position={[0, 0.8, 0.3]} style={{ pointerEvents: "none" }}>
           <div style={{
-            background: "rgba(0,0,0,0.9)",
+            background: "rgba(0,0,0,0.95)",
             color: tape.color,
-            padding: "8px 14px",
-            borderRadius: "4px",
-            fontSize: "14px",
+            padding: "10px 16px",
+            borderRadius: "6px",
+            fontSize: "15px",
             fontFamily: "'VT323', 'Courier New', monospace",
             whiteSpace: "nowrap",
             border: `2px solid ${tape.color}`,
+            boxShadow: `0 0 20px ${tape.color}50`,
             textShadow: `0 0 10px ${tape.color}`,
           }}>
-            {tape.label}
+            ▶ {tape.label}
           </div>
         </Html>
       )}
@@ -145,203 +247,426 @@ const VHSTape = ({
   );
 };
 
-// CRT TV Component
+// CRT TV Component - Enhanced
 const CRTTV = ({ 
   selectedTape,
+  isInserting,
   onClearSelection
 }: { 
   selectedTape: typeof tapeData[0] | null;
+  isInserting: boolean;
   onClearSelection: () => void;
 }) => {
   const screenRef = useRef<THREE.MeshStandardMaterial>(null);
+  const [showContent, setShowContent] = useState(false);
+  
+  // Delay content display for insertion animation
+  useEffect(() => {
+    if (selectedTape && !isInserting) {
+      const timer = setTimeout(() => setShowContent(true), 300);
+      return () => clearTimeout(timer);
+    } else {
+      setShowContent(false);
+    }
+  }, [selectedTape, isInserting]);
   
   useFrame(({ clock }) => {
-    if (screenRef.current && !selectedTape) {
-      // Static noise effect when idle
-      const noise = 0.15 + Math.sin(clock.elapsedTime * 30) * 0.03 + Math.random() * 0.05;
-      screenRef.current.emissiveIntensity = noise;
+    if (screenRef.current) {
+      if (!selectedTape) {
+        // Static noise effect when idle
+        const t = clock.elapsedTime;
+        const flicker = 0.1 + Math.sin(t * 40) * 0.02 + Math.random() * 0.03;
+        screenRef.current.emissiveIntensity = flicker;
+      } else {
+        screenRef.current.emissiveIntensity = 0.25;
+      }
     }
   });
 
   return (
-    <group position={[0, 0, 0]}>
-      {/* TV Body - chunky CRT */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[4.5, 3.5, 3]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.3} metalness={0.1} />
+    <group position={[0, 0.5, 0]}>
+      {/* TV Body - chunky CRT with rounded feel */}
+      <mesh castShadow position={[0, 0, 0]}>
+        <boxGeometry args={[5, 4, 3.5]} />
+        <meshStandardMaterial color="#1C1C1C" roughness={0.25} metalness={0.1} />
       </mesh>
       
-      {/* Screen bezel */}
-      <mesh position={[0, 0.1, 1.45]}>
-        <boxGeometry args={[3.8, 2.8, 0.15]} />
-        <meshStandardMaterial color="#0D0D0D" roughness={0.4} />
+      {/* Top vent */}
+      <mesh position={[0, 2.01, 0]}>
+        <boxGeometry args={[3, 0.02, 1.5]} />
+        <meshStandardMaterial color="#0A0A0A" roughness={0.8} />
       </mesh>
       
-      {/* Screen */}
-      <mesh position={[0, 0.1, 1.53]} onClick={onClearSelection}>
-        <boxGeometry args={[3.4, 2.5, 0.05]} />
+      {/* Screen bezel - recessed */}
+      <mesh position={[0, 0.2, 1.7]}>
+        <boxGeometry args={[4.2, 3.2, 0.2]} />
+        <meshStandardMaterial color="#0A0A0A" roughness={0.4} />
+      </mesh>
+      
+      {/* Screen glass */}
+      <mesh position={[0, 0.2, 1.81]} onClick={selectedTape ? onClearSelection : undefined}>
+        <boxGeometry args={[3.6, 2.7, 0.05]} />
         <meshStandardMaterial 
           ref={screenRef}
-          color={selectedTape ? "#0A0A12" : "#1A1A2A"}
-          emissive={selectedTape ? selectedTape.color : "#00D9FF"}
-          emissiveIntensity={selectedTape ? 0.3 : 0.15}
-          roughness={0.1}
-          metalness={0.2}
+          color={selectedTape ? "#08080C" : "#0A0A15"}
+          emissive={selectedTape ? selectedTape.color : "#00AACC"}
+          emissiveIntensity={selectedTape ? 0.25 : 0.1}
+          roughness={0.05}
+          metalness={0.3}
         />
       </mesh>
       
-      {/* Screen content when tape selected */}
-      {selectedTape && (
+      {/* Static noise overlay when no tape */}
+      {!selectedTape && (
+        <group position={[0, 0.2, 1.84]}>
+          <StaticNoise intensity={0.15} />
+        </group>
+      )}
+      
+      {/* Scanlines overlay */}
+      <mesh position={[0, 0.2, 1.85]}>
+        <planeGeometry args={[3.58, 2.68]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.08} />
+      </mesh>
+      
+      {/* Screen content */}
+      {selectedTape && showContent && (
         <Html
-          position={[0, 0.1, 1.6]}
+          position={[0, 0.2, 1.9]}
           transform
           style={{
-            width: 320,
-            height: 230,
-            pointerEvents: "none",
+            width: 380,
+            height: 280,
+            pointerEvents: "auto",
           }}
         >
           <div
+            onClick={(e) => { e.stopPropagation(); onClearSelection(); }}
             style={{
               width: "100%",
               height: "100%",
-              background: "rgba(0,0,0,0.9)",
+              background: `linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(10,10,15,0.98) 100%)`,
               color: selectedTape.color,
-              padding: "20px",
+              padding: "24px",
               fontFamily: "'VT323', 'Courier New', monospace",
               overflow: "hidden",
-              border: `2px solid ${selectedTape.color}`,
-              boxShadow: `0 0 30px ${selectedTape.color}40`,
+              cursor: "pointer",
+              boxShadow: `inset 0 0 60px ${selectedTape.color}20`,
+              animation: "fadeIn 0.5s ease-out",
             }}
           >
-            <div style={{ 
-              fontSize: "24px", 
-              fontWeight: "bold", 
-              marginBottom: "12px",
-              textShadow: `0 0 10px ${selectedTape.color}`,
+            <style>{`
+              @keyframes fadeIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+              }
+              @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+              }
+            `}</style>
+            
+            {/* REC indicator */}
+            <div style={{
+              position: "absolute",
+              top: "12px",
+              right: "16px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: "12px",
+              color: "#FF3333",
+              animation: "blink 1s infinite",
             }}>
-              ▶ {selectedTape.content.title}
+              <span style={{ 
+                width: "8px", 
+                height: "8px", 
+                background: "#FF3333", 
+                borderRadius: "50%",
+                boxShadow: "0 0 10px #FF3333",
+              }}/>
+              REC
             </div>
+            
+            <div style={{ 
+              fontSize: "28px", 
+              fontWeight: "bold", 
+              marginBottom: "6px",
+              textShadow: `0 0 15px ${selectedTape.color}`,
+            }}>
+              {selectedTape.content.title}
+            </div>
+            
+            {selectedTape.content.subtitle && (
+              <div style={{
+                fontSize: "16px",
+                color: "#888",
+                marginBottom: "16px",
+                borderBottom: `1px solid ${selectedTape.color}40`,
+                paddingBottom: "12px",
+              }}>
+                {selectedTape.content.subtitle}
+              </div>
+            )}
+            
             <div style={{ 
               color: "#CCCCCC", 
-              fontSize: "14px",
-              lineHeight: "1.5",
+              fontSize: "15px",
+              lineHeight: "1.6",
+              maxHeight: "100px",
+              overflow: "hidden",
             }}>
               {selectedTape.content.description}
             </div>
+            
             {selectedTape.content.links && (
-              <div style={{ marginTop: "20px", fontSize: "12px", color: "#888" }}>
-                <div>🐦 {selectedTape.content.links.twitter}</div>
-                <div>💼 {selectedTape.content.links.linkedin}</div>
-                <div>📧 {selectedTape.content.links.email}</div>
+              <div style={{ 
+                marginTop: "20px", 
+                fontSize: "13px", 
+                color: "#666",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "12px",
+              }}>
+                {Object.entries(selectedTape.content.links).map(([key, value]) => (
+                  <a
+                    key={key}
+                    href={typeof value === 'object' ? value.url : `mailto:${value}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      color: selectedTape.color,
+                      textDecoration: "none",
+                      padding: "4px 8px",
+                      border: `1px solid ${selectedTape.color}50`,
+                      borderRadius: "4px",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `${selectedTape.color}20`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                    }}
+                  >
+                    {key === 'twitter' && '𝕏'}
+                    {key === 'linkedin' && '💼'}
+                    {key === 'youtube' && '▶'}
+                    {key === 'email' && '✉'}
+                    {' '}
+                    {typeof value === 'object' ? value.handle : value}
+                  </a>
+                ))}
               </div>
             )}
+            
             <div style={{ 
               position: "absolute",
-              bottom: "10px",
-              right: "15px",
+              bottom: "12px",
+              left: "24px",
               fontSize: "11px",
-              color: "#555",
+              color: "#444",
             }}>
-              Click TV to stop
+              CLICK TO EJECT
+            </div>
+            
+            {/* Timecode */}
+            <div style={{ 
+              position: "absolute",
+              bottom: "12px",
+              right: "16px",
+              fontSize: "14px",
+              color: "#333",
+              fontFamily: "monospace",
+            }}>
+              00:00:01
             </div>
           </div>
         </Html>
       )}
       
-      {/* Scanlines overlay */}
-      <mesh position={[0, 0.1, 1.54]}>
-        <boxGeometry args={[3.38, 2.48, 0.01]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.1} />
-      </mesh>
-      
-      {/* VCR slot */}
-      <mesh position={[0, -1.4, 1.4]}>
-        <boxGeometry args={[1.5, 0.15, 0.3]} />
+      {/* VCR slot area */}
+      <mesh position={[0, -1.65, 1.65]}>
+        <boxGeometry args={[2, 0.35, 0.4]} />
         <meshStandardMaterial color="#0A0A0A" roughness={0.5} />
       </mesh>
       
       {/* VCR slot opening */}
-      <mesh position={[0, -1.4, 1.56]}>
-        <boxGeometry args={[1.0, 0.06, 0.02]} />
-        <meshStandardMaterial color="#000000" roughness={0.8} />
+      <mesh position={[0, -1.6, 1.86]}>
+        <boxGeometry args={[1.2, 0.08, 0.02]} />
+        <meshStandardMaterial color="#000000" roughness={0.9} />
       </mesh>
       
-      {/* Control knobs */}
-      <mesh position={[1.8, -0.5, 1.5]} rotation={[Math.PI/2, 0, 0]}>
-        <cylinderGeometry args={[0.12, 0.12, 0.1, 16]} />
-        <meshStandardMaterial color="#333333" roughness={0.4} metalness={0.6} />
+      {/* VCR buttons */}
+      {[-0.3, 0, 0.3].map((x, i) => (
+        <mesh key={i} position={[x + 1.2, -1.6, 1.86]}>
+          <boxGeometry args={[0.12, 0.06, 0.02]} />
+          <meshStandardMaterial color="#1A1A1A" roughness={0.4} />
+        </mesh>
+      ))}
+      
+      {/* Control panel area */}
+      <mesh position={[2.1, -0.3, 1.65]}>
+        <boxGeometry args={[0.35, 1.8, 0.4]} />
+        <meshStandardMaterial color="#0F0F0F" roughness={0.5} />
       </mesh>
-      <mesh position={[1.8, -1.0, 1.5]} rotation={[Math.PI/2, 0, 0]}>
-        <cylinderGeometry args={[0.12, 0.12, 0.1, 16]} />
-        <meshStandardMaterial color="#333333" roughness={0.4} metalness={0.6} />
+      
+      {/* Channel knobs */}
+      <mesh position={[2.15, 0.3, 1.86]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 0.08, 20]} />
+        <meshStandardMaterial color="#2A2A2A" roughness={0.35} metalness={0.5} />
+      </mesh>
+      <mesh position={[2.15, -0.2, 1.86]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 0.08, 20]} />
+        <meshStandardMaterial color="#2A2A2A" roughness={0.35} metalness={0.5} />
       </mesh>
       
       {/* Power LED */}
-      <mesh position={[1.8, -1.35, 1.52]}>
-        <boxGeometry args={[0.08, 0.03, 0.02]} />
+      <mesh position={[2.15, -0.9, 1.87]}>
+        <boxGeometry args={[0.06, 0.025, 0.015]} />
         <meshStandardMaterial 
-          color="#00FF00" 
-          emissive="#00FF00" 
-          emissiveIntensity={0.8}
+          color={selectedTape ? "#00FF00" : "#FF0000"} 
+          emissive={selectedTape ? "#00FF00" : "#FF0000"}
+          emissiveIntensity={1}
         />
       </mesh>
       
-      {/* Speaker grills on sides */}
-      <mesh position={[-2.0, 0, 1.2]}>
-        <boxGeometry args={[0.3, 2, 0.5]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.6} />
-      </mesh>
-      <mesh position={[2.0, 0, 1.2]}>
-        <boxGeometry args={[0.3, 2, 0.5]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.6} />
+      {/* Brand text area */}
+      <mesh position={[-1.5, -1.6, 1.86]}>
+        <boxGeometry args={[0.8, 0.15, 0.01]} />
+        <meshStandardMaterial color="#C0C0C0" roughness={0.3} metalness={0.7} />
       </mesh>
       
       {/* Screen glow */}
       <pointLight 
-        position={[0, 0, 2.5]} 
-        color={selectedTape ? selectedTape.color : "#00D9FF"} 
-        intensity={selectedTape ? 2 : 0.8} 
-        distance={8} 
+        position={[0, 0.2, 3]} 
+        color={selectedTape ? selectedTape.color : "#00CCFF"} 
+        intensity={selectedTape ? 3 : 1.5} 
+        distance={10} 
         decay={2} 
+      />
+      
+      {/* Ambient screen fill */}
+      <rectAreaLight
+        position={[0, 0.2, 2.5]}
+        width={3}
+        height={2.5}
+        intensity={selectedTape ? 0.8 : 0.3}
+        color={selectedTape ? selectedTape.color : "#00CCFF"}
       />
     </group>
   );
 };
 
-// Tape Shelf Component
+// TV Stand/Cabinet - Enhanced
+const TVStand = () => (
+  <group position={[0, -1.5, 0.3]}>
+    {/* Main cabinet */}
+    <mesh castShadow receiveShadow position={[0, 0, 0]}>
+      <boxGeometry args={[6, 1, 2.2]} />
+      <meshStandardMaterial color="#1A1008" roughness={0.75} />
+    </mesh>
+    
+    {/* Cabinet top */}
+    <mesh position={[0, 0.52, 0]}>
+      <boxGeometry args={[6.1, 0.06, 2.3]} />
+      <meshStandardMaterial color="#231810" roughness={0.6} />
+    </mesh>
+    
+    {/* Cabinet doors */}
+    <mesh position={[-1.4, 0, 1.11]}>
+      <boxGeometry args={[1.8, 0.8, 0.02]} />
+      <meshStandardMaterial color="#12090A" roughness={0.7} />
+    </mesh>
+    <mesh position={[1.4, 0, 1.11]}>
+      <boxGeometry args={[1.8, 0.8, 0.02]} />
+      <meshStandardMaterial color="#12090A" roughness={0.7} />
+    </mesh>
+    
+    {/* Handles */}
+    <mesh position={[-0.6, 0, 1.13]}>
+      <boxGeometry args={[0.12, 0.03, 0.03]} />
+      <meshStandardMaterial color="#C9A227" roughness={0.25} metalness={0.8} />
+    </mesh>
+    <mesh position={[0.6, 0, 1.13]}>
+      <boxGeometry args={[0.12, 0.03, 0.03]} />
+      <meshStandardMaterial color="#C9A227" roughness={0.25} metalness={0.8} />
+    </mesh>
+    
+    {/* Legs */}
+    {[[-2.7, -0.6], [2.7, -0.6]].map(([x, y], i) => (
+      <mesh key={i} position={[x, y, 0]} castShadow>
+        <boxGeometry args={[0.15, 0.3, 2]} />
+        <meshStandardMaterial color="#0F0808" roughness={0.8} />
+      </mesh>
+    ))}
+  </group>
+);
+
+// Tape Shelf Component - Two rows
 const TapeShelf = ({ 
   selectedTapeId,
+  insertingTapeId,
   onSelectTape 
 }: { 
   selectedTapeId: string | null;
+  insertingTapeId: string | null;
   onSelectTape: (tape: typeof tapeData[0]) => void;
 }) => {
+  const topRowTapes = tapeData.slice(0, 7);
+  const bottomRowTapes = tapeData.slice(7);
+
   return (
-    <group position={[0, -3, 1]}>
-      {/* Shelf board */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[8, 0.15, 1.2]} />
-        <meshStandardMaterial color="#3D2E1E" roughness={0.7} />
+    <group position={[0, -3.2, 1.5]}>
+      {/* Shelf unit back */}
+      <mesh position={[0, 0.5, -0.4]} receiveShadow>
+        <boxGeometry args={[7, 3, 0.1]} />
+        <meshStandardMaterial color="#1A1008" roughness={0.85} />
       </mesh>
       
-      {/* Shelf supports */}
-      <mesh position={[-3.5, -0.5, 0]}>
-        <boxGeometry args={[0.15, 1, 1]} />
-        <meshStandardMaterial color="#2D1E0E" roughness={0.8} />
-      </mesh>
-      <mesh position={[3.5, -0.5, 0]}>
-        <boxGeometry args={[0.15, 1, 1]} />
-        <meshStandardMaterial color="#2D1E0E" roughness={0.8} />
+      {/* Top shelf */}
+      <mesh position={[0, 1.2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[7, 0.12, 0.9]} />
+        <meshStandardMaterial color="#2A1A10" roughness={0.7} />
       </mesh>
       
-      {/* VHS Tapes */}
-      {tapeData.map((tape, i) => (
+      {/* Bottom shelf */}
+      <mesh position={[0, -0.1, 0]} castShadow receiveShadow>
+        <boxGeometry args={[7, 0.12, 0.9]} />
+        <meshStandardMaterial color="#2A1A10" roughness={0.7} />
+      </mesh>
+      
+      {/* Side panels */}
+      <mesh position={[-3.45, 0.5, 0]}>
+        <boxGeometry args={[0.1, 2.8, 0.9]} />
+        <meshStandardMaterial color="#1A1008" roughness={0.8} />
+      </mesh>
+      <mesh position={[3.45, 0.5, 0]}>
+        <boxGeometry args={[0.1, 2.8, 0.9]} />
+        <meshStandardMaterial color="#1A1008" roughness={0.8} />
+      </mesh>
+      
+      {/* Top row tapes - About Me in center, highlighted */}
+      {topRowTapes.map((tape, i) => (
         <VHSTape
           key={tape.id}
-          position={[-3.2 + i * 0.92, 0.68, 0]}
+          position={[-2.7 + i * 0.9, 1.85, 0]}
           tape={tape}
           isSelected={selectedTapeId === tape.id}
+          isInserting={insertingTapeId === tape.id}
+          onSelect={() => onSelectTape(tape)}
+        />
+      ))}
+      
+      {/* Bottom row tapes */}
+      {bottomRowTapes.map((tape, i) => (
+        <VHSTape
+          key={tape.id}
+          position={[-2.25 + i * 0.9, 0.55, 0]}
+          tape={tape}
+          isSelected={selectedTapeId === tape.id}
+          isInserting={insertingTapeId === tape.id}
           onSelect={() => onSelectTape(tape)}
         />
       ))}
@@ -349,100 +674,113 @@ const TapeShelf = ({
   );
 };
 
-// TV Stand/Cabinet
-const TVStand = () => (
-  <group position={[0, -1.8, 0]}>
-    {/* Main cabinet */}
-    <mesh position={[0, 0, 0.5]}>
-      <boxGeometry args={[5, 1.2, 2]} />
-      <meshStandardMaterial color="#2D1E0E" roughness={0.7} />
+// Environment elements
+const Environment = () => (
+  <group>
+    {/* Floor */}
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -4.5, 0]} receiveShadow>
+      <planeGeometry args={[40, 40]} />
+      <meshStandardMaterial color="#0D0A08" roughness={0.92} />
     </mesh>
     
-    {/* Cabinet door lines */}
-    <mesh position={[-1.2, 0, 1.51]}>
-      <boxGeometry args={[0.02, 0.9, 0.02]} />
-      <meshStandardMaterial color="#1A1008" roughness={0.5} />
-    </mesh>
-    <mesh position={[1.2, 0, 1.51]}>
-      <boxGeometry args={[0.02, 0.9, 0.02]} />
-      <meshStandardMaterial color="#1A1008" roughness={0.5} />
+    {/* Back wall */}
+    <mesh position={[0, 4, -5]} receiveShadow>
+      <planeGeometry args={[40, 20]} />
+      <meshStandardMaterial color="#0A0806" roughness={0.95} />
     </mesh>
     
-    {/* Handles */}
-    <mesh position={[-0.8, 0, 1.52]}>
-      <boxGeometry args={[0.15, 0.04, 0.04]} />
-      <meshStandardMaterial color="#C0A050" roughness={0.3} metalness={0.7} />
-    </mesh>
-    <mesh position={[0.8, 0, 1.52]}>
-      <boxGeometry args={[0.15, 0.04, 0.04]} />
-      <meshStandardMaterial color="#C0A050" roughness={0.3} metalness={0.7} />
+    {/* Subtle floor reflection plane */}
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -4.49, 2]}>
+      <planeGeometry args={[10, 8]} />
+      <meshStandardMaterial 
+        color="#000000" 
+        roughness={0.7} 
+        metalness={0.3}
+        transparent
+        opacity={0.3}
+      />
     </mesh>
   </group>
-);
-
-// Floor
-const Floor = () => (
-  <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -4.5, 0]}>
-    <planeGeometry args={[30, 30]} />
-    <meshStandardMaterial color="#1A1612" roughness={0.9} />
-  </mesh>
-);
-
-// Background wall
-const BackWall = () => (
-  <mesh position={[0, 2, -4]}>
-    <planeGeometry args={[30, 20]} />
-    <meshStandardMaterial color="#12100E" roughness={0.95} />
-  </mesh>
 );
 
 // Scene content
 const SceneContent = () => {
   const [selectedTape, setSelectedTape] = useState<typeof tapeData[0] | null>(null);
+  const [insertingTapeId, setInsertingTapeId] = useState<string | null>(null);
+
+  const handleSelectTape = (tape: typeof tapeData[0]) => {
+    if (selectedTape?.id === tape.id) {
+      // Eject
+      setSelectedTape(null);
+      setInsertingTapeId(null);
+    } else {
+      // Insert new tape
+      setInsertingTapeId(tape.id);
+      setTimeout(() => {
+        setSelectedTape(tape);
+        setInsertingTapeId(null);
+      }, 600);
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedTape(null);
+    setInsertingTapeId(null);
+  };
 
   return (
     <>
       {/* Dark ambient environment */}
-      <color attach="background" args={["#0A0908"]} />
-      <fog attach="fog" args={["#0A0908", 10, 30]} />
+      <color attach="background" args={["#050403"]} />
+      <fog attach="fog" args={["#050403", 12, 35]} />
       
-      {/* Lighting - moody, focused on TV */}
-      <ambientLight intensity={0.15} color="#FFF5E6" />
+      {/* Main lighting */}
+      <ambientLight intensity={0.08} color="#FFF8F0" />
+      
+      {/* Key light - from above */}
       <spotLight 
-        position={[0, 8, 5]} 
-        angle={0.4} 
-        penumbra={0.5} 
-        intensity={0.8} 
-        color="#FFF8F0"
+        position={[0, 10, 6]} 
+        angle={0.5} 
+        penumbra={0.6} 
+        intensity={0.6} 
+        color="#FFF5E8"
         castShadow
+        shadow-mapSize={[2048, 2048]}
       />
       
-      {/* Subtle rim lights */}
-      <pointLight position={[-6, 2, 2]} color="#4A3020" intensity={0.3} distance={15} />
-      <pointLight position={[6, 2, 2]} color="#4A3020" intensity={0.3} distance={15} />
+      {/* Fill light - warm side */}
+      <pointLight position={[-8, 3, 3]} color="#4A3020" intensity={0.25} distance={20} />
+      <pointLight position={[8, 3, 3]} color="#4A3020" intensity={0.25} distance={20} />
+      
+      {/* Backlight - subtle rim */}
+      <pointLight position={[0, 2, -4]} color="#1A1520" intensity={0.3} distance={15} />
       
       {/* Main elements */}
       <CRTTV 
-        selectedTape={selectedTape} 
-        onClearSelection={() => setSelectedTape(null)} 
+        selectedTape={selectedTape}
+        isInserting={!!insertingTapeId}
+        onClearSelection={handleClearSelection}
       />
       <TVStand />
       <TapeShelf 
         selectedTapeId={selectedTape?.id || null}
-        onSelectTape={setSelectedTape}
+        insertingTapeId={insertingTapeId}
+        onSelectTape={handleSelectTape}
       />
-      <Floor />
-      <BackWall />
+      <Environment />
       
       {/* Camera controls */}
       <OrbitControls 
         enablePan={false}
         enableZoom={true}
-        minDistance={6}
-        maxDistance={15}
-        minPolarAngle={Math.PI / 4}
-        maxPolarAngle={Math.PI / 2.2}
-        target={[0, -1, 0]}
+        minDistance={7}
+        maxDistance={18}
+        minPolarAngle={Math.PI / 5}
+        maxPolarAngle={Math.PI / 2.1}
+        minAzimuthAngle={-Math.PI / 4}
+        maxAzimuthAngle={Math.PI / 4}
+        target={[0, -0.5, 0]}
+        rotateSpeed={0.5}
       />
     </>
   );
@@ -453,12 +791,22 @@ const LoadingScreen = () => (
   <Html center>
     <div style={{
       fontFamily: "'VT323', monospace",
-      color: "#00D9FF",
+      color: "#00CCFF",
       fontSize: "24px",
       textAlign: "center",
     }}>
-      <div style={{ marginBottom: "10px" }}>📼</div>
-      <div>Loading...</div>
+      <div style={{ 
+        marginBottom: "15px", 
+        fontSize: "48px",
+        animation: "pulse 1.5s ease-in-out infinite",
+      }}>📼</div>
+      <div>LOADING...</div>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(0.95); }
+        }
+      `}</style>
     </div>
   </Html>
 );
@@ -466,10 +814,11 @@ const LoadingScreen = () => (
 // Main Scene
 const Scene = () => {
   return (
-    <div style={{ width: "100vw", height: "100vh", background: "#0A0908" }}>
+    <div style={{ width: "100vw", height: "100vh", background: "#050403" }}>
       <Canvas 
-        camera={{ position: [0, 1, 10], fov: 50 }}
+        camera={{ position: [0, 1, 12], fov: 50 }}
         shadows
+        gl={{ antialias: true }}
       >
         <Suspense fallback={<LoadingScreen />}>
           <SceneContent />
@@ -480,17 +829,27 @@ const Scene = () => {
       <div
         style={{
           position: "fixed",
-          top: "20px",
-          left: "20px",
+          top: "24px",
+          left: "24px",
           fontFamily: "'VT323', monospace",
           zIndex: 1000,
         }}
       >
-        <div style={{ fontSize: "28px", color: "#FFFFFF" }}>
-          James Rindos
+        <div style={{ 
+          fontSize: "32px", 
+          color: "#FFFFFF",
+          textShadow: "0 2px 20px rgba(0,0,0,0.5)",
+          letterSpacing: "2px",
+        }}>
+          JAMES RINDOS
         </div>
-        <div style={{ fontSize: "14px", color: "#666", marginTop: "4px" }}>
-          Creative Portfolio
+        <div style={{ 
+          fontSize: "14px", 
+          color: "#666", 
+          marginTop: "6px",
+          letterSpacing: "4px",
+        }}>
+          CREATIVE PORTFOLIO
         </div>
       </div>
       
@@ -498,16 +857,49 @@ const Scene = () => {
       <div
         style={{
           position: "fixed",
-          bottom: "20px",
+          bottom: "24px",
           left: "50%",
           transform: "translateX(-50%)",
           fontFamily: "'VT323', monospace",
           fontSize: "14px",
-          color: "#444",
+          color: "#333",
           textAlign: "center",
+          letterSpacing: "1px",
         }}
       >
-        Click a tape to play • Drag to orbit • Scroll to zoom
+        SELECT A TAPE • DRAG TO ORBIT • SCROLL TO ZOOM
+      </div>
+      
+      {/* Social links */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          fontFamily: "'VT323', monospace",
+          fontSize: "14px",
+          display: "flex",
+          gap: "16px",
+        }}
+      >
+        <a href="https://twitter.com/slimjimm318" target="_blank" rel="noopener noreferrer" 
+           style={{ color: "#444", textDecoration: "none", transition: "color 0.2s" }}
+           onMouseEnter={(e) => e.currentTarget.style.color = "#1DA1F2"}
+           onMouseLeave={(e) => e.currentTarget.style.color = "#444"}>
+          𝕏
+        </a>
+        <a href="https://linkedin.com/in/james-rindos-489a29245" target="_blank" rel="noopener noreferrer"
+           style={{ color: "#444", textDecoration: "none", transition: "color 0.2s" }}
+           onMouseEnter={(e) => e.currentTarget.style.color = "#0077B5"}
+           onMouseLeave={(e) => e.currentTarget.style.color = "#444"}>
+          in
+        </a>
+        <a href="https://youtube.com/@jackacetalks" target="_blank" rel="noopener noreferrer"
+           style={{ color: "#444", textDecoration: "none", transition: "color 0.2s" }}
+           onMouseEnter={(e) => e.currentTarget.style.color = "#FF0000"}
+           onMouseLeave={(e) => e.currentTarget.style.color = "#444"}>
+          ▶
+        </a>
       </div>
     </div>
   );
