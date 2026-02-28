@@ -82,6 +82,37 @@ const tapeData = [
   }},
 ];
 
+// Animated timecode display
+const TimecodeDisplay = () => {
+  const [time, setTime] = useState("00:00:00");
+  
+  useEffect(() => {
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      const hours = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+      const minutes = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+      const seconds = (elapsed % 60).toString().padStart(2, '0');
+      setTime(`${hours}:${minutes}:${seconds}`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  return (
+    <div style={{ 
+      position: "absolute",
+      bottom: "12px",
+      right: "16px",
+      fontSize: "14px",
+      color: "#333",
+      fontFamily: "monospace",
+      letterSpacing: "2px",
+    }}>
+      {time}
+    </div>
+  );
+};
+
 // Animated static noise for TV
 const StaticNoise = ({ intensity = 0.3 }: { intensity: number }) => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -222,6 +253,25 @@ const VHSTape = ({
           distance={1.5} 
           decay={2} 
         />
+      )}
+      
+      {/* "BE KIND REWIND" sticker on some tapes */}
+      {(tape.id === "moziwash" || tape.id === "mudwtr") && (
+        <Html position={[-0.2, -0.4, 0.12]} transform style={{ pointerEvents: "none" }}>
+          <div style={{
+            background: "#FFD700",
+            color: "#000",
+            fontSize: "5px",
+            fontFamily: "Arial, sans-serif",
+            fontWeight: "bold",
+            padding: "2px 4px",
+            borderRadius: "1px",
+            transform: "rotate(-5deg)",
+            whiteSpace: "nowrap",
+          }}>
+            BE KIND REWIND
+          </div>
+        </Html>
       )}
       
       {/* Tape label text - always visible */}
@@ -491,17 +541,8 @@ const CRTTV = ({
               CLICK TO EJECT
             </div>
             
-            {/* Timecode */}
-            <div style={{ 
-              position: "absolute",
-              bottom: "12px",
-              right: "16px",
-              fontSize: "14px",
-              color: "#333",
-              fontFamily: "monospace",
-            }}>
-              00:00:01
-            </div>
+            {/* Timecode - animated */}
+            <TimecodeDisplay />
           </div>
         </Html>
       )}
