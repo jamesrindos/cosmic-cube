@@ -608,6 +608,24 @@ const CRTTV = ({
         <meshStandardMaterial color="#0A0A0A" roughness={0.5} />
       </mesh>
       
+      {/* VCR LED display */}
+      <Html position={[-0.5, -1.6, 1.87]} transform style={{ pointerEvents: "none" }}>
+        <div style={{
+          background: "#000",
+          padding: "3px 8px",
+          borderRadius: "2px",
+          fontFamily: "'VT323', monospace",
+          fontSize: "10px",
+          color: selectedTape ? "#00FF00" : "#333",
+          letterSpacing: "1px",
+          textShadow: selectedTape ? "0 0 5px #00FF00" : "none",
+          minWidth: "80px",
+          textAlign: "center",
+        }}>
+          {selectedTape ? `▶ ${selectedTape.label}` : "NO TAPE"}
+        </div>
+      </Html>
+      
       {/* VCR slot opening */}
       <mesh position={[0, -1.6, 1.86]}>
         <boxGeometry args={[1.2, 0.08, 0.02]} />
@@ -888,6 +906,23 @@ const SceneContent = () => {
     setSelectedTape(null);
     setInsertingTapeId(null);
   };
+  
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === " ") {
+        e.preventDefault();
+        handleClearSelection();
+      }
+      // Arrow keys to browse tapes
+      if (!selectedTape && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+        e.preventDefault();
+        // Could implement tape focusing here
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedTape]);
 
   return (
     <>
