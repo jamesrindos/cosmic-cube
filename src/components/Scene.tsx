@@ -1240,42 +1240,118 @@ const MobileLayout = () => {
               key={tape.id}
               onClick={() => setSelectedTape(tape)}
               style={{
-                width: "70px",
-                height: "100px",
-                background: tape.isSpecial ? "#F0F0F0" : "#0F0F0F",
+                width: "75px",
+                height: "115px",
+                background: tape.isSpecial ? "#E8E8E8" : "#1A1A1A",
                 borderRadius: "4px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
+                padding: "6px",
                 cursor: "pointer",
-                border: selectedTape?.id === tape.id ? `2px solid ${tape.color}` : "2px solid transparent",
-                boxShadow: selectedTape?.id === tape.id ? `0 0 15px ${tape.color}50` : "none",
+                border: selectedTape?.id === tape.id ? `2px solid ${tape.color}` : "2px solid #333",
+                boxShadow: selectedTape?.id === tape.id ? `0 0 20px ${tape.color}60` : "0 2px 8px rgba(0,0,0,0.5)",
                 transition: "all 0.2s",
                 flexShrink: 0,
+                position: "relative",
               }}
             >
-              {/* Label */}
+              {/* Top label area */}
               <div style={{
                 background: tape.color,
-                width: "55px",
-                height: "70px",
+                width: "100%",
+                height: "55px",
                 borderRadius: "2px",
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 padding: "4px",
+                marginBottom: "4px",
               }}>
+                {/* Brand name */}
                 <div style={{
-                  fontSize: "8px",
+                  fontSize: "9px",
                   fontWeight: "bold",
                   color: tape.accent,
                   textAlign: "center",
                   wordBreak: "break-word",
+                  lineHeight: "1.1",
+                  textShadow: tape.accent === "#FFFFFF" ? "0 1px 2px rgba(0,0,0,0.3)" : "none",
                 }}>
                   {tape.label}
                 </div>
+                {/* Subtitle */}
+                <div style={{
+                  fontSize: "6px",
+                  color: tape.accent === "#FFFFFF" ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)",
+                  marginTop: "2px",
+                  textAlign: "center",
+                }}>
+                  {tape.content.subtitle?.slice(0, 20)}
+                </div>
               </div>
+              
+              {/* Tape window (reels) */}
+              <div style={{
+                background: "#0A0A0A",
+                width: "100%",
+                height: "32px",
+                borderRadius: "2px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-around",
+                padding: "4px",
+              }}>
+                {/* Left reel */}
+                <div style={{
+                  width: "18px",
+                  height: "18px",
+                  borderRadius: "50%",
+                  background: "#222",
+                  border: "2px solid #333",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                  <div style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    background: "#111",
+                  }}/>
+                </div>
+                {/* Right reel */}
+                <div style={{
+                  width: "18px",
+                  height: "18px",
+                  borderRadius: "50%",
+                  background: "#222",
+                  border: "2px solid #333",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                  <div style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    background: "#111",
+                  }}/>
+                </div>
+              </div>
+              
+              {/* Bottom edge detail */}
+              <div style={{
+                position: "absolute",
+                bottom: "3px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "20px",
+                height: "3px",
+                background: "#333",
+                borderRadius: "1px",
+              }}/>
             </div>
           ))}
         </div>
