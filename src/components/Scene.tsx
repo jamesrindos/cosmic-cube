@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { InteractiveRubiksCube, InteractiveGuitar, InteractiveVHSTape } from "./InteractiveElements";
 import { VMDesktop } from "./VMDesktop";
 import { ApartmentProvider, useApartment, projectData } from "../context/ApartmentContext";
+import { DustParticles, LightBeamParticles } from "./Particles";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -1726,6 +1727,13 @@ const Apartment = () => {
       <pointLight position={[7, 2, -21]} color="#FFF8E8" intensity={0.6} distance={8} decay={2} />
       <pointLight position={[4, 2.5, -21]} color="#FFF5E6" intensity={0.3} distance={10} decay={2} />
       <pointLight position={[2, 2, -14.5]} color="#FFF5E6" intensity={0.6} distance={6} decay={2} />
+
+      {/* === AMBIENT PARTICLES === */}
+      {/* Dust motes floating throughout apartment */}
+      <DustParticles count={80} area={{ x: 15, y: 3, z: 20 }} offset={{ x: 5, y: 0.5, z: -12 }} />
+      {/* Concentrated particles in bedroom window light beams */}
+      <LightBeamParticles position={[7.5, 0.5, -21]} count={25} />
+      <LightBeamParticles position={[7.5, 0.5, -22.5]} count={25} />
 
       {/* === OUTER WALLS - OPEN LIVING/KITCHEN === */}
       <Wall position={[5, hy, 0]} size={[10, h, t]} />

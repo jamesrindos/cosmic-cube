@@ -103,3 +103,37 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* VT323 font for retro terminal look */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* 3D Canvas interactive styling */
+canvas {
+  cursor: grab;
+}
+
+canvas:active {
+  cursor: grabbing;
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #0D0D0F;
+  color: #7B68EE;
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+}
+
+/* Smooth transitions for UI elements */
+.ui-transition {
+  transition: all 0.2s ease-out;
+}
+
+/* Glow effect utility */
+.glow {
+  filter: drop-shadow(0 0 10px currentColor);
+}
