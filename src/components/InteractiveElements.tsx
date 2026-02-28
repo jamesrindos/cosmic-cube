@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
 // ============================================
@@ -285,6 +286,30 @@ export const InteractiveVHSTape = ({ position, color, labelColor, projectName, o
       {/* Hover glow */}
       {isHovered && (
         <pointLight position={[-0.1, 0, 0]} color={color} intensity={0.3} distance={0.3} decay={2} />
+      )}
+      
+      {/* Tooltip on hover */}
+      {isHovered && projectName && (
+        <Html
+          position={[-0.2, 0.15, 0]}
+          style={{ pointerEvents: "none" }}
+        >
+          <div
+            style={{
+              background: "rgba(0,0,0,0.9)",
+              color: color,
+              padding: "4px 8px",
+              borderRadius: "4px",
+              fontSize: "10px",
+              fontFamily: "'VT323', monospace",
+              whiteSpace: "nowrap",
+              border: `1px solid ${color}`,
+              textShadow: `0 0 3px ${color}`,
+            }}
+          >
+            {projectName}
+          </div>
+        </Html>
       )}
     </group>
   );

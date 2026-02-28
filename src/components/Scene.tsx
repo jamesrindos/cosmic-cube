@@ -1,10 +1,11 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Html } from "@react-three/drei";
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { InteractiveRubiksCube, InteractiveGuitar, InteractiveVHSTape } from "./InteractiveElements";
 import { VMDesktop } from "./VMDesktop";
+import { ApartmentProvider, useApartment, projectData } from "../context/ApartmentContext";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -859,21 +860,30 @@ const BedroomClock = () => (
 
 // === LIVING ROOM ===
 
-// Animated TV Screen with static effect
+// Animated TV Screen with static effect + project content
 const TVScreen = () => {
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
   const [flickerIntensity, setFlickerIntensity] = useState(0.3);
+  const { selectedTape } = useApartment();
+  const project = selectedTape ? projectData[selectedTape] : null;
   
   useFrame(({ clock }) => {
-    // Create static/flicker effect
-    const time = clock.getElapsedTime();
-    const flicker = 0.25 + Math.sin(time * 30) * 0.05 + Math.random() * 0.1;
-    setFlickerIntensity(flicker);
-    
-    if (materialRef.current) {
-      // Slight color shift for CRT effect
-      const hue = 185 + Math.sin(time * 2) * 5;
-      materialRef.current.emissive.setHSL(hue / 360, 0.8, 0.3);
+    if (!project) {
+      // Create static/flicker effect only when idle
+      const time = clock.getElapsedTime();
+      const flicker = 0.25 + Math.sin(time * 30) * 0.05 + Math.random() * 0.1;
+      setFlickerIntensity(flicker);
+      
+      if (materialRef.current) {
+        const hue = 185 + Math.sin(time * 2) * 5;
+        materialRef.current.emissive.setHSL(hue / 360, 0.8, 0.3);
+      }
+    } else {
+      // Stable glow when showing content
+      setFlickerIntensity(0.4);
+      if (materialRef.current) {
+        materialRef.current.emissive.set(project.color);
+      }
     }
   });
   
@@ -884,7 +894,7 @@ const TVScreen = () => {
         <meshStandardMaterial 
           ref={materialRef}
           color="#0A0A0F" 
-          emissive="#00D9FF" 
+          emissive={project ? project.color : "#00D9FF"} 
           emissiveIntensity={flickerIntensity} 
         />
       </mesh>
@@ -897,12 +907,50 @@ const TVScreen = () => {
           opacity={0.15}
         />
       </mesh>
+      {/* Project content overlay when tape selected */}
+      {project && (
+        <Html
+          position={[-0.52, 0.95, 0]}
+          transform
+          style={{
+            width: 140,
+            height: 100,
+            pointerEvents: "none",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              background: "rgba(0,0,0,0.85)",
+              color: project.color,
+              padding: "8px",
+              fontFamily: "'VT323', 'Courier New', monospace",
+              fontSize: "9px",
+              lineHeight: 1.3,
+              overflow: "hidden",
+              border: `1px solid ${project.color}`,
+              textShadow: `0 0 5px ${project.color}`,
+            }}
+          >
+            <div style={{ fontWeight: "bold", fontSize: "11px", marginBottom: "6px" }}>
+              ▶ {project.title}
+            </div>
+            <div style={{ color: "#CCC", fontSize: "8px" }}>
+              {project.description}
+            </div>
+          </div>
+        </Html>
+      )}
     </>
   );
 };
 
-const RetroTV = () => (
-  <group position={[9.5, 0, -4]}>
+const RetroTV = () => {
+  const { setSelectedTape } = useApartment();
+  
+  return (
+  <group position={[9.5, 0, -4]} onClick={() => setSelectedTape(null)}>
     {/* TV Stand / shelf unit */}
     <mesh position={[0, 0.3, 0]}>
       <boxGeometry args={[0.6, 0.6, 1.5]} />
@@ -951,7 +999,8 @@ const RetroTV = () => (
     {/* Screen glow - pulsing */}
     <pointLight position={[-1, 0.95, 0]} color="#00D9FF" intensity={0.6} distance={5} decay={2} />
   </group>
-);
+  );
+};
 
 const VHSShelf = () => {
   // 14 VHS tapes with brand colors (per BRIEF portfolio)
@@ -972,7 +1021,7 @@ const VHSShelf = () => {
     { color: "#607D8B", label: "#FFFFFF", name: "Extra" },
   ];
   
-  const [selectedTape, setSelectedTape] = useState<string | null>(null);
+  const { selectedTape, setSelectedTape } = useApartment();
 
   return (
     <group position={[9.6, 0.75, -6.5]}>
@@ -1783,23 +1832,34 @@ const Apartment = () => {
   );
 };
 
+// Inner scene content that uses context
+const SceneContent = () => {
+  return (
+    <>
+      <color attach="background" args={["#0D0D0F"]} />
+      <ambientLight color="#FFF5E6" intensity={0.8} />
+      <directionalLight position={[-8, 20, 5]} intensity={1.0} color="#ffffff" />
+      <directionalLight position={[10, 15, -10]} intensity={0.4} color="#FFF5E6" />
+      <Apartment />
+      <OrbitControls
+        enableDamping
+        dampingFactor={0.05}
+        minPolarAngle={0.2}
+        maxPolarAngle={Math.PI / 3}
+        target={[0, 0, -7]}
+      />
+    </>
+  );
+};
+
 const Scene = () => {
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D0F" }}>
-      <Canvas camera={{ position: [20, 20, 20], fov: 45 }} shadows>
-        <color attach="background" args={["#0D0D0F"]} />
-        <ambientLight color="#FFF5E6" intensity={0.8} />
-        <directionalLight position={[-8, 20, 5]} intensity={1.0} color="#ffffff" />
-        <directionalLight position={[10, 15, -10]} intensity={0.4} color="#FFF5E6" />
-        <Apartment />
-        <OrbitControls
-          enableDamping
-          dampingFactor={0.05}
-          minPolarAngle={0.2}
-          maxPolarAngle={Math.PI / 3}
-          target={[0, 0, -7]}
-        />
-      </Canvas>
+      <ApartmentProvider>
+        <Canvas camera={{ position: [20, 20, 20], fov: 45 }} shadows>
+          <SceneContent />
+        </Canvas>
+      </ApartmentProvider>
     </div>
   );
 };
