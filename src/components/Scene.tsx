@@ -329,13 +329,23 @@ const CRTTV = ({
 }) => {
   const screenRef = useRef<THREE.MeshStandardMaterial>(null);
   const [showContent, setShowContent] = useState(false);
+  const [showTracking, setShowTracking] = useState(false);
   
-  // Delay content display for insertion animation
+  // Show tracking distortion when inserting tape
   useEffect(() => {
-    if (selectedTape && !isInserting) {
-      const timer = setTimeout(() => setShowContent(true), 300);
-      return () => clearTimeout(timer);
+    if (isInserting) {
+      setShowTracking(true);
+      setShowContent(false);
+    } else if (selectedTape) {
+      // Delay hiding tracking and showing content
+      const trackingTimer = setTimeout(() => setShowTracking(false), 400);
+      const contentTimer = setTimeout(() => setShowContent(true), 600);
+      return () => {
+        clearTimeout(trackingTimer);
+        clearTimeout(contentTimer);
+      };
     } else {
+      setShowTracking(false);
       setShowContent(false);
     }
   }, [selectedTape, isInserting]);
@@ -387,10 +397,55 @@ const CRTTV = ({
       </mesh>
       
       {/* Static noise overlay when no tape */}
-      {!selectedTape && (
+      {!selectedTape && !showTracking && (
         <group position={[0, 0.2, 1.84]}>
           <StaticNoise intensity={0.15} />
         </group>
+      )}
+      
+      {/* Tracking distortion overlay */}
+      {showTracking && (
+        <Html position={[0, 0.2, 1.9]} transform style={{ pointerEvents: "none" }}>
+          <div style={{
+            width: "360px",
+            height: "270px",
+            background: "linear-gradient(0deg, #000 0%, transparent 10%, transparent 90%, #000 100%)",
+            position: "relative",
+            overflow: "hidden",
+          }}>
+            {/* Tracking bars */}
+            {[...Array(8)].map((_, i) => (
+              <div key={i} style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                height: "3px",
+                background: "rgba(255,255,255,0.3)",
+                top: `${10 + i * 12 + Math.sin(Date.now() / 100 + i) * 5}%`,
+                animation: `tracking ${0.1 + Math.random() * 0.1}s linear infinite`,
+              }}/>
+            ))}
+            {/* "TRACKING" text */}
+            <div style={{
+              position: "absolute",
+              bottom: "20px",
+              left: "20px",
+              color: "#FFF",
+              fontFamily: "'VT323', monospace",
+              fontSize: "18px",
+              textShadow: "2px 2px 0 #000",
+              animation: "blink 0.5s infinite",
+            }}>
+              TRACKING...
+            </div>
+            <style>{`
+              @keyframes tracking {
+                0%, 100% { transform: translateX(0); }
+                50% { transform: translateX(10px); }
+              }
+            `}</style>
+          </div>
+        </Html>
       )}
       
       {/* Scanlines overlay */}
