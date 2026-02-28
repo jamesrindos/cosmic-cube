@@ -9,6 +9,7 @@ import { VMDesktop } from "./VMDesktop";
 import { ApartmentProvider, useApartment, projectData } from "../context/ApartmentContext";
 import { DustParticles, LightBeamParticles } from "./Particles";
 import { InvincibleBook, LetterboxdNotebook } from "./CoffeeTableItems";
+import { HelpOverlay, InteractiveLegend } from "./HelpOverlay";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -1899,6 +1900,9 @@ const Scene = () => {
             fontSize: "14px",
           }}
         />
+        {/* Help UI */}
+        <HelpOverlay />
+        <InteractiveLegend />
       </ApartmentProvider>
     </div>
   );
