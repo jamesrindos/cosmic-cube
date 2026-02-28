@@ -60,6 +60,45 @@ const KitchenIsland = () => (
       <boxGeometry args={[2.8, 0.4, 1.0]} />
       <meshStandardMaterial color="#2D2D3A" />
     </mesh>
+    {/* Bar stools */}
+    <group position={[-0.8, 0, 0.8]}>
+      <mesh position={[0, 0.35, 0]}>
+        <cylinderGeometry args={[0.15, 0.15, 0.05, 8]} />
+        <meshStandardMaterial color="#3D3D3D" />
+      </mesh>
+      <mesh position={[0, 0.18, 0]}>
+        <cylinderGeometry args={[0.03, 0.03, 0.35, 6]} />
+        <meshStandardMaterial color="#C0C0C0" />
+      </mesh>
+    </group>
+    <group position={[0.8, 0, 0.8]}>
+      <mesh position={[0, 0.35, 0]}>
+        <cylinderGeometry args={[0.15, 0.15, 0.05, 8]} />
+        <meshStandardMaterial color="#3D3D3D" />
+      </mesh>
+      <mesh position={[0, 0.18, 0]}>
+        <cylinderGeometry args={[0.03, 0.03, 0.35, 6]} />
+        <meshStandardMaterial color="#C0C0C0" />
+      </mesh>
+    </group>
+    {/* Fruit bowl on island */}
+    <mesh position={[0.5, 0.52, 0]}>
+      <sphereGeometry args={[0.15, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2]} />
+      <meshStandardMaterial color="#E8E0D0" side={2} />
+    </mesh>
+    {/* Fruits */}
+    <mesh position={[0.45, 0.55, 0.03]}>
+      <sphereGeometry args={[0.05, 6, 6]} />
+      <meshStandardMaterial color="#FF6B35" />
+    </mesh>
+    <mesh position={[0.55, 0.54, -0.02]}>
+      <sphereGeometry args={[0.045, 6, 6]} />
+      <meshStandardMaterial color="#F4D03F" />
+    </mesh>
+    <mesh position={[0.5, 0.56, 0.06]}>
+      <sphereGeometry args={[0.04, 6, 6]} />
+      <meshStandardMaterial color="#27AE60" />
+    </mesh>
   </group>
 );
 
@@ -123,6 +162,43 @@ const KitchenCabinets = () => (
         <meshStandardMaterial color="#C0C0C0" />
       </mesh>
     ))}
+    
+    {/* Kitchen sink */}
+    <mesh position={[0, 0.87, 0.15]}>
+      <boxGeometry args={[0.6, 0.08, 0.4]} />
+      <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    {/* Faucet */}
+    <mesh position={[0, 1.0, -0.05]}>
+      <boxGeometry args={[0.04, 0.2, 0.04]} />
+      <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    <mesh position={[0, 1.08, 0.08]}>
+      <boxGeometry args={[0.03, 0.03, 0.15]} />
+      <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    
+    {/* Coffee maker */}
+    <mesh position={[-1.5, 0.95, 0.1]}>
+      <boxGeometry args={[0.2, 0.25, 0.2]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    <mesh position={[-1.5, 1.12, 0.15]}>
+      <boxGeometry args={[0.15, 0.08, 0.1]} />
+      <meshStandardMaterial color="#2D2D2D" />
+    </mesh>
+    
+    {/* Toaster */}
+    <mesh position={[1.5, 0.92, 0.1]}>
+      <boxGeometry args={[0.18, 0.15, 0.12]} />
+      <meshStandardMaterial color="#C0C0C0" />
+    </mesh>
+    
+    {/* Knife block */}
+    <mesh position={[-0.8, 0.95, 0.15]}>
+      <boxGeometry args={[0.1, 0.2, 0.08]} />
+      <meshStandardMaterial color="#5C4A3A" />
+    </mesh>
   </group>
 );
 
