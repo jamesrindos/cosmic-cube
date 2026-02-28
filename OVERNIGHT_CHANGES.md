@@ -1,8 +1,8 @@
 # 🏠 Overnight Polish Report - Cosmic Cube
 
 **Branch:** `ace/apartment-polish`  
-**Commits:** 8  
-**Date:** Feb 28, 2026
+**Commits:** 10  
+**Date:** Feb 28, 2026 (Updated 05:30 UTC)
 
 ---
 
@@ -77,6 +77,66 @@ npm run dev
 ```
 
 All changes maintain the Sims-like bright aesthetic while adding the personal, lived-in details that make it feel like home.
+
+---
+
+## Second Polish Pass (05:30 UTC)
+
+### Layout Fixes (Per Reference Diagram)
+- **Couch moved to LEFT wall** — now properly facing the TV on the right
+- **Coffee table centered** between couch and TV
+- **Area rug repositioned** for new layout (6x4 with pattern layers)
+
+### Specific Wall Posters (Per BRIEF)
+Movies:
+- Scott Pilgrim vs the World (pink/blue/yellow comic aesthetic)
+- Into the Spider-Verse (red/blue with halftone dots)
+- Whiplash (gold with cymbal silhouette)
+- Babylon (gold art deco)
+- Marty Supreme (muted, stylish - above desk)
+
+Music:
+- Tyler the Creator (IGOR/CMIYGL colors)
+- Elliott Smith (muted melancholic)
+- Djo (retro synth-wave)
+- Geese (raw rock aesthetic)
+
+Other:
+- Critical Role (D&D fantasy - red/gold/purple)
+
+### VHS Shelf Upgrade
+14 branded portfolio tapes with unique colors:
+1. MoziWash (gold) - first billboard
+2. Audien Hearing (blue)
+3. Boldebottle (orange)
+4. Sunflower Vol 1 (yellow)
+5. Sunflower Vol 2 (amber)
+6. Dirtea (green)
+7. DSC (blue)
+8. GetMTE (purple)
+9. JB (black/gold)
+10. Kalshi (pink)
+11. Moe's (orange/brown)
+12. MudWTR (earthy brown)
+13. Political (blue/red)
+14. Extra slot
+
+### Coffee Table Items
+- **Invincible** coffee table book (yellow with red accent)
+- **Letterboxd notebook** (dark with orange stripe + pen)
+- Extra stacked book
+
+### Desk Clutter Enhanced
+- **Rubik's cube** with visible colored faces
+- **McDonald's toys**: character figure, tiny vehicle, vintage Happy Meal box
+- **Pez dispensers** (3 different colors)
+- More energy drinks
+- Stray headphone cable
+
+### Lived-In Chaos
+- **Pizza boxes** by couch (one open, one stacked)
+- **Phone charger** cable running to wall outlet
+- **Contact sticky note** on door (per BRIEF)
 
 ---
 
