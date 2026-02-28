@@ -548,6 +548,105 @@ const FrontDoor = () => (
   </group>
 );
 
+// Wall decorations
+const WallArt = () => (
+  <group>
+    {/* Bedroom poster - gaming/anime style */}
+    <group position={[4, 1.8, -24.9]}>
+      <mesh>
+        <boxGeometry args={[1.2, 1.6, 0.02]} />
+        <meshStandardMaterial color="#1A1A2E" />
+      </mesh>
+      {/* Poster art - abstract shapes */}
+      <mesh position={[0, 0.2, 0.02]}>
+        <boxGeometry args={[0.8, 0.6, 0.01]} />
+        <meshStandardMaterial color="#E94560" />
+      </mesh>
+      <mesh position={[-0.2, -0.3, 0.02]}>
+        <boxGeometry args={[0.3, 0.4, 0.01]} />
+        <meshStandardMaterial color="#533483" />
+      </mesh>
+      <mesh position={[0.25, -0.35, 0.02]}>
+        <boxGeometry args={[0.4, 0.3, 0.01]} />
+        <meshStandardMaterial color="#0F3460" />
+      </mesh>
+    </group>
+
+    {/* Bedroom poster 2 - smaller */}
+    <group position={[6.5, 1.6, -24.9]}>
+      <mesh>
+        <boxGeometry args={[0.8, 1.0, 0.02]} />
+        <meshStandardMaterial color="#2D2D3A" />
+      </mesh>
+      <mesh position={[0, 0, 0.02]}>
+        <boxGeometry args={[0.6, 0.8, 0.01]} />
+        <meshStandardMaterial color="#7B68EE" emissive="#7B68EE" emissiveIntensity={0.1} />
+      </mesh>
+    </group>
+
+    {/* Living room - framed photo */}
+    <group position={[0.06, 1.8, -4]}>
+      {/* Frame */}
+      <mesh>
+        <boxGeometry args={[0.05, 0.8, 1.0]} />
+        <meshStandardMaterial color="#5C4A3A" />
+      </mesh>
+      {/* Photo */}
+      <mesh position={[0.03, 0, 0]}>
+        <boxGeometry args={[0.01, 0.65, 0.85]} />
+        <meshStandardMaterial color="#E8DCC8" />
+      </mesh>
+    </group>
+
+    {/* Living room - small shelf with plants */}
+    <group position={[0.08, 1.2, -8]}>
+      <mesh>
+        <boxGeometry args={[0.15, 0.04, 0.5]} />
+        <meshStandardMaterial color="#5C4A3A" />
+      </mesh>
+      {/* Small potted plant */}
+      <mesh position={[0, 0.08, 0.1]}>
+        <cylinderGeometry args={[0.06, 0.05, 0.1, 6]} />
+        <meshStandardMaterial color="#D4A574" />
+      </mesh>
+      <mesh position={[0, 0.18, 0.1]}>
+        <sphereGeometry args={[0.08, 6, 4]} />
+        <meshStandardMaterial color="#4A7C59" />
+      </mesh>
+      {/* Small succulent */}
+      <mesh position={[0, 0.06, -0.12]}>
+        <cylinderGeometry args={[0.04, 0.035, 0.06, 6]} />
+        <meshStandardMaterial color="#C4A484" />
+      </mesh>
+      <mesh position={[0, 0.12, -0.12]}>
+        <coneGeometry args={[0.05, 0.08, 5]} />
+        <meshStandardMaterial color="#7CB342" />
+      </mesh>
+    </group>
+
+    {/* Kitchen - magnetic board/notes area */}
+    <group position={[9.94, 1.5, -9]}>
+      <mesh>
+        <boxGeometry args={[0.02, 0.6, 0.8]} />
+        <meshStandardMaterial color="#F5F5F5" />
+      </mesh>
+      {/* Sticky notes */}
+      <mesh position={[0.02, 0.15, -0.2]} rotation={[0, 0, 0.1]}>
+        <boxGeometry args={[0.01, 0.12, 0.12]} />
+        <meshStandardMaterial color="#FFEB3B" />
+      </mesh>
+      <mesh position={[0.02, 0.1, 0.15]} rotation={[0, 0, -0.05]}>
+        <boxGeometry args={[0.01, 0.1, 0.1]} />
+        <meshStandardMaterial color="#FF80AB" />
+      </mesh>
+      <mesh position={[0.02, -0.1, 0]} rotation={[0, 0, 0.02]}>
+        <boxGeometry args={[0.01, 0.15, 0.12]} />
+        <meshStandardMaterial color="#80DEEA" />
+      </mesh>
+    </group>
+  </group>
+);
+
 const PulsingLight = ({ position, color, intensity }: { position: [number, number, number]; color: string; intensity: number }) => {
   const lightRef = useRef<THREE.PointLight>(null);
   useFrame(({ clock }) => {
@@ -616,6 +715,20 @@ const Apartment = () => {
       <VHSShelf />
       <Couch />
       <CoffeeTable />
+
+      {/* === WALL DECORATIONS === */}
+      <WallArt />
+
+      {/* === RUG under coffee table === */}
+      <mesh position={[7.8, 0.02, -4]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[3, 2.5]} />
+        <meshStandardMaterial color="#4A3728" side={2} />
+      </mesh>
+      {/* Rug border */}
+      <mesh position={[7.8, 0.025, -4]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.1, 1.4, 4]} />
+        <meshStandardMaterial color="#6B4423" side={2} />
+      </mesh>
     </group>
   );
 };
