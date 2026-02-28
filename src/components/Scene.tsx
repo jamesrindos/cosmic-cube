@@ -64,22 +64,30 @@ const KitchenIsland = () => (
 );
 
 const Fridge = () => (
+  // Dark/black fridge like in Sims reference
   <group position={[3.5, 0, -11.5]} rotation={[0, Math.PI / 2, 0]}>
     <mesh position={[0, 1, 0]}>
       <boxGeometry args={[0.9, 2, 0.8]} />
-      <meshStandardMaterial color="#D0D0D0" />
+      <meshStandardMaterial color="#2D2D2D" />
     </mesh>
+    {/* Handles */}
     <mesh position={[0.47, 1.2, 0.15]}>
-      <boxGeometry args={[0.04, 0.6, 0.06]} />
-      <meshStandardMaterial color="#C0C0C0" />
+      <boxGeometry args={[0.04, 0.5, 0.04]} />
+      <meshStandardMaterial color="#808080" />
     </mesh>
     <mesh position={[0.47, 0.4, 0.15]}>
-      <boxGeometry args={[0.04, 0.4, 0.06]} />
-      <meshStandardMaterial color="#C0C0C0" />
+      <boxGeometry args={[0.04, 0.35, 0.04]} />
+      <meshStandardMaterial color="#808080" />
     </mesh>
+    {/* Door seam */}
     <mesh position={[0.46, 0.85, 0]}>
       <boxGeometry args={[0.01, 0.02, 0.78]} />
-      <meshStandardMaterial color="#B0B0B0" />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Ice dispenser */}
+    <mesh position={[0.46, 1.3, 0]}>
+      <boxGeometry args={[0.02, 0.25, 0.2]} />
+      <meshStandardMaterial color="#404040" />
     </mesh>
   </group>
 );
@@ -958,8 +966,11 @@ const Apartment = () => {
       <pointLight position={[5, 2.8, -3]} color="#FFF5E6" intensity={1.5} distance={16} decay={1.5} />
       <pointLight position={[5, 2.8, -9]} color="#FFF5E6" intensity={1.2} distance={14} decay={1.5} />
       <PulsingLight position={[9, 1.5, -4]} color="#00D9FF" intensity={0.4} />
-      <PulsingLight position={[2.5, 1.5, -18]} color="#7B68EE" intensity={1.5} />
-      <pointLight position={[4, 2.5, -21]} color="#FFF5E6" intensity={0.25} distance={10} decay={2} />
+      {/* RGB glow from gaming desk corner */}
+      <PulsingLight position={[1.5, 1.5, -18]} color="#7B68EE" intensity={1.2} />
+      {/* Window light from right wall */}
+      <pointLight position={[7, 2, -21]} color="#FFF8E8" intensity={0.6} distance={8} decay={2} />
+      <pointLight position={[4, 2.5, -21]} color="#FFF5E6" intensity={0.3} distance={10} decay={2} />
       <pointLight position={[2, 2, -14.5]} color="#FFF5E6" intensity={0.6} distance={6} decay={2} />
 
       {/* === OUTER WALLS - OPEN LIVING/KITCHEN === */}
@@ -1019,6 +1030,12 @@ const Apartment = () => {
       <mesh position={[7.8, 0.025, -4]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[1.1, 1.4, 4]} />
         <meshStandardMaterial color="#6B4423" side={2} />
+      </mesh>
+
+      {/* === BEDROOM RUG === */}
+      <mesh position={[4, 0.02, -21]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[5, 4]} />
+        <meshStandardMaterial color="#8B7355" side={2} />
       </mesh>
     </group>
   );
