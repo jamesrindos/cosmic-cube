@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -103,9 +105,6 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
-
-/* VT323 font for retro terminal look */
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
 /* 3D Canvas interactive styling */
 canvas {

@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Html, Loader } from "@react-three/drei";
-import { Suspense } from "react";
-import { useRef, useState } from "react";
+import { Html, Loader } from "@react-three/drei";
+import { Suspense, useState } from "react";
+import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { InteractiveRubiksCube, InteractiveGuitar, InteractiveVHSTape } from "./InteractiveElements";
@@ -10,6 +10,7 @@ import { ApartmentProvider, useApartment, projectData } from "../context/Apartme
 import { DustParticles, LightBeamParticles } from "./Particles";
 import { InvincibleBook, LetterboxdNotebook } from "./CoffeeTableItems";
 import { HelpOverlay, InteractiveLegend } from "./HelpOverlay";
+import { CameraController, CameraNavigation, CameraPreset } from "./CameraController";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -480,8 +481,9 @@ const Nightstand = () => (
 );
 
 const GamingDesk = () => (
-  // Gaming desk in bottom-left corner of bedroom, near hallway entrance
-  <group position={[1.2, 0, -18]} rotation={[0, Math.PI / 4, 0]}>
+  // Gaming desk in back-left corner of bedroom, facing left wall
+  // Chair faces into the room (toward windows/door)
+  <group position={[1.5, 0, -23.5]} rotation={[0, Math.PI / 2, 0]}>
     {/* Desktop */}
     <mesh position={[0, 0.75, 0]}>
       <boxGeometry args={[2.5, 0.08, 1]} />
@@ -654,7 +656,8 @@ const GamingDesk = () => (
 );
 
 const GamingChair = () => (
-  <group position={[2.2, 0, -19]} rotation={[0, Math.PI / 4, 0]}>
+  // Chair positioned in front of desk, facing the desk (toward left wall)
+  <group position={[2.8, 0, -23.5]} rotation={[0, -Math.PI / 2, 0]}>
     {/* Seat */}
     <mesh position={[0, 0.45, 0]}>
       <boxGeometry args={[0.5, 0.08, 0.5]} />
@@ -694,7 +697,7 @@ const GamingChair = () => (
 // === BATHROOM (in hallway area) ===
 
 const Bathroom = () => (
-  <group position={[0.5, 0, -14]}>
+  <group position={[5, 0, -14.25]}>
     {/* Bathroom floor - tile effect */}
     <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[2, 3]} />
@@ -951,7 +954,8 @@ const TVScreen = () => {
 };
 
 const RetroTV = () => {
-  const { setSelectedTape } = useApartment();
+  const { selectedTape, setSelectedTape } = useApartment();
+  const tapeData = selectedTape ? projectData[selectedTape] : null;
   
   return (
   <group position={[9.5, 0, -4]} onClick={() => setSelectedTape(null)}>
@@ -966,12 +970,39 @@ const RetroTV = () => {
       <meshStandardMaterial color="#2D2D3A" />
     </mesh>
     {/* Animated TV Screen */}
-    <TVScreen />
+    <TVScreen isPlaying={!!selectedTape} />
     {/* Screen bezel */}
     <mesh position={[-0.6, 0.95, 0]}>
       <boxGeometry args={[0.02, 0.8, 1.0]} />
       <meshStandardMaterial color="#1A1A2A" />
     </mesh>
+    
+    {/* Project info overlay when tape is playing */}
+    {tapeData && (
+      <Html position={[-1.5, 0.95, 0]} style={{ pointerEvents: 'none' }}>
+        <div style={{
+          background: 'rgba(0,0,0,0.9)',
+          color: tapeData.color,
+          padding: '12px 16px',
+          borderRadius: '8px',
+          border: `2px solid ${tapeData.color}`,
+          maxWidth: '200px',
+          fontFamily: "'VT323', monospace",
+          textShadow: `0 0 5px ${tapeData.color}`,
+        }}>
+          <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '6px' }}>
+            {tapeData.title}
+          </div>
+          <div style={{ fontSize: '10px', color: '#ccc', lineHeight: '1.3' }}>
+            {tapeData.description}
+          </div>
+          <div style={{ fontSize: '9px', color: '#666', marginTop: '8px' }}>
+            Click TV to stop
+          </div>
+        </div>
+      </Html>
+    )}
+    
     {/* VCR slot at bottom */}
     <mesh position={[-0.55, 0.45, 0]}>
       <boxGeometry args={[0.08, 0.06, 0.5]} />
@@ -1000,8 +1031,14 @@ const RetroTV = () => {
       <cylinderGeometry args={[0.015, 0.01, 0.5, 4]} />
       <meshStandardMaterial color="#C0C0C0" />
     </mesh>
-    {/* Screen glow - pulsing */}
-    <pointLight position={[-1, 0.95, 0]} color="#00D9FF" intensity={0.6} distance={5} decay={2} />
+    {/* Screen glow - pulsing, color changes with tape */}
+    <pointLight 
+      position={[-1, 0.95, 0]} 
+      color={tapeData?.color || "#00D9FF"} 
+      intensity={selectedTape ? 1.0 : 0.6} 
+      distance={5} 
+      decay={2} 
+    />
   </group>
   );
 };
@@ -1290,11 +1327,11 @@ const WallArt = () => (
         <meshStandardMaterial color="#1A1A1A" />
       </mesh>
       {/* Pink/magenta dominant colors */}
-      <mesh position={[0, 0.1, 0.015]}>
+      <mesh position={[0, 0.1, 0.03]}>
         <boxGeometry args={[0.75, 0.5, 0.01]} />
         <meshStandardMaterial color="#E91E63" />
       </mesh>
-      <mesh position={[0, -0.35, 0.015]}>
+      <mesh position={[0, -0.35, 0.03]}>
         <boxGeometry args={[0.75, 0.4, 0.01]} />
         <meshStandardMaterial color="#2196F3" />
       </mesh>
@@ -1311,11 +1348,11 @@ const WallArt = () => (
         <meshStandardMaterial color="#0D0D0F" />
       </mesh>
       {/* Red/blue Spider-Man colors */}
-      <mesh position={[0, 0.2, 0.015]}>
+      <mesh position={[0, 0.2, 0.03]}>
         <boxGeometry args={[0.4, 0.6, 0.01]} />
         <meshStandardMaterial color="#E53935" />
       </mesh>
-      <mesh position={[-0.2, -0.2, 0.015]}>
+      <mesh position={[-0.2, -0.2, 0.03]}>
         <boxGeometry args={[0.35, 0.4, 0.01]} />
         <meshStandardMaterial color="#1E88E5" />
       </mesh>
@@ -1335,7 +1372,7 @@ const WallArt = () => (
         <meshStandardMaterial color="#1A1A1A" />
       </mesh>
       {/* Yellow/gold dominant */}
-      <mesh position={[0, 0, 0.015]}>
+      <mesh position={[0, 0, 0.03]}>
         <boxGeometry args={[0.65, 0.9, 0.01]} />
         <meshStandardMaterial color="#F9A825" />
       </mesh>
@@ -1353,7 +1390,7 @@ const WallArt = () => (
         <meshStandardMaterial color="#0D0D0F" />
       </mesh>
       {/* Gold/art deco style */}
-      <mesh position={[0, 0, 0.015]}>
+      <mesh position={[0, 0, 0.03]}>
         <boxGeometry args={[0.55, 0.8, 0.01]} />
         <meshStandardMaterial color="#D4AF37" />
       </mesh>
@@ -1372,7 +1409,7 @@ const WallArt = () => (
         <meshStandardMaterial color="#1A1A1A" />
       </mesh>
       {/* Colorful IGOR/CMIYGL vibes */}
-      <mesh position={[0.015, 0, 0]}>
+      <mesh position={[0.03, 0, 0]}>
         <boxGeometry args={[0.01, 0.8, 0.6]} />
         <meshStandardMaterial color="#E91E63" />
       </mesh>
@@ -1393,7 +1430,7 @@ const WallArt = () => (
         <meshStandardMaterial color="#F5F5DC" />
       </mesh>
       {/* Muted, melancholic tones */}
-      <mesh position={[0.015, 0, 0]}>
+      <mesh position={[0.03, 0, 0]}>
         <boxGeometry args={[0.01, 0.6, 0.45]} />
         <meshStandardMaterial color="#708090" />
       </mesh>
@@ -1423,7 +1460,7 @@ const WallArt = () => (
         <meshStandardMaterial color="#2D2D2D" />
       </mesh>
       {/* Raw, energetic rock aesthetic */}
-      <mesh position={[-0.015, 0, 0]}>
+      <mesh position={[-0.03, 0, 0]}>
         <boxGeometry args={[0.01, 0.6, 0.45]} />
         <meshStandardMaterial color="#8B4513" />
       </mesh>
@@ -1461,7 +1498,7 @@ const WallArt = () => (
         <meshStandardMaterial color="#0D0D0F" />
       </mesh>
       {/* Timothée Chalamet vibes - muted, stylish */}
-      <mesh position={[0, 0, 0.015]} rotation={[0, Math.PI / 4, 0]}>
+      <mesh position={[0, 0, 0.03]} rotation={[0, Math.PI / 4, 0]}>
         <boxGeometry args={[0.45, 0.6, 0.01]} />
         <meshStandardMaterial color="#2F4F4F" />
       </mesh>
@@ -1712,14 +1749,32 @@ const Apartment = () => {
       <LightBeamParticles position={[7.5, 0.5, -22.5]} count={25} />
 
       {/* === OUTER WALLS - OPEN LIVING/KITCHEN === */}
-      <Wall position={[5, hy, 0]} size={[10, h, t]} />
+      {/* Front wall with door opening - split into two sections */}
+      <Wall position={[0.75, hy, 0]} size={[1.5, h, t]} /> {/* Left of door */}
+      <Wall position={[7, hy, 0]} size={[6, h, t]} /> {/* Right of door */}
+      {/* Door header above opening */}
+      <mesh position={[2, WALL_HEIGHT - 0.2, 0]}>
+        <boxGeometry args={[1.2, 0.4, WALL_THICKNESS]} />
+        <meshStandardMaterial color={WALL_COLOR} />
+      </mesh>
       <Wall position={[0, hy, -6]} size={[t, h, 12]} />
       <Wall position={[10, hy, -6]} size={[t, h, 12]} />
       <Wall position={[5, hy, -12]} size={[10, h, t]} />
 
       {/* === HALLWAY WALLS === */}
+      {/* Left hallway wall - extends from living room to bedroom */}
       <Wall position={[1, hy, -14.5]} size={[t, h, 5]} />
-      <Wall position={[3, hy, -14.5]} size={[t, h, 5]} />
+      {/* Right hallway wall - with bathroom cutout */}
+      <Wall position={[3, hy, -13]} size={[t, h, 2]} /> {/* Before bathroom */}
+      <Wall position={[3, hy, -16]} size={[t, h, 2]} /> {/* After bathroom */}
+      
+      {/* === BATHROOM ENCLOSURE (off right side of hallway) === */}
+      {/* Bathroom back wall */}
+      <Wall position={[5, hy, -15.5]} size={[4, h, t]} />
+      {/* Bathroom right wall */}
+      <Wall position={[7, hy, -14.25]} size={[t, h, 2.5]} />
+      {/* Bathroom front wall with door opening */}
+      <Wall position={[5.5, hy, -13]} size={[3, h, t]} />
 
       {/* === BEDROOM WALLS === */}
       <Wall position={[4, hy, -25]} size={[8, h, t]} />
@@ -1817,21 +1872,18 @@ const Apartment = () => {
 };
 
 // Inner scene content that uses context
-const SceneContent = () => {
+const SceneContent = ({ activePreset }: { activePreset: CameraPreset }) => {
   return (
     <>
-      <color attach="background" args={["#0D0D0F"]} />
-      <ambientLight color="#FFF5E6" intensity={0.8} />
-      <directionalLight position={[-8, 20, 5]} intensity={1.0} color="#ffffff" />
-      <directionalLight position={[10, 15, -10]} intensity={0.4} color="#FFF5E6" />
+      <color attach="background" args={["#1A1A2E"]} />
+      {/* Bright Sims-style lighting - warm and well-lit */}
+      <ambientLight color="#FFF8F0" intensity={1.2} />
+      <directionalLight position={[-8, 25, 10]} intensity={1.5} color="#FFFFFF" castShadow />
+      <directionalLight position={[15, 20, -5]} intensity={0.8} color="#FFF5E6" />
+      {/* Fill light from below to reduce harsh shadows */}
+      <hemisphereLight args={["#FFF8F0", "#8B7355", 0.6]} />
       <Apartment />
-      <OrbitControls
-        enableDamping
-        dampingFactor={0.05}
-        minPolarAngle={0.2}
-        maxPolarAngle={Math.PI / 3}
-        target={[0, 0, -7]}
-      />
+      <CameraController activePreset={activePreset} />
     </>
   );
 };
@@ -1876,12 +1928,14 @@ const LoadingScreen = () => (
 );
 
 const Scene = () => {
+  const [activePreset, setActivePreset] = useState<CameraPreset>("overview");
+
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D0F" }}>
       <ApartmentProvider>
-        <Canvas camera={{ position: [20, 20, 20], fov: 45 }} shadows>
+        <Canvas camera={{ position: [18, 16, 8], fov: 45 }} shadows>
           <Suspense fallback={<LoadingScreen />}>
-            <SceneContent />
+            <SceneContent activePreset={activePreset} />
           </Suspense>
         </Canvas>
         <Loader
@@ -1900,8 +1954,12 @@ const Scene = () => {
             fontSize: "14px",
           }}
         />
-        {/* Help UI */}
-        <HelpOverlay />
+        {/* Camera Navigation */}
+        <CameraNavigation 
+          activePreset={activePreset} 
+          onPresetChange={setActivePreset} 
+        />
+        {/* Interactive legend - top right */}
         <InteractiveLegend />
       </ApartmentProvider>
     </div>
