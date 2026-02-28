@@ -1,8 +1,8 @@
 # 🏠 Overnight Polish Report - Cosmic Cube
 
 **Branch:** `ace/apartment-polish`  
-**Commits:** 25  
-**Date:** Feb 28, 2026 (Final Update 07:30 UTC)
+**Commits:** 44  
+**Date:** Feb 28, 2026 (Final Update 08:00 UTC)
 
 ---
 
@@ -192,7 +192,7 @@ Other:
 
 ## Summary of All Changes
 
-**Total commits this branch:** 25
+**Total commits this branch:** 44
 
 ### From BRIEF Now Implemented:
 - ✅ Layout matches reference diagram (couch left, TV right)
@@ -222,6 +222,15 @@ Other:
 - ✅ Social links (Twitter, IG, LinkedIn, YouTube)
 - ✅ Steam window with recently played
 - ✅ Animated TV static/CRT effect
+- ✅ **VHS → TV connection** (click tape to show on TV!)
+- ✅ Project descriptions on TV screen
+- ✅ Click TV to deselect
+- ✅ Ambient dust particles
+- ✅ Window light beam particles
+- ✅ Loading screen with retro styling
+- ✅ Suspense/lazy loading
+- ✅ VT323 retro font
+- ✅ Cursor styling (grab/grabbing)
 
 ---
 
@@ -266,10 +275,66 @@ Other:
 
 ---
 
+---
+
+## VHS → TV Connection (07:45 UTC)
+
+### Full Integration Complete!
+- **Click any VHS tape** → Project info displays on TV screen
+- **TV color changes** to match selected project
+- **Click TV** → Deselects tape, returns to static
+- **ApartmentContext** manages shared state
+
+### Project Data
+All 14 portfolio descriptions from BRIEF:
+- MoziWash (First Billboard) — 48hr no-sleep with best friend
+- Audien Hearing — AI CTV ad experiments
+- Boldebottle — NanoBanana Pro launch project
+- Sunflower Vol 1 — Remixing iconic sobriety campaigns
+- Sunflower Vol 2 (Pixar) — Art style that hit emotionally
+- Dirtea — UK nootropics brand US launch
+- DSC — Twin brother characters, makes me laugh
+- GetMTE — Repurposed from friend's work
+- JB — 48hr brand research deep dive
+- Kalshi (Wimbledon) — Spec ad with Nate, day before Wimbledon
+- Moe's — Spec ad, rawdogging Veo prompts
+- MudWTR — "Favorite video I've made probably ever"
+- Political — MZL Media/Z Tribeca, presidents/senators/congresspeople
+- More Coming...
+
+---
+
+## Ambient Polish (07:50 UTC)
+
+### Particles Added
+- **Dust motes** floating throughout apartment (80 particles)
+- **Window light beam particles** in bedroom (50 particles)
+- Gentle swirling/drifting motion
+- Adds life and atmosphere
+
+### CSS Improvements
+- VT323 retro font imported
+- Canvas cursor: grab/grabbing
+- Glow utility class
+- Smooth transition utilities
+
+---
+
+## Loading Experience (08:00 UTC)
+
+### Loading Screen
+- Custom retro-styled loading component
+- Suspense boundary for lazy loading
+- Drei Loader with purple/cyan theme
+- Animated loading bar
+- VT323 font for retro feel
+
+---
+
 ### Still Could Add (Future):
-- VHS tape → plays on TV when clicked
-- Sound effects
-- Letterboxd integration
+- Sound effects (clicks, strums, TV static)
+- Letterboxd integration in notebook
+- Camera animations on object focus
 - Mobile responsive version
 
 ---
