@@ -1190,12 +1190,11 @@ const MobileLayout = () => {
             {/* Video player or content */}
             {selectedTape.content.videoSrc ? (
               <>
-                {/* Local video player */}
+                {/* Local video player - auto-adjusts to video resolution */}
                 <div style={{
                   width: "100%",
-                  maxWidth: "300px",
-                  margin: "0 auto",
-                  aspectRatio: "9/16",
+                  display: "flex",
+                  justifyContent: "center",
                   background: "#000",
                   borderRadius: "4px",
                   overflow: "hidden",
@@ -1206,9 +1205,8 @@ const MobileLayout = () => {
                     controls
                     playsInline
                     style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
+                      maxWidth: "100%",
+                      maxHeight: "50vh",
                     }}
                   />
                 </div>
