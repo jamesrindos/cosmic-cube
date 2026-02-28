@@ -219,7 +219,7 @@ const Bed = () => (
 );
 
 const GamingDesk = () => (
-  <group position={[0.5, 0, -16]} rotation={[0, -Math.PI / 4, 0]}>
+  <group position={[1.5, 0, -18.5]} rotation={[0, Math.PI, 0]}>
     {/* Desktop */}
     <mesh position={[0, 0.75, 0]}>
       <boxGeometry args={[2.5, 0.08, 1]} />
@@ -297,7 +297,7 @@ const GamingDesk = () => (
 );
 
 const GamingChair = () => (
-  <group position={[0.5, 0, -17.5]} rotation={[0, -Math.PI / 4, 0]}>
+  <group position={[1.5, 0, -19.8]} rotation={[0, Math.PI, 0]}>
     {/* Seat */}
     <mesh position={[0, 0.45, 0]}>
       <boxGeometry args={[0.5, 0.08, 0.5]} />
@@ -335,7 +335,7 @@ const GamingChair = () => (
 );
 
 const Guitar = () => (
-  <group position={[0.5, 0, -22]} rotation={[0, 0, 0.15]}>
+  <group position={[0.4, 0, -23.5]} rotation={[0, 0.2, 0.15]}>
     <mesh position={[0, 0.6, 0]}>
       <boxGeometry args={[0.5, 0.8, 0.12]} />
       <meshStandardMaterial color="#8B0000" />
@@ -475,6 +475,16 @@ const Couch = () => (
       <boxGeometry args={[1, 0.1, 1]} />
       <meshStandardMaterial color="#353548" />
     </mesh>
+    {/* Throw pillow */}
+    <mesh position={[-0.8, 0.65, 0.15]} rotation={[0.1, 0.3, 0.15]}>
+      <boxGeometry args={[0.35, 0.25, 0.1]} />
+      <meshStandardMaterial color="#E67E22" />
+    </mesh>
+    {/* Throw blanket draped */}
+    <mesh position={[0.3, 0.58, 0.45]} rotation={[0.4, 0, 0.1]}>
+      <boxGeometry args={[0.8, 0.03, 0.6]} />
+      <meshStandardMaterial color="#2E86AB" />
+    </mesh>
   </group>
 );
 
@@ -490,6 +500,26 @@ const CoffeeTable = () => (
         <meshStandardMaterial color="#2D2020" />
       </mesh>
     ))}
+    {/* Remote control */}
+    <mesh position={[0.15, 0.46, 0.2]} rotation={[0, 0.3, 0]}>
+      <boxGeometry args={[0.15, 0.02, 0.05]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Coffee mug */}
+    <mesh position={[-0.2, 0.48, -0.3]}>
+      <cylinderGeometry args={[0.04, 0.035, 0.08, 8]} />
+      <meshStandardMaterial color="#E8E0D0" />
+    </mesh>
+    {/* Coaster */}
+    <mesh position={[-0.2, 0.44, -0.3]}>
+      <cylinderGeometry args={[0.06, 0.06, 0.01, 8]} />
+      <meshStandardMaterial color="#5C4A3A" />
+    </mesh>
+    {/* Magazine/book */}
+    <mesh position={[0.1, 0.45, -0.4]} rotation={[0, -0.2, 0]}>
+      <boxGeometry args={[0.2, 0.02, 0.28]} />
+      <meshStandardMaterial color="#CC3333" />
+    </mesh>
   </group>
 );
 
