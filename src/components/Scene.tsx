@@ -1,17 +1,15 @@
-import { Canvas } from "@react-three/fiber";
-import { Html, Loader } from "@react-three/drei";
-import { Suspense, useState, useEffect } from "react";
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Html, Loader, PointerLockControls } from "@react-three/drei";
+import { Suspense, useState, useEffect, useRef } from "react";
 import * as THREE from "three";
 import { InteractiveRubiksCube, InteractiveGuitar, InteractiveVHSTape } from "./InteractiveElements";
-import { VMDesktop } from "./VMDesktop";
 import { ApartmentProvider, useApartment, projectData } from "../context/ApartmentContext";
 import { DustParticles, LightBeamParticles } from "./Particles";
 import { InvincibleBook, LetterboxdNotebook } from "./CoffeeTableItems";
 import { InteractiveLegend } from "./HelpOverlay";
 import { CameraController, CameraNavigation, CameraPreset } from "./CameraController";
 import { RoomClickZones } from "./RoomClickZones";
+import { FullscreenDesktop } from "./ComputerInteraction";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -415,8 +413,8 @@ const Bed = () => (
 );
 
 const Nightstand = () => (
-  // Nightstand on LEFT side of bed now (bed moved to right wall)
-  <group position={[3.2, 0, -21]}>
+  // Nightstand on RIGHT side of bed (between bed and wall)
+  <group position={[7.2, 0, -21]}>
     {/* Main body */}
     <mesh position={[0, 0.25, 0]}>
       <boxGeometry args={[0.5, 0.5, 0.4]} />
@@ -481,10 +479,27 @@ const Nightstand = () => (
   </group>
 );
 
-const GamingDesk = () => (
-  // Gaming desk in back-left corner of bedroom, facing left wall
-  // Chair faces into the room (toward windows/door)
-  <group position={[1.5, 0, -23.5]} rotation={[0, Math.PI / 2, 0]}>
+const GamingDesk = ({ onEnterDesktop }: { onEnterDesktop: () => void }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const handlePointerOver = () => {
+    setIsHovered(true);
+    document.body.style.cursor = "pointer";
+  };
+  
+  const handlePointerOut = () => {
+    setIsHovered(false);
+    document.body.style.cursor = "auto";
+  };
+  
+  const handleClick = (e: THREE.Event) => {
+    e.stopPropagation();
+    onEnterDesktop();
+  };
+
+  return (
+  // Gaming desk against back wall (poster wall), facing outward into room
+  <group position={[3, 0, -24.2]} rotation={[0, 0, 0]}>
     {/* Desktop */}
     <mesh position={[0, 0.75, 0]}>
       <boxGeometry args={[2.5, 0.08, 1]} />
@@ -498,17 +513,81 @@ const GamingDesk = () => (
       </mesh>
     ))}
 
-    {/* Center monitor (larger) - with VM Desktop */}
-    <mesh position={[0, 1.25, -0.4]}>
-      <boxGeometry args={[0.9, 0.55, 0.04]} />
-      <meshStandardMaterial color="#0A0A0F" />
-    </mesh>
-    {/* VM Desktop rendered on center monitor */}
-    <VMDesktop position={[0, 1.25, -0.38]} />
+    {/* === CENTER MONITOR - CLICKABLE WITH WHITE OUTLINE === */}
+    <group 
+      position={[0, 1.25, -0.4]}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
+      onClick={handleClick}
+    >
+      {/* Monitor frame */}
+      <mesh>
+        <boxGeometry args={[0.9, 0.55, 0.04]} />
+        <meshStandardMaterial color="#0A0A0F" />
+      </mesh>
+      
+      {/* WHITE OUTLINE when hovered - indicates clickable */}
+      {isHovered && (
+        <>
+          {/* Top edge */}
+          <mesh position={[0, 0.28, 0.025]}>
+            <boxGeometry args={[0.92, 0.025, 0.01]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={1} />
+          </mesh>
+          {/* Bottom edge */}
+          <mesh position={[0, -0.28, 0.025]}>
+            <boxGeometry args={[0.92, 0.025, 0.01]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={1} />
+          </mesh>
+          {/* Left edge */}
+          <mesh position={[-0.46, 0, 0.025]}>
+            <boxGeometry args={[0.025, 0.58, 0.01]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={1} />
+          </mesh>
+          {/* Right edge */}
+          <mesh position={[0.46, 0, 0.025]}>
+            <boxGeometry args={[0.025, 0.58, 0.01]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={1} />
+          </mesh>
+        </>
+      )}
+      
+      {/* Screen glow */}
+      <mesh position={[0, 0, 0.022]}>
+        <boxGeometry args={[0.85, 0.5, 0.001]} />
+        <meshStandardMaterial 
+          color="#0A0A0F" 
+          emissive={isHovered ? "#FFFFFF" : "#7B68EE"} 
+          emissiveIntensity={isHovered ? 0.2 : 0.4} 
+        />
+      </mesh>
+      
+      {/* "Click to enter" tooltip */}
+      {isHovered && (
+        <Html position={[0, 0.4, 0.1]} style={{ pointerEvents: "none" }}>
+          <div style={{
+            background: "rgba(0,0,0,0.9)",
+            color: "#FFFFFF",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            fontSize: "14px",
+            fontFamily: "'VT323', monospace",
+            whiteSpace: "nowrap",
+            border: "2px solid #FFFFFF",
+            boxShadow: "0 0 20px rgba(255,255,255,0.3)",
+          }}>
+            🖱️ Click to enter desktop
+          </div>
+        </Html>
+      )}
+    </group>
+    
+    {/* Monitor stand */}
     <mesh position={[0, 0.95, -0.35]}>
       <boxGeometry args={[0.15, 0.05, 0.1]} />
       <meshStandardMaterial color="#1A1A1A" />
     </mesh>
+    
     {/* Left monitor */}
     <mesh position={[-0.85, 1.2, -0.38]} rotation={[0, 0.2, 0]}>
       <boxGeometry args={[0.7, 0.45, 0.04]} />
@@ -518,6 +597,7 @@ const GamingDesk = () => (
       <boxGeometry args={[0.12, 0.05, 0.08]} />
       <meshStandardMaterial color="#1A1A1A" />
     </mesh>
+    
     {/* Right monitor */}
     <mesh position={[0.85, 1.2, -0.38]} rotation={[0, -0.2, 0]}>
       <boxGeometry args={[0.7, 0.45, 0.04]} />
@@ -534,12 +614,10 @@ const GamingDesk = () => (
     <pointLight position={[0, 1.2, 0.2]} color="#7B68EE" intensity={0.8} distance={4} decay={2} />
 
     {/* === KEYBOARD & MOUSE === */}
-    {/* Large mousepad/desk mat */}
     <mesh position={[0, 0.795, 0.1]}>
       <boxGeometry args={[1.8, 0.01, 0.6]} />
       <meshStandardMaterial color="#1A1A2E" />
     </mesh>
-    {/* RGB edge on mousepad */}
     <mesh position={[0, 0.796, 0.38]}>
       <boxGeometry args={[1.75, 0.005, 0.02]} />
       <meshStandardMaterial color="#7B68EE" emissive="#7B68EE" emissiveIntensity={0.3} />
@@ -550,12 +628,10 @@ const GamingDesk = () => (
       <boxGeometry args={[0.45, 0.03, 0.15]} />
       <meshStandardMaterial color="#2D2D3A" />
     </mesh>
-    {/* Keycaps (simplified) */}
     <mesh position={[0, 0.835, 0.15]}>
       <boxGeometry args={[0.42, 0.01, 0.12]} />
       <meshStandardMaterial color="#1A1A1A" />
     </mesh>
-    {/* RGB underglow on keyboard */}
     <pointLight position={[0, 0.81, 0.15]} color="#7B68EE" intensity={0.2} distance={0.5} decay={2} />
     
     {/* Gaming mouse */}
@@ -563,13 +639,12 @@ const GamingDesk = () => (
       <boxGeometry args={[0.06, 0.025, 0.1]} />
       <meshStandardMaterial color="#1A1A1A" />
     </mesh>
-    {/* Mouse RGB */}
     <mesh position={[0.35, 0.83, 0.18]}>
       <boxGeometry args={[0.02, 0.005, 0.04]} />
       <meshStandardMaterial color="#00D9FF" emissive="#00D9FF" emissiveIntensity={0.4} />
     </mesh>
 
-    {/* === INTERACTIVE RUBIK'S CUBE (click to solve!) === */}
+    {/* === INTERACTIVE RUBIK'S CUBE === */}
     <InteractiveRubiksCube position={[0.5, 0.85, 0.1]} />
     
     {/* === McDONALD'S TOYS (per BRIEF - new + vintage) === */}
@@ -654,11 +729,12 @@ const GamingDesk = () => (
       <meshStandardMaterial color="#1A1A1A" />
     </mesh>
   </group>
-);
+  );
+};
 
 const GamingChair = () => (
-  // Chair positioned in front of desk, facing the desk (toward left wall)
-  <group position={[2.8, 0, -23.5]} rotation={[0, -Math.PI / 2, 0]}>
+  // Chair in front of desk, facing the monitors (toward back wall)
+  <group position={[3, 0, -22.5]} rotation={[0, Math.PI, 0]}>
     {/* Seat */}
     <mesh position={[0, 0.45, 0]}>
       <boxGeometry args={[0.5, 0.08, 0.5]} />
@@ -699,6 +775,27 @@ const GamingChair = () => (
 
 const Bathroom = () => (
   <group position={[5, 0, -14.25]}>
+    {/* === BATHROOM DOOR === */}
+    <group position={[-1.5, 0, 1.25]}>
+      {/* Door frame */}
+      <mesh position={[0, 1.15, 0]}>
+        <boxGeometry args={[0.12, 2.3, 0.8]} />
+        <meshStandardMaterial color="#3D2E2E" />
+      </mesh>
+      {/* Door panel - slightly ajar */}
+      <group rotation={[0, 0.3, 0]} position={[0, 0, -0.35]}>
+        <mesh position={[0.08, 1.1, 0]}>
+          <boxGeometry args={[0.08, 2.1, 0.7]} />
+          <meshStandardMaterial color="#5C3A1E" />
+        </mesh>
+        {/* Door handle */}
+        <mesh position={[0.14, 1.0, 0.25]}>
+          <boxGeometry args={[0.04, 0.1, 0.04]} />
+          <meshStandardMaterial color="#C0A050" />
+        </mesh>
+      </group>
+    </group>
+    
     {/* Bathroom floor - tile effect */}
     <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[2, 3]} />
@@ -1401,69 +1498,38 @@ const WallArt = () => (
       </mesh>
     </group>
 
-    {/* === LEFT WALL (bedroom) - Music posters === */}
+    {/* === LEFT WALL (bedroom) - Curated music poster === */}
     
-    {/* Tyler the Creator poster */}
-    <group position={[0.06, 1.8, -22]}>
+    {/* Tyler the Creator poster - IGOR style, prominent */}
+    <group position={[0.06, 1.7, -21.5]}>
       <mesh>
-        <boxGeometry args={[0.02, 1.0, 0.8]} />
+        <boxGeometry args={[0.02, 1.2, 0.9]} />
         <meshStandardMaterial color="#1A1A1A" />
       </mesh>
-      {/* Colorful IGOR/CMIYGL vibes */}
+      {/* Colorful IGOR vibes */}
       <mesh position={[0.03, 0, 0]}>
-        <boxGeometry args={[0.01, 0.8, 0.6]} />
+        <boxGeometry args={[0.01, 1.0, 0.75]} />
         <meshStandardMaterial color="#E91E63" />
       </mesh>
-      <mesh position={[0.02, 0.2, 0.15]}>
-        <boxGeometry args={[0.01, 0.35, 0.25]} />
+      <mesh position={[0.02, 0.25, 0.15]}>
+        <boxGeometry args={[0.01, 0.4, 0.3]} />
         <meshStandardMaterial color="#4CAF50" />
       </mesh>
-      <mesh position={[0.02, -0.15, -0.1]}>
-        <boxGeometry args={[0.01, 0.3, 0.2]} />
+      <mesh position={[0.02, -0.2, -0.15]}>
+        <boxGeometry args={[0.01, 0.35, 0.25]} />
         <meshStandardMaterial color="#FF9800" />
       </mesh>
     </group>
 
-    {/* Elliott Smith poster */}
-    <group position={[0.06, 1.5, -20]}>
+    {/* Elliott Smith poster - smaller, below Tyler */}
+    <group position={[0.06, 1.2, -23]}>
       <mesh>
-        <boxGeometry args={[0.02, 0.8, 0.6]} />
+        <boxGeometry args={[0.02, 0.6, 0.5]} />
         <meshStandardMaterial color="#F5F5DC" />
       </mesh>
-      {/* Muted, melancholic tones */}
       <mesh position={[0.03, 0, 0]}>
-        <boxGeometry args={[0.01, 0.6, 0.45]} />
+        <boxGeometry args={[0.01, 0.5, 0.4]} />
         <meshStandardMaterial color="#708090" />
-      </mesh>
-    </group>
-
-    {/* Djo poster (Joe Keery's band) */}
-    <group position={[0.06, 1.8, -23.5]}>
-      <mesh>
-        <boxGeometry args={[0.02, 0.9, 0.7]} />
-        <meshStandardMaterial color="#1A1A1A" />
-      </mesh>
-      {/* Retro synth-wave colors */}
-      <mesh position={[0.015, 0.1, 0]}>
-        <boxGeometry args={[0.01, 0.4, 0.55]} />
-        <meshStandardMaterial color="#FF6B6B" />
-      </mesh>
-      <mesh position={[0.02, -0.2, 0]}>
-        <boxGeometry args={[0.01, 0.3, 0.5]} />
-        <meshStandardMaterial color="#4ECDC4" />
-      </mesh>
-    </group>
-
-    {/* Geese (band) poster */}
-    <group position={[7.94, 1.6, -22]}>
-      <mesh>
-        <boxGeometry args={[0.02, 0.8, 0.6]} />
-        <meshStandardMaterial color="#2D2D2D" />
-      </mesh>
-      {/* Raw, energetic rock aesthetic */}
-      <mesh position={[-0.03, 0, 0]}>
-        <boxGeometry args={[0.01, 0.6, 0.45]} />
-        <meshStandardMaterial color="#8B4513" />
       </mesh>
       <mesh position={[-0.02, 0.15, 0.1]}>
         <boxGeometry args={[0.01, 0.25, 0.2]} />
@@ -1719,7 +1785,7 @@ const PulsingLight = ({ position, color, intensity }: { position: [number, numbe
   return <pointLight ref={lightRef} position={position} color={color} intensity={intensity} distance={12} decay={2} />;
 };
 
-const Apartment = () => {
+const Apartment = ({ onEnterDesktop }: { onEnterDesktop: () => void }) => {
   const h = WALL_HEIGHT;
   const t = WALL_THICKNESS;
   const hy = h / 2;
@@ -1796,10 +1862,10 @@ const Apartment = () => {
       <Nightstand />
       <BedroomStereo />
       <BedroomClock />
-      <GamingDesk />
+      <GamingDesk onEnterDesktop={onEnterDesktop} />
       <GamingChair />
-      {/* Interactive Guitar - click to strum! */}
-      <InteractiveGuitar position={[0.3, 0, -20]} />
+      {/* Interactive Guitar - far left corner of bedroom, relative to bed */}
+      <InteractiveGuitar position={[0.5, 0, -24]} />
       <BedroomClutter />
 
       {/* === KITCHEN === */}
@@ -1875,10 +1941,12 @@ const Apartment = () => {
 // Inner scene content that uses context
 const SceneContent = ({ 
   activePreset, 
-  onNavigate 
+  onNavigate,
+  onEnterDesktop,
 }: { 
   activePreset: CameraPreset;
   onNavigate: (preset: CameraPreset) => void;
+  onEnterDesktop: () => void;
 }) => {
   return (
     <>
@@ -1889,9 +1957,9 @@ const SceneContent = ({
       <directionalLight position={[15, 20, -5]} intensity={0.8} color="#FFF5E6" />
       {/* Fill light from below to reduce harsh shadows */}
       <hemisphereLight args={["#FFF8F0", "#8B7355", 0.6]} />
-      <Apartment />
-      <RoomClickZones onNavigate={onNavigate} />
-      <CameraController activePreset={activePreset} />
+      <Apartment onEnterDesktop={onEnterDesktop} />
+      {/* Fly camera - click to lock, WASD to move, mouse to look, ESC to unlock */}
+      <FlyCamera />
     </>
   );
 };
@@ -1969,6 +2037,60 @@ const LoadingScreen = () => (
   </Html>
 );
 
+// Fly Camera component for noclip-style navigation
+const FlyCamera = () => {
+  const { camera, gl } = useThree();
+  const controlsRef = useRef<any>(null);
+  const moveSpeed = 0.15;
+  const keys = useRef({ w: false, a: false, s: false, d: false, space: false, shift: false });
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      if (key === 'w') keys.current.w = true;
+      if (key === 'a') keys.current.a = true;
+      if (key === 's') keys.current.s = true;
+      if (key === 'd') keys.current.d = true;
+      if (key === ' ') keys.current.space = true;
+      if (key === 'shift') keys.current.shift = true;
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      if (key === 'w') keys.current.w = false;
+      if (key === 'a') keys.current.a = false;
+      if (key === 's') keys.current.s = false;
+      if (key === 'd') keys.current.d = false;
+      if (key === ' ') keys.current.space = false;
+      if (key === 'shift') keys.current.shift = false;
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  useFrame(() => {
+    if (!controlsRef.current?.isLocked) return;
+    
+    const direction = new THREE.Vector3();
+    const right = new THREE.Vector3();
+    
+    camera.getWorldDirection(direction);
+    right.crossVectors(direction, camera.up).normalize();
+    
+    if (keys.current.w) camera.position.addScaledVector(direction, moveSpeed);
+    if (keys.current.s) camera.position.addScaledVector(direction, -moveSpeed);
+    if (keys.current.a) camera.position.addScaledVector(right, -moveSpeed);
+    if (keys.current.d) camera.position.addScaledVector(right, moveSpeed);
+    if (keys.current.space) camera.position.y += moveSpeed;
+    if (keys.current.shift) camera.position.y -= moveSpeed;
+  });
+
+  return <PointerLockControls ref={controlsRef} />;
+};
+
 // Mobile detection hook
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -1987,54 +2109,56 @@ const useIsMobile = () => {
 
 const Scene = () => {
   const [activePreset, setActivePreset] = useState<CameraPreset>("overview");
+  const [showDesktop, setShowDesktop] = useState(false);
   const isMobile = useIsMobile();
+
+  // Handle ESC key to exit desktop
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showDesktop) {
+        setShowDesktop(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showDesktop]);
 
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D0F" }}>
-      {/* Mobile warning */}
-      {isMobile && (
+      {/* Fullscreen Desktop Overlay */}
+      {showDesktop && (
+        <FullscreenDesktop onExit={() => setShowDesktop(false)} />
+      )}
+      
+      {/* Mobile hint - non-blocking, dismissible */}
+      {isMobile && !showDesktop && (
         <div
           style={{
             position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(13, 13, 15, 0.95)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-            padding: "20px",
-            textAlign: "center",
+            bottom: 20,
+            left: 20,
+            right: 20,
+            background: "rgba(0,0,0,0.8)",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            zIndex: 1000,
             fontFamily: "'VT323', monospace",
+            textAlign: "center",
           }}
         >
-          <div style={{ fontSize: "48px", marginBottom: "16px" }}>🖥️</div>
-          <div style={{ fontSize: "24px", color: "#FFFFFF", marginBottom: "8px" }}>
-            Best Viewed on Desktop
+          <div style={{ fontSize: "14px", color: "#FFFFFF" }}>
+            📱 Tap to explore • Best on desktop for full experience
           </div>
-          <div style={{ fontSize: "14px", color: "#888", maxWidth: "300px" }}>
-            This interactive 3D portfolio experience is optimized for desktop browsers with a mouse.
-          </div>
-          <a
-            href="mailto:jamesrindos1@gmail.com"
-            style={{
-              marginTop: "24px",
-              color: "#7B68EE",
-              fontSize: "14px",
-              textDecoration: "none",
-            }}
-          >
-            📧 jamesrindos1@gmail.com
-          </a>
         </div>
       )}
       <ApartmentProvider>
         <Canvas camera={{ position: [18, 16, 8], fov: 45 }} shadows>
           <Suspense fallback={<LoadingScreen />}>
-            <SceneContent activePreset={activePreset} onNavigate={setActivePreset} />
+            <SceneContent 
+              activePreset={activePreset} 
+              onNavigate={setActivePreset}
+              onEnterDesktop={() => setShowDesktop(true)}
+            />
           </Suspense>
         </Canvas>
         <Loader
@@ -2079,13 +2203,7 @@ const Scene = () => {
           </div>
         </div>
         
-        {/* Camera Navigation */}
-        <CameraNavigation 
-          activePreset={activePreset} 
-          onPresetChange={setActivePreset} 
-        />
-        {/* Interactive legend - top right */}
-        <InteractiveLegend />
+        {/* UI hidden for camera testing */}
       </ApartmentProvider>
     </div>
   );
