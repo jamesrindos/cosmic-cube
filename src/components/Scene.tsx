@@ -8,6 +8,7 @@ import { InteractiveRubiksCube, InteractiveGuitar, InteractiveVHSTape } from "./
 import { VMDesktop } from "./VMDesktop";
 import { ApartmentProvider, useApartment, projectData } from "../context/ApartmentContext";
 import { DustParticles, LightBeamParticles } from "./Particles";
+import { InvincibleBook, LetterboxdNotebook } from "./CoffeeTableItems";
 
 const WALL_COLOR = "#F5F0E6";
 const FLOOR_COLOR = "#8B7355";
@@ -1172,38 +1173,11 @@ const CoffeeTable = () => (
       <meshStandardMaterial color="#5C4A3A" />
     </mesh>
     
-    {/* INVINCIBLE coffee table book (per BRIEF) */}
-    <group position={[-0.1, 0.45, 0.2]}>
-      {/* Book */}
-      <mesh rotation={[0, 0.15, 0]}>
-        <boxGeometry args={[0.35, 0.04, 0.45]} />
-        <meshStandardMaterial color="#FFD700" />
-      </mesh>
-      {/* Red accent on cover (Invincible logo area) */}
-      <mesh position={[0, 0.022, 0]} rotation={[0, 0.15, 0]}>
-        <boxGeometry args={[0.2, 0.002, 0.25]} />
-        <meshStandardMaterial color="#E74C3C" />
-      </mesh>
-    </group>
+    {/* INTERACTIVE Invincible coffee table book */}
+    <InvincibleBook position={[-0.1, 0.45, 0.2]} />
     
-    {/* Letterboxd notebook (per BRIEF) */}
-    <group position={[0.25, 0.45, -0.2]}>
-      {/* Notebook */}
-      <mesh rotation={[0, -0.25, 0]}>
-        <boxGeometry args={[0.18, 0.025, 0.25]} />
-        <meshStandardMaterial color="#1A1A2E" />
-      </mesh>
-      {/* Orange Letterboxd stripe */}
-      <mesh position={[0, 0.014, 0]} rotation={[0, -0.25, 0]}>
-        <boxGeometry args={[0.04, 0.002, 0.24]} />
-        <meshStandardMaterial color="#FF8000" />
-      </mesh>
-      {/* Pen on top */}
-      <mesh position={[0.12, 0.04, 0]} rotation={[0, -0.1, 0]}>
-        <cylinderGeometry args={[0.008, 0.008, 0.15, 6]} />
-        <meshStandardMaterial color="#1A1A1A" />
-      </mesh>
-    </group>
+    {/* INTERACTIVE Letterboxd notebook - shows recent watches! */}
+    <LetterboxdNotebook position={[0.25, 0.45, -0.2]} />
     
     {/* Another book stacked */}
     <mesh position={[-0.15, 0.48, 0.15]} rotation={[0, 0.4, 0]}>
