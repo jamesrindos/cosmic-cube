@@ -13,6 +13,16 @@ export const InteractiveRubiksCube = ({ position }: { position: [number, number,
   const [solveProgress, setSolveProgress] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [clickPulse, setClickPulse] = useState(0);
+  
+  // Cursor change on hover
+  const handlePointerOver = () => {
+    setIsHovered(true);
+    document.body.style.cursor = "pointer";
+  };
+  const handlePointerOut = () => {
+    setIsHovered(false);
+    document.body.style.cursor = "auto";
+  };
 
   useFrame((_, delta) => {
     if (isSolving && groupRef.current) {
@@ -56,8 +66,8 @@ export const InteractiveRubiksCube = ({ position }: { position: [number, number,
       ref={groupRef} 
       position={position}
       onClick={handleClick}
-      onPointerOver={() => setIsHovered(true)}
-      onPointerOut={() => setIsHovered(false)}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
       scale={[scale, scale, scale]}
     >
       {/* Main cube body */}
@@ -155,6 +165,16 @@ export const InteractiveGuitar = ({ position }: { position: [number, number, num
   const [isStrumming, setIsStrumming] = useState(false);
   const [strumTime, setStrumTime] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  
+  // Cursor change on hover
+  const handlePointerOver = () => {
+    setIsHovered(true);
+    document.body.style.cursor = "pointer";
+  };
+  const handlePointerOut = () => {
+    setIsHovered(false);
+    document.body.style.cursor = "auto";
+  };
 
   useFrame((_, delta) => {
     if (isStrumming && groupRef.current) {

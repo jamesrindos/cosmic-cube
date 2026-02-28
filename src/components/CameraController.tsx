@@ -3,34 +3,39 @@ import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 // Camera presets for each room/view
+// Layout: Living/Kitchen z=0 to -12, Hallway z=-12 to -17, Bedroom z=-17 to -25
 export const CAMERA_PRESETS = {
   overview: {
-    position: new THREE.Vector3(20, 18, 10),
-    target: new THREE.Vector3(4, 0, -12),
+    position: new THREE.Vector3(22, 20, 12),
+    target: new THREE.Vector3(5, 0, -10),
     name: "Overview",
     key: "1",
   },
   livingRoom: {
-    position: new THREE.Vector3(14, 6, 4),
-    target: new THREE.Vector3(5, 1, -4),
+    // Looking at living room from front-right corner, isometric angle
+    position: new THREE.Vector3(16, 10, 6),
+    target: new THREE.Vector3(5, 0, -4),
     name: "Living Room",
     key: "2",
   },
   kitchen: {
-    position: new THREE.Vector3(0, 5, -6),
-    target: new THREE.Vector3(6, 1, -10),
+    // Looking at kitchen area from front-left, showing island and fridge
+    position: new THREE.Vector3(-4, 8, -4),
+    target: new THREE.Vector3(6, 0, -9),
     name: "Kitchen",
     key: "3",
   },
   hallway: {
-    position: new THREE.Vector3(-3, 4, -13),
-    target: new THREE.Vector3(4, 1, -14.5),
+    // Looking down the hallway from living room side
+    position: new THREE.Vector3(8, 6, -10),
+    target: new THREE.Vector3(2, 0, -14),
     name: "Hallway",
     key: "4",
   },
   bedroom: {
-    position: new THREE.Vector3(14, 7, -16),
-    target: new THREE.Vector3(4, 1, -21),
+    // Looking at bedroom from hallway entrance, showing desk/bed/guitar
+    position: new THREE.Vector3(12, 10, -14),
+    target: new THREE.Vector3(4, 0, -21),
     name: "Bedroom",
     key: "5",
   },
