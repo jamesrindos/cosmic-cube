@@ -218,6 +218,57 @@ const Bed = () => (
   </group>
 );
 
+const Nightstand = () => (
+  <group position={[4.8, 0, -22.5]}>
+    {/* Main body */}
+    <mesh position={[0, 0.25, 0]}>
+      <boxGeometry args={[0.5, 0.5, 0.4]} />
+      <meshStandardMaterial color="#3D2E2E" />
+    </mesh>
+    {/* Drawer */}
+    <mesh position={[0, 0.25, 0.21]}>
+      <boxGeometry args={[0.42, 0.18, 0.02]} />
+      <meshStandardMaterial color="#4D3E2E" />
+    </mesh>
+    {/* Drawer handle */}
+    <mesh position={[0, 0.25, 0.23]}>
+      <boxGeometry args={[0.1, 0.02, 0.02]} />
+      <meshStandardMaterial color="#C0A050" />
+    </mesh>
+    {/* Lamp base */}
+    <mesh position={[0, 0.55, 0]}>
+      <cylinderGeometry args={[0.06, 0.08, 0.08, 8]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    {/* Lamp stem */}
+    <mesh position={[0, 0.7, 0]}>
+      <cylinderGeometry args={[0.02, 0.02, 0.25, 6]} />
+      <meshStandardMaterial color="#C0A050" />
+    </mesh>
+    {/* Lamp shade */}
+    <mesh position={[0, 0.9, 0]}>
+      <cylinderGeometry args={[0.1, 0.06, 0.2, 8, 1, true]} />
+      <meshStandardMaterial color="#F5E6D3" side={2} />
+    </mesh>
+    {/* Lamp glow */}
+    <pointLight position={[0, 0.85, 0]} color="#FFF5E6" intensity={0.3} distance={2} decay={2} />
+    {/* Phone on nightstand */}
+    <mesh position={[-0.12, 0.52, 0.1]} rotation={[0, 0.2, 0]}>
+      <boxGeometry args={[0.08, 0.01, 0.15]} />
+      <meshStandardMaterial color="#1A1A1A" />
+    </mesh>
+    {/* Alarm clock */}
+    <mesh position={[0.12, 0.54, -0.08]}>
+      <boxGeometry args={[0.1, 0.08, 0.05]} />
+      <meshStandardMaterial color="#2D2D3A" />
+    </mesh>
+    <mesh position={[0.12, 0.54, -0.055]}>
+      <boxGeometry args={[0.08, 0.05, 0.01]} />
+      <meshStandardMaterial color="#00FF00" emissive="#00FF00" emissiveIntensity={0.3} />
+    </mesh>
+  </group>
+);
+
 const GamingDesk = () => (
   <group position={[1.5, 0, -18.5]} rotation={[0, Math.PI, 0]}>
     {/* Desktop */}
@@ -545,6 +596,40 @@ const FrontDoor = () => (
       <cylinderGeometry args={[0.02, 0.02, 0.02, 6]} />
       <meshStandardMaterial color="#1A1A1A" />
     </mesh>
+    {/* Doormat */}
+    <mesh position={[0, 0.01, 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[0.8, 0.5]} />
+      <meshStandardMaterial color="#5D4E37" side={2} />
+    </mesh>
+    {/* Shoes by the door */}
+    <group position={[0.6, 0, 0.4]}>
+      {/* Sneaker 1 */}
+      <mesh position={[0, 0.04, 0]} rotation={[0, 0.3, 0]}>
+        <boxGeometry args={[0.12, 0.06, 0.25]} />
+        <meshStandardMaterial color="#2D2D3A" />
+      </mesh>
+      {/* Sneaker 2 */}
+      <mesh position={[0.15, 0.04, 0.05]} rotation={[0, 0.5, 0]}>
+        <boxGeometry args={[0.12, 0.06, 0.25]} />
+        <meshStandardMaterial color="#2D2D3A" />
+      </mesh>
+    </group>
+    {/* Key hooks on wall */}
+    <group position={[-0.5, 1.4, 0.06]}>
+      <mesh>
+        <boxGeometry args={[0.3, 0.15, 0.02]} />
+        <meshStandardMaterial color="#5C4A3A" />
+      </mesh>
+      {/* Keys hanging */}
+      <mesh position={[-0.08, -0.1, 0.02]}>
+        <boxGeometry args={[0.04, 0.08, 0.01]} />
+        <meshStandardMaterial color="#C0A050" />
+      </mesh>
+      <mesh position={[0.05, -0.12, 0.02]}>
+        <boxGeometry args={[0.05, 0.1, 0.01]} />
+        <meshStandardMaterial color="#A0A0A0" />
+      </mesh>
+    </group>
   </group>
 );
 
@@ -700,6 +785,7 @@ const Apartment = () => {
       {/* === BEDROOM === */}
       <BedroomWindows />
       <Bed />
+      <Nightstand />
       <GamingDesk />
       <GamingChair />
       <Guitar />
