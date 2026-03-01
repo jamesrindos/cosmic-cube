@@ -105,22 +105,49 @@ const FlatLayout = () => {
   // Force background video to play on mobile
   useEffect(() => {
     const video = videoRef.current;
-    if (video) {
-      video.setAttribute('playsinline', '');
-      video.setAttribute('webkit-playsinline', '');
-      video.muted = true;
+    if (!video) return;
+    
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.muted = true;
+    video.defaultMuted = true;
+    
+    const tryPlay = () => {
       const playPromise = video.play();
       if (playPromise) {
-        playPromise.catch(() => {
-          // Retry on user interaction
-          const handler = () => {
-            video.play();
-            document.removeEventListener('touchstart', handler);
-          };
-          document.addEventListener('touchstart', handler);
-        });
+        playPromise.catch(() => {});
       }
-    }
+    };
+    
+    // Try immediately
+    tryPlay();
+    
+    // Retry when video is ready
+    video.addEventListener('canplay', tryPlay);
+    video.addEventListener('loadeddata', tryPlay);
+    
+    // Retry on visibility change (tab focus)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') tryPlay();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    
+    // Retry on any user interaction
+    const interactionHandler = () => {
+      tryPlay();
+      document.removeEventListener('touchstart', interactionHandler);
+      document.removeEventListener('click', interactionHandler);
+    };
+    document.addEventListener('touchstart', interactionHandler);
+    document.addEventListener('click', interactionHandler);
+    
+    return () => {
+      video.removeEventListener('canplay', tryPlay);
+      video.removeEventListener('loadeddata', tryPlay);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      document.removeEventListener('touchstart', interactionHandler);
+      document.removeEventListener('click', interactionHandler);
+    };
   }, []);
   
   const [tvPos, setTvPos] = useState({ top: 21.9, left: 27.6, width: 37.7, height: 52.3 });
@@ -250,6 +277,7 @@ const FlatLayout = () => {
         loop
         muted
         playsInline
+        preload="auto"
         onTouchStart={(e) => {
           const video = e.currentTarget;
           if (video.paused) video.play();
