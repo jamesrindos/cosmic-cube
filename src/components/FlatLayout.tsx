@@ -421,11 +421,13 @@ const FlatLayout = () => {
         zIndex: 100,
       }}>
         <a href="https://twitter.com/slimjimm318" target="_blank" rel="noopener noreferrer" 
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "18px" }}>𝕏</a>
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "24px" }}>𝕏</a>
         <a href="https://linkedin.com/in/james-rindos-489a29245" target="_blank" rel="noopener noreferrer"
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "16px" }}>LinkedIn</a>
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "24px" }}>LinkedIn</a>
         <a href="https://youtube.com/@jackacetalks" target="_blank" rel="noopener noreferrer"
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "16px" }}>YouTube</a>
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "24px" }}>YouTube</a>
+        <a href="mailto:jamesrindos1@gmail.com" 
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "24px" }}>Email</a>
       </div>
     </div>
   );
