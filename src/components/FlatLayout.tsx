@@ -1,0 +1,397 @@
+import { useState, useRef, useEffect } from "react";
+
+// Tape data - order matches the video from top to bottom
+const tapeData = [
+  { id: "dirtea", label: "DIRTEA", color: "#4CAF50", content: {
+    title: "Dirtea", subtitle: "UK → US Launch",
+    description: "nootropics brand in the UK looking to take a big swing with a US launch. was able to help out with one of their instagram reels. this seems simple enough but unfortunately took so much time with the tools that i had at my disposal lol. the physics were so hard to nail down!!",
+    videoSrc: "/videos/dirtea_web.mp4",
+  }},
+  { id: "moes", label: "MOE'S", color: "#FF5722", content: {
+    title: "Moe's", subtitle: "Veo Spec Ad",
+    description: "another spec ad. weird one. veo had been out for maybe a week. and i was rawdogging these prompts trying to get these animals to act like people and look somewhat consistent in between scenes. what a nightmare. kind of holds up though.",
+    videoSrc: "/videos/moes_web.mp4",
+  }},
+  { id: "mte", label: "MTE", color: "#00BCD4", content: {
+    title: "GetMTE", subtitle: "Repurposed Ad",
+    description: "one of my friends was making this ad and got let go, so i was tasked with repurposing it. i guess i think the hook came out cool.",
+    videoSrc: "/videos/getmte_web.mp4",
+  }},
+  { id: "bolde", label: "BOLDE", color: "#9C27B0", content: {
+    title: "BoldeBottle", subtitle: "NanoBanana Pro",
+    description: "got this assignment right around the launch of nanobanana pro. learned that providing start frame and end frame is absolutely the move. they paid me with one of their shaker cups. i haven't used it yet though.",
+    videoId: "1CyvtfAykkHmDIuZ1l9xFLNC_5VUJzK4d",
+  }},
+  { id: "dsc", label: "DSC", color: "#3F51B5", content: {
+    title: "DSC", subtitle: "Twin Lacrosse Players",
+    description: "weird one. named the characters after my brothers, twin lacrosse players. don't think its a winner at all but it makes me laugh.",
+    videoId: "1si8ma8CQ6toLZuct49P8cyKYRfryOf15",
+  }},
+  { id: "mudwtr", label: "MUD\\WTR", color: "#795548", content: {
+    title: "MUD/WTR", subtitle: "AI Video",
+    description: "my favorite video i've made probably ever? just so fucking cool. opened my eyes to what was possible with ai video despite veo being out for only a few weeks. i've directed i think 4 more like it with similar characters. but this one will always take the cake.",
+    videoId: "1vV0oq5rcdwBmX2D2Dug2jAR2FbfmZ82B",
+  }},
+  { id: "moziwash", label: "MOZI WASH", color: "#FFD700", content: {
+    title: "MoziWash", subtitle: "First Billboard",
+    description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
+    videoSrc: "/videos/moziwash_billboard.mp4",
+  }},
+  { id: "kalshi", label: "KALSHI", color: "#E91E63", content: {
+    title: "Kalshi", subtitle: "Wimbledon Spec Ad",
+    description: "what a blast. my friend nate and i locked ourselves in a room the day before wimbledon and made this ad for kalshi as a spec ad. we were spamming our connect while she was seeing a movie until she passed it on to her higher ups. was really cool to follow up pj ace's great work on his kalshi ads with this wimbledon spot.",
+    videoSrc: "/videos/kalshi_web.mp4",
+  }},
+  { id: "political", label: "POLITICAL", color: "#0D47A1", content: {
+    title: "Political Media", subtitle: "Biden • DNC • State Campaigns",
+    description: "i worked with mzl media and z tribeca for a year producing political campaign content for presidents, senators, congresspeople, and mayoral candidates across 12+ states. incredible experience!!",
+    imageSrc: "/images/politics_web.jpg",
+  }},
+  { id: "bigface", label: "BIGFACE", color: "#222", content: {
+    title: "BigFace", subtitle: "48 Hour Sprint",
+    description: "another sleepless 48 hour period. did a ton of brand research. spent a ton of time making it look and sound like HIM but in a way that farms aura.",
+    videoSrc: "/videos/bigface_web.mp4",
+  }},
+  { id: "sunflower1", label: "SUNFLOWER Vol.1", color: "#FFC107", content: {
+    title: "Sunflower Vol 1", subtitle: "Sobriety Remix",
+    description: "this brand asked for like 40 videos in a month on top of everything else i was creating. when i was tapped out of new concepts i turned to remixing some of my favorite iconic ad campaigns around sobriety. really like how this one came out!",
+    videoSrc: "/videos/sunflower1_web.mp4",
+  }},
+  { id: "sunflower2", label: "SUNFLOWER Vol.2", color: "#FF9800", content: {
+    title: "Sunflower Vol 2", subtitle: "Pixar Style",
+    description: "people in the office told me this one hit emotionally but i just think the art style carried.",
+    videoSrc: "/videos/sunflower2_web.mp4",
+  }},
+  { id: "audien", label: "AUDIEN HEARING", color: "#2196F3", content: {
+    title: "Audien Hearing", subtitle: "AI CTV Ads",
+    description: "this hearing aid company saw early potential for ai ctv ads and this is just one of many many ideas that we experimented with.",
+    videoSrc: "/videos/audien_web.mp4",
+  }},
+  { id: "about", label: "ABOUT ME", color: "#FFF", content: {
+    title: "James Rindos", subtitle: "Creative Technologist",
+    description: "transparently, i'm in a bit of a discovery phase. i spent the last year building AI creative and agent-based systems. putting ads on everything from Instagram to Times Square billboards. the year before that i was in political media, producing campaign content for congresspeople, senators, and a president. competition runs in my veins. whatever we work on together, i want us to win... and selfishly i hope to learn more about myself on the way.\n\nlets chat: jamesrindos1@gmail.com",
+    imageSrc: "/images/james-about.jpg",
+    links: { 
+      twitter: { handle: "@slimjimm318", url: "https://twitter.com/slimjimm318" },
+      linkedin: { handle: "james-rindos", url: "https://linkedin.com/in/james-rindos-489a29245" },
+    }
+  }},
+];
+
+const FlatLayout = () => {
+  const [selectedTape, setSelectedTape] = useState<typeof tapeData[0] | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const contentVideoRef = useRef<HTMLVideoElement>(null);
+  
+  // TV screen overlay position - manually calibrated
+  const [tvPos, setTvPos] = useState({ top: 21.9, left: 27.6, width: 37.7, height: 52.3 });
+  const [tvDragging, setTvDragging] = useState<'move' | 'resize' | null>(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0, ...tvPos });
+  
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!tvDragging) return;
+      const dx = ((e.clientX - dragStart.x) / window.innerWidth) * 100;
+      const dy = ((e.clientY - dragStart.y) / window.innerHeight) * 100;
+      
+      if (tvDragging === 'move') {
+        setTvPos({
+          ...tvPos,
+          top: Math.round((dragStart.top + dy) * 10) / 10,
+          left: Math.round((dragStart.left + dx) * 10) / 10,
+        });
+      } else if (tvDragging === 'resize') {
+        setTvPos({
+          ...tvPos,
+          width: Math.max(10, Math.round((dragStart.width + dx) * 10) / 10),
+          height: Math.max(10, Math.round((dragStart.height + dy) * 10) / 10),
+        });
+      }
+    };
+    const handleMouseUp = () => setTvDragging(null);
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [tvDragging, dragStart, tvPos]);
+
+  const logTvPos = () => {
+    alert(`TV Position:\ntop: ${tvPos.top}%\nleft: ${tvPos.left}%\nwidth: ${tvPos.width}%\nheight: ${tvPos.height}%`);
+  };
+
+  // Reset playing state when switching tapes
+  useEffect(() => {
+    setIsPlaying(true);
+  }, [selectedTape]);
+
+  // Final tape positions - manually calibrated via drag-and-drop
+  const tapePositions = [
+    8.2,   // DIRTEA
+    14.2,  // MOE'S
+    19.9,  // MTE
+    25.5,  // BOLDE
+    31.7,  // DSC
+    37.5,  // MUD\WTR
+    43.4,  // MOZI WASH
+    49.3,  // KALSHI
+    55.6,  // POLITICAL
+    61.9,  // BIGFACE
+    68.1,  // SUNFLOWER Vol.1
+    74.3,  // SUNFLOWER Vol.2
+    80.4,  // AUDIEN HEARING
+    87.1,  // ABOUT ME
+  ];
+
+  return (
+    <div style={{
+      width: "100vw",
+      height: "100vh",
+      background: "#000",
+      overflow: "hidden",
+      position: "relative",
+      fontFamily: "'VT323', monospace",
+    }}>
+      {/* Background video loop */}
+      <video
+        ref={videoRef}
+        src="/videos/tv-loop-web.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+      />
+
+      {/* Header overlay */}
+      <div style={{ 
+        position: "absolute",
+        top: "20px",
+        left: "32px",
+        zIndex: 100,
+      }}>
+        <div style={{ fontSize: "28px", letterSpacing: "3px", color: "rgba(232,220,200,0.9)", fontWeight: "bold" }}>
+          JAMES RINDOS
+        </div>
+        <div style={{ fontSize: "14px", color: "rgba(200,200,200,1)", letterSpacing: "4px" }}>
+          CREATIVE PORTFOLIO
+        </div>
+      </div>
+
+      {/* TV CALIBRATION CONTROLS - hidden */}
+
+      {/* TV Screen overlay - draggable for calibration */}
+      {selectedTape && (
+        <div style={{
+          position: "absolute",
+          top: `${tvPos.top}%`,
+          left: `${tvPos.left}%`,
+          width: `${tvPos.width}%`,
+          height: `${tvPos.height}%`,
+          overflow: "hidden",
+          borderRadius: "4px",
+          zIndex: 50,
+        }}>
+          {/* CRT effects overlay */}
+          <div style={{
+            position: "absolute",
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: `repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px)`,
+            pointerEvents: "none",
+            zIndex: 10,
+          }}/>
+          
+          {/* Video/Image content - click to toggle play/pause */}
+          {selectedTape.content.videoSrc ? (
+            <div 
+              onClick={() => {
+                if (contentVideoRef.current) {
+                  if (contentVideoRef.current.paused) {
+                    contentVideoRef.current.play();
+                    setIsPlaying(true);
+                  } else {
+                    contentVideoRef.current.pause();
+                    setIsPlaying(false);
+                  }
+                }
+              }}
+              style={{ width: "100%", height: "100%", cursor: "pointer", position: "relative" }}
+            >
+              <video
+                ref={contentVideoRef}
+                src={selectedTape.content.videoSrc}
+                autoPlay
+                loop
+                playsInline
+                style={{ 
+                  width: "100%", 
+                  height: "100%", 
+                  objectFit: "cover",
+                  imageRendering: "pixelated",
+                }}
+              />
+              {/* Pause indicator */}
+              {!isPlaying && (
+                <div style={{
+                  position: "absolute",
+                  top: "50%", left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  fontSize: "48px",
+                  color: "rgba(255,255,255,0.7)",
+                  textShadow: "0 0 20px rgba(0,0,0,0.8)",
+                  pointerEvents: "none",
+                }}>▶</div>
+              )}
+            </div>
+          ) : selectedTape.content.videoId ? (
+            <a 
+              href={`https://drive.google.com/file/d/${selectedTape.content.videoId}/view`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                width: "100%", 
+                height: "100%",
+                display: "flex", 
+                flexDirection: "column",
+                alignItems: "center", 
+                justifyContent: "center",
+                textDecoration: "none", 
+                background: "rgba(0,0,0,0.9)",
+              }}
+            >
+              <div style={{
+                width: "60px", height: "60px", borderRadius: "50%",
+                background: selectedTape.color,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: `0 0 30px ${selectedTape.color}`,
+              }}>
+                <span style={{ fontSize: "28px", marginLeft: "4px", color: "#FFF" }}>▶</span>
+              </div>
+              <div style={{ color: "#888", marginTop: "12px", fontSize: "12px" }}>WATCH ON DRIVE</div>
+            </a>
+          ) : selectedTape.content.imageSrc ? (
+            <div 
+              onClick={() => setSelectedTape(null)}
+              style={{
+                width: "100%", 
+                height: "100%",
+                position: "relative",
+                background: "#000",
+                cursor: "pointer",
+              }}
+            >
+              <img 
+                src={selectedTape.content.imageSrc}
+                alt={selectedTape.content.title}
+                style={{ 
+                  width: "100%", 
+                  height: "100%", 
+                  objectFit: "cover",
+                  filter: "contrast(1.1) saturate(0.9)",
+                }}
+              />
+              {/* Static grain overlay for CRT effect */}
+              <div style={{
+                position: "absolute",
+                top: 0, left: 0, right: 0, bottom: 0,
+                background: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                opacity: 0.15,
+                mixBlendMode: "overlay",
+                pointerEvents: "none",
+              }}/>
+              {/* Scanline effect */}
+              <div style={{
+                position: "absolute",
+                top: 0, left: 0, right: 0, bottom: 0,
+                background: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px)`,
+                pointerEvents: "none",
+              }}/>
+            </div>
+          ) : (
+            <div 
+              onClick={() => setSelectedTape(null)}
+              style={{
+                width: "100%", height: "100%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: "rgba(0,0,0,0.9)", color: "#555", fontSize: "14px",
+                cursor: "pointer",
+              }}
+            >
+              {selectedTape.content.title}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Info bar when tape selected */}
+      {selectedTape && (
+        <div style={{
+          position: "absolute",
+          bottom: "80px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "rgba(0,0,0,0.85)",
+          padding: "12px 24px",
+          borderRadius: "8px",
+          textAlign: "center",
+          zIndex: 100,
+          maxWidth: "500px",
+        }}>
+          <div style={{ color: selectedTape.color, fontSize: "18px", fontWeight: "bold" }}>
+            {selectedTape.content.title}
+          </div>
+          <div style={{ color: "#CCC", fontSize: "13px", marginTop: "6px" }}>
+            {selectedTape.content.description}
+          </div>
+        </div>
+      )}
+
+      {/* Tape hotspots - final calibrated positions */}
+      {tapeData.map((tape, i) => (
+        <div
+          key={tape.id}
+          onClick={() => setSelectedTape(selectedTape?.id === tape.id ? null : tape)}
+          style={{
+            position: "absolute",
+            right: "0.5%",
+            top: `${tapePositions[i]}%`,
+            width: "12.5%",
+            height: "5%",
+            cursor: "pointer",
+            zIndex: 60,
+          }}
+          title={tape.label}
+        />
+      ))}
+
+      {/* Social links */}
+      <div style={{
+        position: "absolute",
+        bottom: "20px",
+        right: "32px",
+        display: "flex",
+        gap: "24px",
+        zIndex: 100,
+      }}>
+        <a href="https://twitter.com/slimjimm318" target="_blank" rel="noopener noreferrer" 
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "18px" }}>𝕏</a>
+        <a href="https://linkedin.com/in/james-rindos-489a29245" target="_blank" rel="noopener noreferrer"
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "16px" }}>LinkedIn</a>
+        <a href="https://youtube.com/@jackacetalks" target="_blank" rel="noopener noreferrer"
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "16px" }}>YouTube</a>
+      </div>
+    </div>
+  );
+};
+
+export default FlatLayout;
