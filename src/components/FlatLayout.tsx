@@ -20,7 +20,7 @@ const tapeData = [
   { id: "bolde", label: "BOLDE", color: "#9C27B0", content: {
     title: "BoldeBottle", subtitle: "NanoBanana Pro",
     description: "got this assignment right around the launch of nanobanana pro. learned that providing start frame and end frame is absolutely the move. they paid me with one of their shaker cups. i haven't used it yet though.",
-    videoSrc: "https://files.catbox.moe/d6hwek.mp4",
+    videoSrc: "https://files.catbox.moe/da2q01.mp4",
   }},
   { id: "dsc", label: "DSC", color: "#3F51B5", content: {
     title: "DSC", subtitle: "Twin Lacrosse Players",
