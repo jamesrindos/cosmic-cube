@@ -35,7 +35,7 @@ const tapeData = [
   { id: "moziwash", label: "MOZI WASH", color: "#FFD700", content: {
     title: "MoziWash", subtitle: "First Billboard",
     description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
-    videoSrc: "/videos/moziwash_billboard.mp4",
+    videoSrc: "/videos/moziwash_web.mp4",
   }},
   { id: "kalshi", label: "KALSHI", color: "#E91E63", content: {
     title: "Kalshi", subtitle: "Wimbledon Spec Ad",
@@ -85,7 +85,6 @@ const FlatLayout = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentVideoRef = useRef<HTMLVideoElement>(null);
   
-  // Detect mobile portrait orientation
   useEffect(() => {
     const checkOrientation = () => {
       const isMobile = window.innerWidth < 768;
@@ -103,7 +102,6 @@ const FlatLayout = () => {
     };
   }, []);
   
-  // TV screen overlay position - manually calibrated
   const [tvPos, setTvPos] = useState({ top: 21.9, left: 27.6, width: 37.7, height: 52.3 });
   const [tvDragging, setTvDragging] = useState<'move' | 'resize' | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0, ...tvPos });
@@ -142,12 +140,10 @@ const FlatLayout = () => {
     alert(`TV Position:\ntop: ${tvPos.top}%\nleft: ${tvPos.left}%\nwidth: ${tvPos.width}%\nheight: ${tvPos.height}%`);
   };
 
-  // Reset playing state when switching tapes
   useEffect(() => {
     setIsPlaying(true);
   }, [selectedTape]);
 
-  // Final tape positions - manually calibrated via drag-and-drop
   const tapePositions = [
     8.2,   // DIRTEA
     14.2,  // MOE'S
@@ -191,7 +187,6 @@ const FlatLayout = () => {
           padding: "40px",
           textAlign: "center",
         }}>
-          {/* Rotate phone icon */}
           <div style={{
             fontSize: "64px",
             marginBottom: "24px",
@@ -225,7 +220,20 @@ const FlatLayout = () => {
         </div>
       )}
       
-      {/* Background video loop */}
+      {/* Background: video with image fallback */}
+      <img
+        src="/images/tv-bg.png"
+        alt="TV background"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: 0,
+        }}
+      />
       <video
         ref={videoRef}
         src="/videos/tv-loop-web.mp4"
@@ -240,6 +248,7 @@ const FlatLayout = () => {
           width: "100%",
           height: "100%",
           objectFit: "cover",
+          zIndex: 1,
         }}
       />
 
@@ -258,9 +267,7 @@ const FlatLayout = () => {
         </div>
       </div>
 
-      {/* TV CALIBRATION CONTROLS - hidden */}
-
-      {/* TV Screen overlay - draggable for calibration */}
+      {/* TV Screen overlay */}
       {selectedTape && (
         <div style={{
           position: "absolute",
@@ -281,7 +288,7 @@ const FlatLayout = () => {
             zIndex: 10,
           }}/>
           
-          {/* Video/Image content - click to toggle play/pause */}
+          {/* Video/Image content */}
           {selectedTape.content.videoSrc ? (
             <div 
               onClick={() => {
@@ -310,7 +317,6 @@ const FlatLayout = () => {
                   imageRendering: "pixelated",
                 }}
               />
-              {/* Pause indicator */}
               {!isPlaying && (
                 <div style={{
                   position: "absolute",
@@ -323,32 +329,6 @@ const FlatLayout = () => {
                 }}>▶</div>
               )}
             </div>
-          ) : selectedTape.content.videoId ? (
-            <a 
-              href={`https://drive.google.com/file/d/${selectedTape.content.videoId}/view`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                width: "100%", 
-                height: "100%",
-                display: "flex", 
-                flexDirection: "column",
-                alignItems: "center", 
-                justifyContent: "center",
-                textDecoration: "none", 
-                background: "rgba(0,0,0,0.9)",
-              }}
-            >
-              <div style={{
-                width: "60px", height: "60px", borderRadius: "50%",
-                background: selectedTape.color,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: `0 0 30px ${selectedTape.color}`,
-              }}>
-                <span style={{ fontSize: "28px", marginLeft: "4px", color: "#FFF" }}>▶</span>
-              </div>
-              <div style={{ color: "#888", marginTop: "12px", fontSize: "12px" }}>WATCH ON DRIVE</div>
-            </a>
           ) : selectedTape.content.imageSrc ? (
             <div 
               onClick={() => setSelectedTape(null)}
@@ -370,7 +350,6 @@ const FlatLayout = () => {
                   filter: "contrast(1.1) saturate(0.9)",
                 }}
               />
-              {/* Static grain overlay for CRT effect */}
               <div style={{
                 position: "absolute",
                 top: 0, left: 0, right: 0, bottom: 0,
@@ -379,7 +358,6 @@ const FlatLayout = () => {
                 mixBlendMode: "overlay",
                 pointerEvents: "none",
               }}/>
-              {/* Scanline effect */}
               <div style={{
                 position: "absolute",
                 top: 0, left: 0, right: 0, bottom: 0,
@@ -426,7 +404,7 @@ const FlatLayout = () => {
         </div>
       )}
 
-      {/* Tape hotspots - final calibrated positions */}
+      {/* Tape hotspots - invisible, click only */}
       {tapeData.map((tape, i) => (
         <div
           key={tape.id}
@@ -439,6 +417,8 @@ const FlatLayout = () => {
             height: "5%",
             cursor: "pointer",
             zIndex: 60,
+            background: "transparent",
+            color: "transparent",
           }}
           title={tape.label}
         />
