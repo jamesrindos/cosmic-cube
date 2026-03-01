@@ -81,8 +81,27 @@ const tapeData = [
 const FlatLayout = () => {
   const [selectedTape, setSelectedTape] = useState<typeof tapeData[0] | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentVideoRef = useRef<HTMLVideoElement>(null);
+  
+  // Detect mobile portrait orientation
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isMobile = window.innerWidth < 768;
+      const isPortrait = window.innerHeight > window.innerWidth;
+      setIsMobilePortrait(isMobile && isPortrait);
+    };
+    
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
   
   // TV screen overlay position - manually calibrated
   const [tvPos, setTvPos] = useState({ top: 21.9, left: 27.6, width: 37.7, height: 52.3 });
@@ -155,6 +174,57 @@ const FlatLayout = () => {
       position: "relative",
       fontFamily: "'VT323', monospace",
     }}>
+      {/* Mobile portrait overlay */}
+      {isMobilePortrait && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          background: "rgba(0,0,0,0.95)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          padding: "40px",
+          textAlign: "center",
+        }}>
+          {/* Rotate phone icon */}
+          <div style={{
+            fontSize: "64px",
+            marginBottom: "24px",
+            animation: "rotate-hint 2s ease-in-out infinite",
+          }}>
+            📱
+          </div>
+          <div style={{
+            color: "#FFF",
+            fontSize: "24px",
+            fontWeight: "bold",
+            marginBottom: "12px",
+          }}>
+            ROTATE YOUR PHONE
+          </div>
+          <div style={{
+            color: "#888",
+            fontSize: "14px",
+            maxWidth: "280px",
+            lineHeight: 1.5,
+          }}>
+            This portfolio is best viewed in landscape orientation
+          </div>
+          <style>{`
+            @keyframes rotate-hint {
+              0%, 100% { transform: rotate(0deg); }
+              25% { transform: rotate(15deg); }
+              75% { transform: rotate(-15deg); }
+            }
+          `}</style>
+        </div>
+      )}
+      
       {/* Background video loop */}
       <video
         ref={videoRef}
