@@ -265,6 +265,33 @@ const FlatLayout = () => {
         }}
       />
 
+      {/* Dark edge overlays - fade out the bright edges on mobile */}
+      <div className="edge-overlay-left" style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "15%",
+        height: "100%",
+        background: "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)",
+        zIndex: 2,
+        pointerEvents: "none",
+      }} />
+      <div className="edge-overlay-right" style={{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        width: "15%",
+        height: "100%",
+        background: "linear-gradient(to left, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)",
+        zIndex: 2,
+        pointerEvents: "none",
+      }} />
+      <style>{`
+        @media (min-width: 1024px) {
+          .edge-overlay-left, .edge-overlay-right { display: none !important; }
+        }
+      `}</style>
+
       {/* Header overlay */}
       <div style={{ 
         position: "absolute",
