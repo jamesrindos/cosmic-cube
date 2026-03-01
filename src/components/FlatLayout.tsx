@@ -236,7 +236,7 @@ const FlatLayout = () => {
       />
       <video
         ref={videoRef}
-        src="/videos/tv-loop-web.mp4"
+        src="https://files.catbox.moe/jyg0zn.mp4"
         autoPlay
         loop
         muted
