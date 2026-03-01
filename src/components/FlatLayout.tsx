@@ -245,10 +245,15 @@ const FlatLayout = () => {
       <video
         ref={videoRef}
         src="https://files.catbox.moe/jyg0zn.mp4"
+        poster="/images/tv-bg.png"
         autoPlay
         loop
         muted
         playsInline
+        onTouchStart={(e) => {
+          const video = e.currentTarget;
+          if (video.paused) video.play();
+        }}
         style={{
           position: "absolute",
           top: 0,
@@ -438,19 +443,20 @@ const FlatLayout = () => {
         bottom: "20px",
         right: "32px",
         display: "flex",
-        gap: "24px",
+        gap: "28px",
         zIndex: 100,
+        alignItems: "center",
       }}>
         <a href="https://twitter.com/slimjimm318" target="_blank" rel="noopener noreferrer" 
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "22px" }}>𝕏</a>
+           style={{ color: "rgba(220,220,220,0.85)", textDecoration: "none", fontSize: "24px", fontWeight: "500" }}>𝕏</a>
         <a href="https://instagram.com/jamesrindos" target="_blank" rel="noopener noreferrer"
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "22px" }}>Instagram</a>
+           style={{ color: "rgba(220,220,220,0.85)", textDecoration: "none", fontSize: "18px", fontWeight: "500" }}>Instagram</a>
         <a href="https://linkedin.com/in/james-rindos-489a29245" target="_blank" rel="noopener noreferrer"
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "22px" }}>LinkedIn</a>
+           style={{ color: "rgba(220,220,220,0.85)", textDecoration: "none", fontSize: "18px", fontWeight: "500" }}>LinkedIn</a>
         <a href="https://youtube.com/@jackacetalks" target="_blank" rel="noopener noreferrer"
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "22px" }}>YouTube</a>
+           style={{ color: "rgba(220,220,220,0.85)", textDecoration: "none", fontSize: "18px", fontWeight: "500" }}>YouTube</a>
         <a href="mailto:jamesrindos1@gmail.com" 
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "22px" }}>Email</a>
+           style={{ color: "rgba(220,220,220,0.85)", textDecoration: "none", fontSize: "18px", fontWeight: "500" }}>Email</a>
       </div>
     </div>
   );
