@@ -101,6 +101,27 @@ const FlatLayout = () => {
       window.removeEventListener('orientationchange', checkOrientation);
     };
   }, []);
+
+  // Force background video to play on mobile
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
+      video.muted = true;
+      const playPromise = video.play();
+      if (playPromise) {
+        playPromise.catch(() => {
+          // Retry on user interaction
+          const handler = () => {
+            video.play();
+            document.removeEventListener('touchstart', handler);
+          };
+          document.addEventListener('touchstart', handler);
+        });
+      }
+    }
+  }, []);
   
   const [tvPos, setTvPos] = useState({ top: 21.9, left: 27.6, width: 37.7, height: 52.3 });
   const [tvDragging, setTvDragging] = useState<'move' | 'resize' | null>(null);
