@@ -20,22 +20,22 @@ const tapeData = [
   { id: "bolde", label: "BOLDE", color: "#9C27B0", content: {
     title: "BoldeBottle", subtitle: "NanoBanana Pro",
     description: "got this assignment right around the launch of nanobanana pro. learned that providing start frame and end frame is absolutely the move. they paid me with one of their shaker cups. i haven't used it yet though.",
-    videoSrc: "/videos/bolde.mp4",
+    videoSrc: "/videos/bolde_web.mp4",
   }},
   { id: "dsc", label: "DSC", color: "#3F51B5", content: {
     title: "DSC", subtitle: "Twin Lacrosse Players",
     description: "weird one. named the characters after my brothers, twin lacrosse players. don't think its a winner at all but it makes me laugh.",
-    videoSrc: "/videos/dsc.mp4",
+    videoSrc: "/videos/dsc_web.mp4",
   }},
   { id: "mudwtr", label: "MUD\\WTR", color: "#795548", content: {
     title: "MUD/WTR", subtitle: "AI Video",
     description: "my favorite video i've made probably ever? just so fucking cool. opened my eyes to what was possible with ai video despite veo being out for only a few weeks. i've directed i think 4 more like it with similar characters. but this one will always take the cake.",
-    videoSrc: "/videos/mudwtr.mp4",
+    videoSrc: "/videos/mudwtr_web.mp4",
   }},
   { id: "moziwash", label: "MOZI WASH", color: "#FFD700", content: {
     title: "MoziWash", subtitle: "First Billboard",
     description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
-    videoSrc: "/videos/moziwash_billboard.mp4",
+    videoSrc: "/videos/moziwash_web.mp4",
   }},
   { id: "kalshi", label: "KALSHI", color: "#E91E63", content: {
     title: "Kalshi", subtitle: "Wimbledon Spec Ad",
