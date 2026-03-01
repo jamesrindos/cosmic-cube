@@ -220,7 +220,20 @@ const FlatLayout = () => {
         </div>
       )}
       
-      {/* Background looping video */}
+      {/* Background: video with image fallback for environments where video fails */}
+      <img
+        src="/images/tv-bg.png"
+        alt="TV background"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: 0,
+        }}
+      />
       <video
         ref={videoRef}
         src="/videos/tv-loop-web.mp4"
@@ -235,6 +248,7 @@ const FlatLayout = () => {
           width: "100%",
           height: "100%",
           objectFit: "cover",
+          zIndex: 1,
         }}
       />
 
