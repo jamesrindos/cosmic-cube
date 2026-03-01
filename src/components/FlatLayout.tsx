@@ -225,20 +225,7 @@ const FlatLayout = () => {
         </div>
       )}
       
-      {/* Background: video with image fallback */}
-      <img
-        src="/images/tv-bg.png"
-        alt="TV background"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          zIndex: 0,
-        }}
-      />
+      {/* Background video loop */}
       <video
         ref={videoRef}
         src="/videos/tv-loop-web.mp4"
@@ -253,7 +240,6 @@ const FlatLayout = () => {
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          zIndex: 1,
         }}
       />
 
@@ -453,37 +439,9 @@ const FlatLayout = () => {
             height: "5%",
             cursor: "pointer",
             zIndex: 60,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: selectedTape?.id === tape.id 
-              ? "rgba(255,255,255,0.15)" 
-              : "rgba(0,0,0,0.4)",
-            borderRadius: "4px",
-            border: selectedTape?.id === tape.id 
-              ? `1px solid ${tape.color}` 
-              : "1px solid rgba(255,255,255,0.1)",
-            transition: "all 0.2s ease",
           }}
           title={tape.label}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
-          onMouseLeave={(e) => { 
-            e.currentTarget.style.background = selectedTape?.id === tape.id 
-              ? "rgba(255,255,255,0.15)" 
-              : "rgba(0,0,0,0.4)"; 
-          }}
-        >
-          <span style={{
-            color: selectedTape?.id === tape.id ? tape.color : "rgba(232,220,200,0.85)",
-            fontSize: "11px",
-            fontFamily: "'VT323', monospace",
-            letterSpacing: "1px",
-            textShadow: "0 1px 2px rgba(0,0,0,0.8)",
-            pointerEvents: "none",
-          }}>
-            {tape.label}
-          </span>
-        </div>
+        />
       ))}
 
       {/* Social links */}
