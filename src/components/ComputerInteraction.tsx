@@ -28,7 +28,7 @@ export const ComputerSetup = ({ position, rotation = [0, 0, 0], onEnterDesktop }
     document.body.style.cursor = "auto";
   };
   
-  const handleClick = (e: THREE.Event) => {
+  const handleClick = (e: any) => {
     e.stopPropagation();
     onEnterDesktop();
   };
