@@ -49,7 +49,7 @@ export const InteractiveRubiksCube = ({ position }: { position: [number, number,
     }
   });
 
-  const handleClick = (e: THREE.Event) => {
+  const handleClick = (e: any) => {
     e.stopPropagation();
     if (!isSolving) {
       setIsSolving(true);
@@ -193,7 +193,7 @@ export const InteractiveGuitar = ({ position }: { position: [number, number, num
     }
   });
 
-  const handleClick = (e: THREE.Event) => {
+  const handleClick = (e: any) => {
     e.stopPropagation();
     if (!isStrumming) {
       setIsStrumming(true);
