@@ -447,7 +447,7 @@ const FlatLayout = () => {
           {/* Mobile: left vertical panel */}
           <div className="info-panel-mobile" style={{
             position: "absolute",
-            left: "8px",
+            left: "5%",
             top: "50%",
             transform: "translateY(-50%)",
             background: "rgba(0,0,0,0.85)",
