@@ -372,20 +372,19 @@ const FlatLayout = () => {
       {selectedTape && (
         <div style={{
           position: "absolute",
-          bottom: "80px",
-          left: "50%",
-          transform: "translateX(-50%)",
+          bottom: "16px",
+          left: "24px",
           background: "rgba(0,0,0,0.85)",
-          padding: "12px 24px",
+          padding: "10px 18px",
           borderRadius: "8px",
-          textAlign: "center",
+          textAlign: "left",
           zIndex: 100,
-          maxWidth: "500px",
+          maxWidth: "min(400px, 60vw)",
         }}>
-          <div style={{ color: selectedTape.color, fontSize: "18px", fontWeight: "bold" }}>
+          <div style={{ color: selectedTape.color, fontSize: "16px", fontWeight: "bold" }}>
             {selectedTape.content.title}
           </div>
-          <div style={{ color: "#CCC", fontSize: "13px", marginTop: "6px" }}>
+          <div style={{ color: "#CCC", fontSize: "11px", marginTop: "4px", lineHeight: 1.4, maxHeight: "80px", overflow: "auto" }}>
             {selectedTape.content.description}
           </div>
         </div>
@@ -411,23 +410,25 @@ const FlatLayout = () => {
         />
       ))}
 
-      {/* Social links */}
+      {/* Social links - positioned bottom-left to avoid tape hotspots on the right */}
       <div style={{
         position: "absolute",
-        bottom: "20px",
-        right: "32px",
+        bottom: "4px",
+        left: "50%",
+        transform: "translateX(-50%)",
         display: "flex",
-        gap: "24px",
+        gap: "16px",
         zIndex: 100,
+        fontSize: "14px",
       }}>
         <a href="https://twitter.com/slimjimm318" target="_blank" rel="noopener noreferrer" 
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "24px" }}>𝕏</a>
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none" }}>𝕏</a>
         <a href="https://linkedin.com/in/james-rindos-489a29245" target="_blank" rel="noopener noreferrer"
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "24px" }}>LinkedIn</a>
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none" }}>LinkedIn</a>
         <a href="https://youtube.com/@jackacetalks" target="_blank" rel="noopener noreferrer"
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "24px" }}>YouTube</a>
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none" }}>YouTube</a>
         <a href="mailto:jamesrindos1@gmail.com" 
-           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none", fontSize: "24px" }}>Email</a>
+           style={{ color: "rgba(200,200,200,0.7)", textDecoration: "none" }}>Email</a>
       </div>
     </div>
   );
