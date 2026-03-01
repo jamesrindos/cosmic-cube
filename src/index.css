@@ -101,8 +101,14 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html, body {
+    background: #000 !important;
+    margin: 0;
+    padding: 0;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
 }
 

@@ -394,27 +394,60 @@ const FlatLayout = () => {
         </div>
       )}
 
-      {/* Info bar when tape selected */}
+      {/* Info bar when tape selected - left vertical panel on mobile, bottom center on desktop */}
       {selectedTape && (
-        <div style={{
-          position: "absolute",
-          bottom: "60px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          background: "rgba(0,0,0,0.85)",
-          padding: "12px 24px",
-          borderRadius: "8px",
-          textAlign: "center",
-          zIndex: 100,
-          maxWidth: "500px",
-        }}>
-          <div style={{ color: selectedTape.color, fontSize: "18px", fontWeight: "bold" }}>
-            {selectedTape.content.title}
+        <>
+          {/* Desktop: bottom center */}
+          <div className="info-panel-desktop" style={{
+            position: "absolute",
+            bottom: "60px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "rgba(0,0,0,0.85)",
+            padding: "12px 24px",
+            borderRadius: "8px",
+            textAlign: "center",
+            zIndex: 100,
+            maxWidth: "500px",
+          }}>
+            <div style={{ color: selectedTape.color, fontSize: "18px", fontWeight: "bold" }}>
+              {selectedTape.content.title}
+            </div>
+            <div style={{ color: "#CCC", fontSize: "13px", marginTop: "6px", lineHeight: 1.4 }}>
+              {selectedTape.content.description}
+            </div>
           </div>
-          <div style={{ color: "#CCC", fontSize: "13px", marginTop: "6px", lineHeight: 1.4 }}>
-            {selectedTape.content.description}
+          {/* Mobile: left vertical panel */}
+          <div className="info-panel-mobile" style={{
+            position: "absolute",
+            left: "8px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            background: "rgba(0,0,0,0.85)",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            textAlign: "left",
+            zIndex: 100,
+            maxWidth: "140px",
+            maxHeight: "70vh",
+            overflowY: "auto",
+          }}>
+            <div style={{ color: selectedTape.color, fontSize: "16px", fontWeight: "bold" }}>
+              {selectedTape.content.title}
+            </div>
+            <div style={{ color: "#CCC", fontSize: "11px", marginTop: "6px", lineHeight: 1.4 }}>
+              {selectedTape.content.description}
+            </div>
           </div>
-        </div>
+          <style>{`
+            @media (min-width: 768px) {
+              .info-panel-mobile { display: none !important; }
+            }
+            @media (max-width: 767px) {
+              .info-panel-desktop { display: none !important; }
+            }
+          `}</style>
+        </>
       )}
 
       {/* Tape hotspots - invisible, click only */}
@@ -437,11 +470,12 @@ const FlatLayout = () => {
         />
       ))}
 
-      {/* Social links - bottom right */}
+      {/* Social links - bottom center */}
       <div style={{
         position: "absolute",
         bottom: "20px",
-        right: "32px",
+        left: "50%",
+        transform: "translateX(-50%)",
         display: "flex",
         gap: "28px",
         zIndex: 100,
