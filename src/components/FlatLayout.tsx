@@ -25,12 +25,12 @@ const tapeData = [
   { id: "dsc", label: "DSC", color: "#3F51B5", content: {
     title: "DSC", subtitle: "Twin Lacrosse Players",
     description: "weird one. named the characters after my brothers, twin lacrosse players. don't think its a winner at all but it makes me laugh.",
-    videoSrc: "https://files.catbox.moe/e74iv5.mp4",
+    videoSrc: "https://files.catbox.moe/6ofgy1.mp4",
   }},
   { id: "mudwtr", label: "MUD\\WTR", color: "#795548", content: {
     title: "MUD/WTR", subtitle: "AI Video",
     description: "my favorite video i've made probably ever? just so fucking cool. opened my eyes to what was possible with ai video despite veo being out for only a few weeks. i've directed i think 4 more like it with similar characters. but this one will always take the cake.",
-    videoSrc: "https://files.catbox.moe/b96f0x.mp4",
+    videoSrc: "https://files.catbox.moe/53kbrr.mp4",
   }},
   { id: "moziwash", label: "MOZI WASH", color: "#FFD700", content: {
     title: "MoziWash", subtitle: "First Billboard",
