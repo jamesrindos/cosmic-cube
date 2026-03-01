@@ -35,7 +35,7 @@ const tapeData = [
   { id: "moziwash", label: "MOZI WASH", color: "#FFD700", content: {
     title: "MoziWash", subtitle: "First Billboard",
     description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
-    videoSrc: "/videos/moziwash_web.mp4",
+    videoSrc: "/videos/moziwash_billboard.mp4",
   }},
   { id: "kalshi", label: "KALSHI", color: "#E91E63", content: {
     title: "Kalshi", subtitle: "Wimbledon Spec Ad",
@@ -323,6 +323,32 @@ const FlatLayout = () => {
                 }}>▶</div>
               )}
             </div>
+          ) : selectedTape.content.videoId ? (
+            <a 
+              href={`https://drive.google.com/file/d/${selectedTape.content.videoId}/view`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                width: "100%", 
+                height: "100%",
+                display: "flex", 
+                flexDirection: "column",
+                alignItems: "center", 
+                justifyContent: "center",
+                textDecoration: "none", 
+                background: "rgba(0,0,0,0.9)",
+              }}
+            >
+              <div style={{
+                width: "60px", height: "60px", borderRadius: "50%",
+                background: selectedTape.color,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: `0 0 30px ${selectedTape.color}`,
+              }}>
+                <span style={{ fontSize: "28px", marginLeft: "4px", color: "#FFF" }}>▶</span>
+              </div>
+              <div style={{ color: "#888", marginTop: "12px", fontSize: "12px" }}>WATCH ON DRIVE</div>
+            </a>
           ) : selectedTape.content.imageSrc ? (
             <div 
               onClick={() => setSelectedTape(null)}
