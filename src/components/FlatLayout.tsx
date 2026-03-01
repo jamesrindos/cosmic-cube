@@ -467,10 +467,10 @@ const FlatLayout = () => {
             </div>
           </div>
           <style>{`
-            @media (min-width: 768px) {
+            @media (min-width: 1280px) {
               .info-panel-mobile { display: none !important; }
             }
-            @media (max-width: 767px) {
+            @media (max-width: 1279px) {
               .info-panel-desktop { display: none !important; }
             }
           `}</style>
