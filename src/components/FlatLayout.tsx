@@ -1,17 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 
 // Phone animation videos per tape (hosted on Catbox)
+// Note: moziwash temporarily disabled - missing phone-freeze video (only have raw vertical content)
 const PHONE_VIDEOS: Record<string, { out: string; freeze: string; away: string }> = {
   sunflower1: {
-    out: "https://files.catbox.moe/rh6e5w.mp4",
-    freeze: "https://files.catbox.moe/dtr1c9.mp4",
-    away: "https://files.catbox.moe/gwi6wa.mp4",
+    out: "https://files.catbox.moe/muiyx8.mp4",   // Trimmed faster version (4.5s vs 8s)
+    freeze: "https://files.catbox.moe/dtr1c9.mp4", // Phone showing sunflower content (31s loop)
+    away: "https://files.catbox.moe/gwi6wa.mp4",   // Hand putting phone away
   },
-  moziwash: {
-    out: "https://files.catbox.moe/7mrlvb.mp4",
-    freeze: "https://files.catbox.moe/rnkqtz.mp4",
-    away: "https://files.catbox.moe/anadyv.mp4",
-  },
+  // moziwash disabled until we have proper phone-freeze-moziwash video
+  // The current "freeze" is raw vertical content (1080x1920) which breaks layout
 };
 
 // Tapes that use phone animation (vertical content)
@@ -387,10 +385,12 @@ const FlatLayout = () => {
       {/* Phone animation overlay - pointerEvents none so tapes are clickable through it */}
       {phonePhase !== 'none' && (
         <video
+          key={`${selectedTape?.id}-${phonePhase}`} // Force remount on phase/tape change to prevent stale video
           ref={phoneVideoRef}
           src={getPhoneVideoSrc()}
           autoPlay
           playsInline
+          muted={phonePhase !== 'showing'} // Only play audio during content display, mute hand animations
           loop={phonePhase === 'showing'}
           onEnded={handlePhoneAnimationEnd}
           onError={(e) => {
