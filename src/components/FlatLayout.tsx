@@ -635,26 +635,27 @@ const FlatLayout = () => {
         </div>
       )}
 
-      {/* Info bar when tape selected - left vertical panel on mobile, bottom center on desktop */}
+      {/* Info bar when tape selected - left vertical panel on both mobile and desktop */}
       {selectedTape && (!isPhoneTape(selectedTape.id) || phonePhase === 'showing') && (
         <>
-          {/* Desktop: bottom center */}
+          {/* Desktop: left side panel */}
           <div className="info-panel-desktop" style={{
             position: "absolute",
-            bottom: "60px",
-            left: "50%",
-            transform: "translateX(-50%)",
+            left: "32px",
+            top: "100px", // Below header
             background: "rgba(0,0,0,0.88)",
-            padding: "10px 20px",
+            padding: "14px 18px",
             borderRadius: "8px",
-            textAlign: "center",
+            textAlign: "left",
             zIndex: 100,
-            maxWidth: "600px",
+            maxWidth: "280px",
+            maxHeight: "calc(100vh - 180px)",
+            overflowY: "auto",
           }}>
-            <div style={{ color: selectedTape.color, fontSize: "26px", fontWeight: "bold" }}>
+            <div style={{ color: selectedTape.color, fontSize: "24px", fontWeight: "bold" }}>
               {selectedTape.content.title}
             </div>
-            <div style={{ color: "#EEE", fontSize: "17px", marginTop: "6px", lineHeight: 1.5 }}>
+            <div style={{ color: "#EEE", fontSize: "15px", marginTop: "8px", lineHeight: 1.5 }}>
               {selectedTape.content.description}
             </div>
           </div>
