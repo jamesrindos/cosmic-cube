@@ -380,6 +380,17 @@ const FlatLayout = () => {
           muted
           loop={phonePhase === 'showing'}
           onEnded={handlePhoneAnimationEnd}
+          onError={(e) => {
+            console.error('Phone video failed to load:', getPhoneVideoSrc(), e);
+            // Recover from failed video load
+            setPhonePhase('none');
+          }}
+          onClick={() => {
+            // Allow clicking to dismiss/exit when in showing phase
+            if (phonePhase === 'showing') {
+              setPhonePhase('exiting');
+            }
+          }}
           style={{
             position: "absolute",
             top: 0,
@@ -388,6 +399,7 @@ const FlatLayout = () => {
             height: "100%",
             objectFit: "cover",
             zIndex: 200,
+            cursor: phonePhase === 'showing' ? 'pointer' : 'default',
           }}
         />
       )}
