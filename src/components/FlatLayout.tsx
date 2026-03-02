@@ -928,7 +928,7 @@ const FlatLayout = () => {
         <div style={{
           position: "absolute",
           top: "20px",
-          right: "20px",
+          left: "20px",
           background: "rgba(0,0,0,0.9)",
           padding: "16px",
           borderRadius: "8px",
@@ -995,7 +995,7 @@ const FlatLayout = () => {
         <div style={{
           position: "absolute",
           bottom: "20px",
-          right: "20px",
+          left: "20px",
           background: "rgba(0,0,0,0.95)",
           padding: "16px",
           borderRadius: "8px",
