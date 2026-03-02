@@ -571,7 +571,7 @@ const FlatLayout = () => {
                   setIsVideoLoading(true);
                   // Start delayed indicator for buffering too
                   if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
-                  loadingTimeoutRef.current = setTimeout(() => setShowLoadingIndicator(true), 1000);
+                  loadingTimeoutRef.current = setTimeout(() => setShowLoadingIndicator(true), 2000);
                 }}
                 onPlaying={() => {
                   if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
