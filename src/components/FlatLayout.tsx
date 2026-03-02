@@ -269,7 +269,7 @@ const FlatLayout = () => {
     };
   }, []);
   
-  const [tvPos, setTvPos] = useState({ top: 21.9, left: 27.6, width: 37.7, height: 52.3 });
+  const [tvPos, setTvPos] = useState({ top: 20.5, left: 27.0, width: 38.9, height: 55.5 }); // Scaled up ~3% to cover static
   const [tvDragging, setTvDragging] = useState<'move' | 'resize' | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0, ...tvPos });
   
