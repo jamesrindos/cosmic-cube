@@ -1,12 +1,21 @@
 import { useState, useRef, useEffect } from "react";
 
-// Phone animation videos (hosted on Catbox - Vercel doesn't serve LFS files correctly)
-const PHONE_OUT_VIDEO = "https://files.catbox.moe/rh6e5w.mp4";
-const PHONE_FREEZE_SUNFLOWER = "https://files.catbox.moe/dtr1c9.mp4";
-const PHONE_AWAY_VIDEO = "https://files.catbox.moe/gwi6wa.mp4";
+// Phone animation videos per tape (hosted on Catbox)
+const PHONE_VIDEOS: Record<string, { out: string; freeze: string; away: string }> = {
+  sunflower1: {
+    out: "https://files.catbox.moe/rh6e5w.mp4",
+    freeze: "https://files.catbox.moe/dtr1c9.mp4",
+    away: "https://files.catbox.moe/gwi6wa.mp4",
+  },
+  moziwash: {
+    out: "https://files.catbox.moe/7mrlvb.mp4",
+    freeze: "https://files.catbox.moe/rnkqtz.mp4",
+    away: "https://files.catbox.moe/anadyv.mp4",
+  },
+};
 
 // Tapes that use phone animation (vertical content)
-const PHONE_TAPES = ["sunflower1", "moziwash"];
+const PHONE_TAPES = Object.keys(PHONE_VIDEOS);
 
 // Tape data - order matches the video from top to bottom
 const tapeData = [
@@ -113,12 +122,14 @@ const FlatLayout = () => {
     }
   };
   
-  // Get phone video source based on phase
+  // Get phone video source based on phase and selected tape
   const getPhoneVideoSrc = () => {
+    if (!selectedTape || !PHONE_VIDEOS[selectedTape.id]) return '';
+    const videos = PHONE_VIDEOS[selectedTape.id];
     switch (phonePhase) {
-      case 'entering': return PHONE_OUT_VIDEO;
-      case 'showing': return PHONE_FREEZE_SUNFLOWER;
-      case 'exiting': return PHONE_AWAY_VIDEO;
+      case 'entering': return videos.out;
+      case 'showing': return videos.freeze;
+      case 'exiting': return videos.away;
       default: return '';
     }
   };
@@ -373,26 +384,19 @@ const FlatLayout = () => {
         </div>
       </div>
 
-      {/* Phone animation overlay */}
+      {/* Phone animation overlay - pointerEvents none so tapes are clickable through it */}
       {phonePhase !== 'none' && (
         <video
           ref={phoneVideoRef}
           src={getPhoneVideoSrc()}
           autoPlay
           playsInline
-          muted
           loop={phonePhase === 'showing'}
           onEnded={handlePhoneAnimationEnd}
           onError={(e) => {
             console.error('Phone video failed to load:', getPhoneVideoSrc(), e);
             // Recover from failed video load
             setPhonePhase('none');
-          }}
-          onClick={() => {
-            // Allow clicking to dismiss/exit when in showing phase
-            if (phonePhase === 'showing') {
-              setPhonePhase('exiting');
-            }
           }}
           style={{
             position: "absolute",
@@ -402,7 +406,7 @@ const FlatLayout = () => {
             height: "100%",
             objectFit: "cover",
             zIndex: 200,
-            cursor: phonePhase === 'showing' ? 'pointer' : 'default',
+            pointerEvents: "none", // Let clicks pass through to tape hotspots
           }}
         />
       )}
@@ -577,12 +581,12 @@ const FlatLayout = () => {
         </>
       )}
 
-      {/* Tape hotspots - invisible, click only (add ?debug=1 to see them) */}
+      {/* Tape hotspots - clickable above phone overlay */}
       {tapeData.map((tape, i) => (
         <div
           key={tape.id}
           onClick={() => {
-            console.log('Tape clicked:', tape.id);
+            console.log('Tape clicked:', tape.id, 'current phase:', phonePhase);
             if (selectedTape?.id === tape.id) {
               // Clicking same tape - deselect
               if (isPhoneTape(tape.id) && phonePhase === 'showing') {
@@ -592,11 +596,14 @@ const FlatLayout = () => {
                 setPhonePhase('none');
               }
             } else {
-              // Clicking new tape
+              // Clicking a different tape
               if (isPhoneTape(tape.id)) {
+                // New tape uses phone animation
                 setSelectedTape(tape);
                 setPhonePhase('entering');
               } else {
+                // New tape is regular (not phone)
+                // If phone was showing, just clear it immediately
                 setPhonePhase('none');
                 setSelectedTape(tape);
               }
@@ -609,7 +616,7 @@ const FlatLayout = () => {
             width: "12.5%",
             height: "5%",
             cursor: "pointer",
-            zIndex: 60,
+            zIndex: 250, // Above phone overlay (200)
             background: isDebug ? "rgba(255,0,0,0.3)" : "transparent",
             border: isDebug ? "2px solid red" : "none",
             color: isDebug ? "white" : "transparent",
