@@ -95,7 +95,10 @@ const FlatLayout = () => {
   const isDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
   
   // Debug crop control (only active in debug mode)
+  const [debugCropX, setDebugCropX] = useState(50); // 0-100 horizontal position
   const [debugCropY, setDebugCropY] = useState(50); // 0-100 vertical position
+  const [debugScale, setDebugScale] = useState(100); // 100 = normal, 150 = 1.5x zoom out
+  const [debugContain, setDebugContain] = useState(false); // true = letterbox mode
   
   // Phone animation state
   const [phonePhase, setPhonePhase] = useState<'none' | 'entering' | 'showing' | 'exiting'>('none');
@@ -505,11 +508,15 @@ const FlatLayout = () => {
                 loop
                 playsInline
                 style={{ 
-                  width: "100%", 
-                  height: "100%", 
-                  objectFit: "cover",
-                  objectPosition: isDebug ? `center ${debugCropY}%` : ((selectedTape.content as any).videoCrop || "center center"),
+                  width: isDebug ? `${debugScale}%` : "100%", 
+                  height: isDebug ? `${debugScale}%` : "100%", 
+                  objectFit: isDebug ? (debugContain ? "contain" : "cover") : ((selectedTape.content as any).videoFit || "cover"),
+                  objectPosition: isDebug ? `${debugCropX}% ${debugCropY}%` : ((selectedTape.content as any).videoCrop || "center center"),
                   imageRendering: "pixelated",
+                  background: debugContain ? "#000" : "transparent",
+                  position: "absolute",
+                  left: isDebug ? `${(100 - debugScale) / 2}%` : 0,
+                  top: isDebug ? `${(100 - debugScale) / 2}%` : 0,
                 }}
               />
               {!isPlaying && (
@@ -694,24 +701,57 @@ const FlatLayout = () => {
           zIndex: 500,
           color: "#fff",
           fontFamily: "monospace",
-          fontSize: "14px",
+          fontSize: "13px",
+          minWidth: "250px",
         }}>
-          <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
-            Crop Debug: {selectedTape.id}
+          <div style={{ marginBottom: "12px", fontWeight: "bold", fontSize: "14px" }}>
+            🎬 {selectedTape.id}
           </div>
-          <div style={{ marginBottom: "8px" }}>
-            Y Position: {debugCropY}%
-          </div>
+          
+          <div style={{ marginBottom: "4px" }}>X: {debugCropX}%</div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={debugCropX}
+            onChange={(e) => setDebugCropX(Number(e.target.value))}
+            style={{ width: "100%", marginBottom: "8px" }}
+          />
+          
+          <div style={{ marginBottom: "4px" }}>Y: {debugCropY}%</div>
           <input
             type="range"
             min="0"
             max="100"
             value={debugCropY}
             onChange={(e) => setDebugCropY(Number(e.target.value))}
-            style={{ width: "200px", marginBottom: "8px" }}
+            style={{ width: "100%", marginBottom: "8px" }}
           />
-          <div style={{ fontSize: "12px", color: "#888" }}>
-            Copy: videoCrop: "center {debugCropY}%"
+          
+          <div style={{ marginBottom: "4px" }}>Scale: {debugScale}%</div>
+          <input
+            type="range"
+            min="50"
+            max="200"
+            value={debugScale}
+            onChange={(e) => setDebugScale(Number(e.target.value))}
+            style={{ width: "100%", marginBottom: "8px" }}
+          />
+          
+          <label style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={debugContain}
+              onChange={(e) => setDebugContain(e.target.checked)}
+            />
+            Letterbox (black bars)
+          </label>
+          
+          <div style={{ fontSize: "11px", color: "#888", borderTop: "1px solid #444", paddingTop: "8px" }}>
+            {debugContain 
+              ? `videoFit: "contain"` 
+              : `videoCrop: "${debugCropX}% ${debugCropY}%"`}
+            {debugScale !== 100 && `, scale: ${debugScale}%`}
           </div>
         </div>
       )}
