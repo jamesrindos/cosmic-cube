@@ -782,7 +782,7 @@ const FlatLayout = () => {
               if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
               loadingTimeoutRef.current = setTimeout(() => {
                 setShowLoadingIndicator(true);
-              }, 1000);
+              }, 2000);
               if (isPhoneTape(tape.id)) {
                 // New tape uses phone animation
                 setSelectedTape(tape);
