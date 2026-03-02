@@ -112,11 +112,16 @@ const FlatLayout = () => {
   
   // Handle phone animation sequence
   const handlePhoneAnimationEnd = () => {
+    console.log('Video ended, phase:', phonePhase);
     if (phonePhase === 'entering') {
+      console.log('Transitioning to showing');
       setPhonePhase('showing');
     } else if (phonePhase === 'exiting') {
+      console.log('Transitioning to none');
       setPhonePhase('none');
       setSelectedTape(null);
+    } else {
+      console.log('onEnded fired during', phonePhase, '- this should not happen if loop is true');
     }
   };
   
@@ -383,9 +388,10 @@ const FlatLayout = () => {
       </div>
 
       {/* Phone animation overlay - pointerEvents none so tapes are clickable through it */}
+      {phonePhase !== 'none' && console.log('Rendering phone video:', { phase: phonePhase, tape: selectedTape?.id, loop: phonePhase === 'showing', src: getPhoneVideoSrc() })}
       {phonePhase !== 'none' && (
         <video
-          key={`${selectedTape?.id}-${phonePhase}`} // Force remount on phase/tape change to prevent stale video
+          key={`phone-${selectedTape?.id}-${phonePhase}`} // Remount on tape or phase change for clean video switch
           ref={phoneVideoRef}
           src={getPhoneVideoSrc()}
           autoPlay
