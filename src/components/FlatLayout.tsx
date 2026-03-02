@@ -438,8 +438,8 @@ const FlatLayout = () => {
         }
       `}</style>
 
-      {/* Header overlay */}
-      <div style={{ 
+      {/* Header overlay - hidden when rotation screen shows */}
+      {!isMobilePortrait && <div style={{ 
         position: "absolute",
         top: "20px",
         left: "32px",
@@ -451,7 +451,7 @@ const FlatLayout = () => {
         <div style={{ fontSize: "14px", color: "rgba(200,200,200,1)", letterSpacing: "4px" }}>
           CREATIVE PORTFOLIO
         </div>
-      </div>
+      </div>}
 
       {/* Phone animation - new overlay architecture */}
       {/* Phone out/away video (hand animation) */}
@@ -808,8 +808,8 @@ const FlatLayout = () => {
         </div>
       )}
 
-      {/* Social links - bottom center */}
-      <div style={{
+      {/* Social links - bottom center - hidden when rotation screen shows */}
+      {!isMobilePortrait && <div style={{
         position: "absolute",
         bottom: "20px",
         left: "50%",
@@ -829,7 +829,7 @@ const FlatLayout = () => {
            style={{ color: "rgba(220,220,220,0.85)", textDecoration: "none", fontSize: "18px", fontWeight: "500" }}>YouTube</a>
         <a href="mailto:jamesrindos1@gmail.com" 
            style={{ color: "rgba(220,220,220,0.85)", textDecoration: "none", fontSize: "18px", fontWeight: "500" }}>Email</a>
-      </div>
+      </div>}
     </div>
   );
 };
