@@ -40,7 +40,7 @@ const tapeData = [
     title: "MoziWash", subtitle: "First Billboard",
     description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
     videoSrc: "https://files.catbox.moe/rnkqtz.mp4",
-    videoCrop: "center 30%", // Vertical video - crop to show upper portion
+    videoFit: "contain", // Letterbox - show full vertical video with black bars
   }},
   { id: "kalshi", label: "KALSHI", color: "#E91E63", content: {
     title: "Kalshi", subtitle: "Wimbledon Spec Ad",
@@ -513,7 +513,7 @@ const FlatLayout = () => {
                   objectFit: isDebug ? (debugContain ? "contain" : "cover") : ((selectedTape.content as any).videoFit || "cover"),
                   objectPosition: isDebug ? `${debugCropX}% ${debugCropY}%` : ((selectedTape.content as any).videoCrop || "center center"),
                   imageRendering: "pixelated",
-                  background: debugContain ? "#000" : "transparent",
+                  background: (isDebug ? debugContain : (selectedTape.content as any).videoFit === "contain") ? "#000" : "transparent",
                   position: "absolute",
                   left: isDebug ? `${(100 - debugScale) / 2}%` : 0,
                   top: isDebug ? `${(100 - debugScale) / 2}%` : 0,
