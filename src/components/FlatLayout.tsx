@@ -623,21 +623,20 @@ const FlatLayout = () => {
           {/* Desktop: bottom center */}
           <div className="info-panel-desktop" style={{
             position: "absolute",
-            bottom: "70px",
+            bottom: "60px",
             left: "50%",
             transform: "translateX(-50%)",
-            background: "rgba(0,0,0,0.92)",
-            padding: "16px 32px",
-            borderRadius: "12px",
+            background: "rgba(0,0,0,0.88)",
+            padding: "10px 20px",
+            borderRadius: "8px",
             textAlign: "center",
             zIndex: 100,
             maxWidth: "600px",
-            backdropFilter: "blur(8px)",
           }}>
-            <div style={{ color: selectedTape.color, fontSize: "22px", fontWeight: "bold", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+            <div style={{ color: selectedTape.color, fontSize: "26px", fontWeight: "bold" }}>
               {selectedTape.content.title}
             </div>
-            <div style={{ color: "#DDD", fontSize: "15px", marginTop: "10px", lineHeight: 1.5 }}>
+            <div style={{ color: "#EEE", fontSize: "17px", marginTop: "6px", lineHeight: 1.5 }}>
               {selectedTape.content.description}
             </div>
           </div>
@@ -647,20 +646,19 @@ const FlatLayout = () => {
             left: "4%",
             top: "50%",
             transform: "translateY(-50%)",
-            background: "rgba(0,0,0,0.92)",
-            padding: "14px 18px",
-            borderRadius: "10px",
+            background: "rgba(0,0,0,0.88)",
+            padding: "10px 14px",
+            borderRadius: "8px",
             textAlign: "left",
             zIndex: 100,
-            maxWidth: "180px",
+            maxWidth: "160px",
             maxHeight: "70vh",
             overflowY: "auto",
-            backdropFilter: "blur(8px)",
           }}>
-            <div style={{ color: selectedTape.color, fontSize: "18px", fontWeight: "bold", textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+            <div style={{ color: selectedTape.color, fontSize: "20px", fontWeight: "bold" }}>
               {selectedTape.content.title}
             </div>
-            <div style={{ color: "#DDD", fontSize: "13px", marginTop: "8px", lineHeight: 1.5 }}>
+            <div style={{ color: "#EEE", fontSize: "14px", marginTop: "6px", lineHeight: 1.5 }}>
               {selectedTape.content.description}
             </div>
           </div>
