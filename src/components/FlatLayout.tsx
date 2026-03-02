@@ -89,6 +89,8 @@ const FlatLayout = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentVideoRef = useRef<HTMLVideoElement>(null);
   
@@ -560,9 +562,22 @@ const FlatLayout = () => {
                 autoPlay
                 loop
                 playsInline
-                onCanPlay={() => setIsVideoLoading(false)}
-                onWaiting={() => setIsVideoLoading(true)}
-                onPlaying={() => setIsVideoLoading(false)}
+                onCanPlay={() => {
+                  if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
+                  setIsVideoLoading(false);
+                  setShowLoadingIndicator(false);
+                }}
+                onWaiting={() => {
+                  setIsVideoLoading(true);
+                  // Start delayed indicator for buffering too
+                  if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
+                  loadingTimeoutRef.current = setTimeout(() => setShowLoadingIndicator(true), 1000);
+                }}
+                onPlaying={() => {
+                  if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
+                  setIsVideoLoading(false);
+                  setShowLoadingIndicator(false);
+                }}
                 style={{ 
                   width: isDebug ? `${debugScale}%` : "100%", 
                   height: isDebug ? `${debugScale}%` : "100%", 
@@ -575,8 +590,8 @@ const FlatLayout = () => {
                   top: isDebug ? `${(100 - debugScale) / 2}%` : 0,
                 }}
               />
-              {/* Loading indicator - animated dots */}
-              {isVideoLoading && (
+              {/* Loading indicator - animated dots (only after 1s delay) */}
+              {showLoadingIndicator && (
                 <div style={{
                   position: "absolute",
                   top: "50%", left: "50%",
@@ -629,7 +644,11 @@ const FlatLayout = () => {
               <img 
                 src={selectedTape.content.imageSrc}
                 alt={selectedTape.content.title}
-                onLoad={() => setIsVideoLoading(false)}
+                onLoad={() => {
+                  if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
+                  setIsVideoLoading(false);
+                  setShowLoadingIndicator(false);
+                }}
                 style={{ 
                   width: "100%", 
                   height: "100%", 
@@ -637,8 +656,8 @@ const FlatLayout = () => {
                   filter: "contrast(1.1) saturate(0.9)",
                 }}
               />
-              {/* Loading indicator for images - animated dots */}
-              {isVideoLoading && (
+              {/* Loading indicator for images - animated dots (only after 1s delay) */}
+              {showLoadingIndicator && (
                 <div style={{
                   position: "absolute",
                   top: "50%", left: "50%",
@@ -757,7 +776,13 @@ const FlatLayout = () => {
               }
             } else {
               // Clicking a different tape
-              setIsVideoLoading(true); // Show loading indicator
+              setIsVideoLoading(true);
+              setShowLoadingIndicator(false); // Don't show immediately
+              // Only show loading indicator after 1 second delay
+              if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
+              loadingTimeoutRef.current = setTimeout(() => {
+                setShowLoadingIndicator(true);
+              }, 1000);
               if (isPhoneTape(tape.id)) {
                 // New tape uses phone animation
                 setSelectedTape(tape);
