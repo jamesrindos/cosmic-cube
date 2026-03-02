@@ -105,7 +105,7 @@ const FlatLayout = () => {
   
   // Debug hotspot dragging
   const [debugTapePositions, setDebugTapePositions] = useState<number[]>([
-    8.2, 14.2, 19.9, 25.5, 31.7, 37.5, 43.4, 49.3, 55.6, 61.9, 68.1, 74.3, 80.4, 87.1
+    5.4, 11.6, 17.8, 23.9, 29.9, 36.1, 42.3, 48.5, 55.1, 61.6, 67.8, 74.6, 80.5, 87.2
   ]);
   const [debugTapeRight, setDebugTapeRight] = useState<number[]>(
     Array(14).fill(0.5) // all start at right: 0.5%
@@ -374,20 +374,20 @@ const FlatLayout = () => {
   }, [selectedTape]);
 
   const tapePositions = [
-    8.2,   // DIRTEA
-    14.2,  // MOE'S
-    19.9,  // MTE
-    25.5,  // BOLDE
-    31.7,  // DSC
-    37.5,  // MUD\WTR
-    43.4,  // MOZI WASH
-    49.3,  // KALSHI
-    55.6,  // POLITICAL
-    61.9,  // BIGFACE
-    68.1,  // SUNFLOWER Vol.1
-    74.3,  // SUNFLOWER Vol.2
-    80.4,  // AUDIEN HEARING
-    87.1,  // ABOUT ME
+    5.4,   // DIRTEA
+    11.6,  // MOE'S
+    17.8,  // MTE
+    23.9,  // BOLDE
+    29.9,  // DSC
+    36.1,  // MUD\WTR
+    42.3,  // MOZI WASH
+    48.5,  // KALSHI
+    55.1,  // POLITICAL
+    61.6,  // BIGFACE
+    67.8,  // SUNFLOWER Vol.1
+    74.6,  // SUNFLOWER Vol.2
+    80.5,  // AUDIEN HEARING
+    87.2,  // ABOUT ME
   ];
 
   return (
