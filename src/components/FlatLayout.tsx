@@ -575,32 +575,32 @@ const FlatLayout = () => {
                   top: isDebug ? `${(100 - debugScale) / 2}%` : 0,
                 }}
               />
-              {/* Loading indicator */}
+              {/* Loading indicator - animated dots */}
               {isVideoLoading && (
                 <div style={{
                   position: "absolute",
                   top: "50%", left: "50%",
                   transform: "translate(-50%, -50%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "12px",
                   pointerEvents: "none",
+                  fontFamily: "'VT323', monospace",
+                  fontSize: "24px",
+                  color: "#fff",
+                  textShadow: "0 0 10px rgba(255,255,255,0.5)",
                 }}>
-                  <div style={{
-                    width: "40px",
-                    height: "40px",
-                    border: "3px solid rgba(255,255,255,0.2)",
-                    borderTopColor: "#fff",
-                    borderRadius: "50%",
-                    animation: "spin 1s linear infinite",
-                  }} />
-                  <div style={{ color: "#fff", fontSize: "14px", opacity: 0.8 }}>Loading...</div>
+                  <span>Loading</span>
+                  <span className="loading-dots" style={{ display: "inline-block", width: "24px", textAlign: "left" }} />
                 </div>
               )}
               <style>{`
-                @keyframes spin {
-                  to { transform: rotate(360deg); }
+                @keyframes dots {
+                  0% { content: '.'; }
+                  33% { content: '..'; }
+                  66% { content: '...'; }
+                  100% { content: '.'; }
+                }
+                .loading-dots::after {
+                  content: '.';
+                  animation: dots 1.5s steps(1) infinite;
                 }
               `}</style>
               {!isPlaying && !isVideoLoading && (
@@ -637,27 +637,20 @@ const FlatLayout = () => {
                   filter: "contrast(1.1) saturate(0.9)",
                 }}
               />
-              {/* Loading indicator for images */}
+              {/* Loading indicator for images - animated dots */}
               {isVideoLoading && (
                 <div style={{
                   position: "absolute",
                   top: "50%", left: "50%",
                   transform: "translate(-50%, -50%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "12px",
                   pointerEvents: "none",
+                  fontFamily: "'VT323', monospace",
+                  fontSize: "24px",
+                  color: "#fff",
+                  textShadow: "0 0 10px rgba(255,255,255,0.5)",
                 }}>
-                  <div style={{
-                    width: "40px",
-                    height: "40px",
-                    border: "3px solid rgba(255,255,255,0.2)",
-                    borderTopColor: "#fff",
-                    borderRadius: "50%",
-                    animation: "spin 1s linear infinite",
-                  }} />
-                  <div style={{ color: "#fff", fontSize: "14px", opacity: 0.8 }}>Loading...</div>
+                  <span>Loading</span>
+                  <span className="loading-dots" style={{ display: "inline-block", width: "24px", textAlign: "left" }} />
                 </div>
               )}
               <div style={{
