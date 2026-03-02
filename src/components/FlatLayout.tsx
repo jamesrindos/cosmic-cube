@@ -94,6 +94,9 @@ const FlatLayout = () => {
   // Debug mode - add ?debug=1 to URL to see hotspot positions
   const isDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
   
+  // Debug crop control (only active in debug mode)
+  const [debugCropY, setDebugCropY] = useState(50); // 0-100 vertical position
+  
   // Phone animation state
   const [phonePhase, setPhonePhase] = useState<'none' | 'entering' | 'showing' | 'exiting'>('none');
   const phoneVideoRef = useRef<HTMLVideoElement>(null);
@@ -505,7 +508,7 @@ const FlatLayout = () => {
                   width: "100%", 
                   height: "100%", 
                   objectFit: "cover",
-                  objectPosition: (selectedTape.content as any).videoCrop || "center center",
+                  objectPosition: isDebug ? `center ${debugCropY}%` : ((selectedTape.content as any).videoCrop || "center center"),
                   imageRendering: "pixelated",
                 }}
               />
@@ -678,6 +681,40 @@ const FlatLayout = () => {
           {isDebug && tape.label}
         </div>
       ))}
+
+      {/* Debug crop controls */}
+      {isDebug && selectedTape && (selectedTape.content as any).videoSrc && (
+        <div style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          background: "rgba(0,0,0,0.9)",
+          padding: "16px",
+          borderRadius: "8px",
+          zIndex: 500,
+          color: "#fff",
+          fontFamily: "monospace",
+          fontSize: "14px",
+        }}>
+          <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
+            Crop Debug: {selectedTape.id}
+          </div>
+          <div style={{ marginBottom: "8px" }}>
+            Y Position: {debugCropY}%
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={debugCropY}
+            onChange={(e) => setDebugCropY(Number(e.target.value))}
+            style={{ width: "200px", marginBottom: "8px" }}
+          />
+          <div style={{ fontSize: "12px", color: "#888" }}>
+            Copy: videoCrop: "center {debugCropY}%"
+          </div>
+        </div>
+      )}
 
       {/* Social links - bottom center */}
       <div style={{
