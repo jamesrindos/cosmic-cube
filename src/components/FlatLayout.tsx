@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 // Note: moziwash temporarily disabled - missing phone-freeze video (only have raw vertical content)
 const PHONE_VIDEOS: Record<string, { out: string; freeze: string; away: string }> = {
   sunflower1: {
-    out: "https://files.catbox.moe/muiyx8.mp4",   // Trimmed faster version (4.5s vs 8s)
+    out: "https://files.catbox.moe/fwhm30.mp4",   // Trimmed faster version (5.5s, hand enters frame)
     freeze: "https://files.catbox.moe/dtr1c9.mp4", // Phone showing sunflower content (31s loop)
     away: "https://files.catbox.moe/gwi6wa.mp4",   // Hand putting phone away
   },
