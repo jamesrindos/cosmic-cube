@@ -107,6 +107,33 @@ const FlatLayout = () => {
     audio.play().catch(() => {});
   };
   
+  // Ambient sound - plays when no tape is selected
+  const ambientRef = useRef<HTMLAudioElement | null>(null);
+  
+  useEffect(() => {
+    // Create ambient audio element once
+    if (!ambientRef.current) {
+      ambientRef.current = new Audio('/sounds/ambient.mp3');
+      ambientRef.current.loop = true;
+      ambientRef.current.volume = 0.15;
+    }
+    
+    const ambient = ambientRef.current;
+    
+    if (!selectedTape) {
+      // No tape selected - play ambient
+      ambient.play().catch(() => {});
+    } else {
+      // Tape selected - pause ambient
+      ambient.pause();
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      ambient.pause();
+    };
+  }, [selectedTape]);
+  
   // Phone animation state
   const [phonePhase, setPhonePhase] = useState<'none' | 'entering' | 'showing' | 'exiting'>('none');
   const phoneVideoRef = useRef<HTMLVideoElement>(null);
