@@ -88,6 +88,7 @@ const FlatLayout = () => {
   const [selectedTape, setSelectedTape] = useState<typeof tapeData[0] | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentVideoRef = useRef<HTMLVideoElement>(null);
   
@@ -559,6 +560,9 @@ const FlatLayout = () => {
                 autoPlay
                 loop
                 playsInline
+                onCanPlay={() => setIsVideoLoading(false)}
+                onWaiting={() => setIsVideoLoading(true)}
+                onPlaying={() => setIsVideoLoading(false)}
                 style={{ 
                   width: isDebug ? `${debugScale}%` : "100%", 
                   height: isDebug ? `${debugScale}%` : "100%", 
@@ -571,7 +575,35 @@ const FlatLayout = () => {
                   top: isDebug ? `${(100 - debugScale) / 2}%` : 0,
                 }}
               />
-              {!isPlaying && (
+              {/* Loading indicator */}
+              {isVideoLoading && (
+                <div style={{
+                  position: "absolute",
+                  top: "50%", left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "12px",
+                  pointerEvents: "none",
+                }}>
+                  <div style={{
+                    width: "40px",
+                    height: "40px",
+                    border: "3px solid rgba(255,255,255,0.2)",
+                    borderTopColor: "#fff",
+                    borderRadius: "50%",
+                    animation: "spin 1s linear infinite",
+                  }} />
+                  <div style={{ color: "#fff", fontSize: "14px", opacity: 0.8 }}>Loading...</div>
+                </div>
+              )}
+              <style>{`
+                @keyframes spin {
+                  to { transform: rotate(360deg); }
+                }
+              `}</style>
+              {!isPlaying && !isVideoLoading && (
                 <div style={{
                   position: "absolute",
                   top: "50%", left: "50%",
@@ -597,6 +629,7 @@ const FlatLayout = () => {
               <img 
                 src={selectedTape.content.imageSrc}
                 alt={selectedTape.content.title}
+                onLoad={() => setIsVideoLoading(false)}
                 style={{ 
                   width: "100%", 
                   height: "100%", 
@@ -604,6 +637,29 @@ const FlatLayout = () => {
                   filter: "contrast(1.1) saturate(0.9)",
                 }}
               />
+              {/* Loading indicator for images */}
+              {isVideoLoading && (
+                <div style={{
+                  position: "absolute",
+                  top: "50%", left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "12px",
+                  pointerEvents: "none",
+                }}>
+                  <div style={{
+                    width: "40px",
+                    height: "40px",
+                    border: "3px solid rgba(255,255,255,0.2)",
+                    borderTopColor: "#fff",
+                    borderRadius: "50%",
+                    animation: "spin 1s linear infinite",
+                  }} />
+                  <div style={{ color: "#fff", fontSize: "14px", opacity: 0.8 }}>Loading...</div>
+                </div>
+              )}
               <div style={{
                 position: "absolute",
                 top: 0, left: 0, right: 0, bottom: 0,
@@ -708,6 +764,7 @@ const FlatLayout = () => {
               }
             } else {
               // Clicking a different tape
+              setIsVideoLoading(true); // Show loading indicator
               if (isPhoneTape(tape.id)) {
                 // New tape uses phone animation
                 setSelectedTape(tape);
