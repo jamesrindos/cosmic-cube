@@ -318,7 +318,7 @@ const FlatLayout = () => {
       position: "relative",
       fontFamily: "'VT323', monospace",
     }}>
-      {/* Mobile portrait overlay */}
+      {/* Mobile portrait overlay - fully opaque to hide everything */}
       {isMobilePortrait && (
         <div style={{
           position: "fixed",
@@ -326,7 +326,7 @@ const FlatLayout = () => {
           left: 0,
           width: "100vw",
           height: "100vh",
-          background: "rgba(0,0,0,0.95)",
+          background: "#000",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -640,25 +640,24 @@ const FlatLayout = () => {
               {selectedTape.content.description}
             </div>
           </div>
-          {/* Mobile: left vertical panel */}
+          {/* Mobile: left vertical panel - positioned below header */}
           <div className="info-panel-mobile" style={{
             position: "absolute",
             left: "4%",
-            top: "50%",
-            transform: "translateY(-50%)",
+            top: "80px", // Below the header
             background: "rgba(0,0,0,0.88)",
             padding: "10px 14px",
             borderRadius: "8px",
             textAlign: "left",
             zIndex: 100,
             maxWidth: "160px",
-            maxHeight: "70vh",
+            maxHeight: "calc(100vh - 160px)", // Account for header and footer
             overflowY: "auto",
           }}>
-            <div style={{ color: selectedTape.color, fontSize: "20px", fontWeight: "bold" }}>
+            <div style={{ color: selectedTape.color, fontSize: "18px", fontWeight: "bold" }}>
               {selectedTape.content.title}
             </div>
-            <div style={{ color: "#EEE", fontSize: "14px", marginTop: "6px", lineHeight: 1.5 }}>
+            <div style={{ color: "#EEE", fontSize: "13px", marginTop: "6px", lineHeight: 1.4 }}>
               {selectedTape.content.description}
             </div>
           </div>
