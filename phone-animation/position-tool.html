@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Phone Screen Position Tool (1:1 Scale)</title>
+  <style>
+    body { margin: 0; background: #1a1a1a; color: white; font-family: system-ui; }
+    .container { display: flex; gap: 20px; padding: 20px; }
+    .preview { position: relative; overflow: auto; max-height: 90vh; border: 2px solid #444; }
+    .preview img { display: block; /* NO scaling - actual pixels */ }
+    .overlay {
+      position: absolute;
+      border: 3px solid #00ff00;
+      background: rgba(0, 255, 0, 0.3);
+      cursor: move;
+      box-sizing: border-box;
+    }
+    .resize-handle {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: #ff0;
+      bottom: -8px;
+      right: -8px;
+      cursor: se-resize;
+    }
+    .controls { padding: 20px; min-width: 350px; position: sticky; top: 20px; }
+    .controls h2 { margin-top: 0; }
+    input[type="number"] { width: 80px; padding: 8px; font-size: 18px; }
+    label { display: block; margin: 12px 0; font-size: 16px; }
+    button { padding: 12px 24px; font-size: 16px; margin: 8px 4px; cursor: pointer; }
+    .ffmpeg-cmd { 
+      background: #333; 
+      padding: 15px; 
+      margin-top: 20px; 
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .note { color: #f90; margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="preview" id="preview">
+      <img id="bg" src="hand-frame150.png" alt="Phone frame (1920x1080)">
+      <div id="overlay" class="overlay">
+        <div class="resize-handle" id="resize"></div>
+      </div>
+    </div>
+    <div class="controls">
+      <h2>📱 Phone Screen Position</h2>
+      <p class="note">⚠️ Image is 1:1 scale (1920x1080). Scroll to see full image. These are ACTUAL pixel coordinates.</p>
+      
+      <label>X: <input type="number" id="inputX" value="558"> px</label>
+      <label>Y: <input type="number" id="inputY" value="135"> px</label>
+      <label>Width: <input type="number" id="inputW" value="356"> px</label>
+      <label>Height: <input type="number" id="inputH" value="620"> px</label>
+      
+      <button onclick="updateFromInputs()">Apply Values</button>
+      <button onclick="copyCmd()">📋 Copy for Ace</button>
+      
+      <div class="ffmpeg-cmd" id="cmd">
+        <strong>Give these to Ace:</strong><br>
+        X=<span id="cmdX">558</span>, Y=<span id="cmdY">135</span>, W=<span id="cmdW">356</span>, H=<span id="cmdH">620</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('overlay');
+    const resize = document.getElementById('resize');
+    const preview = document.getElementById('preview');
+    
+    let x = 558, y = 135, w = 356, h = 620;
+    let isDragging = false, isResizing = false;
+    let startX, startY, startLeft, startTop, startW, startH;
+    
+    function updateOverlay() {
+      overlay.style.left = x + 'px';
+      overlay.style.top = y + 'px';
+      overlay.style.width = w + 'px';
+      overlay.style.height = h + 'px';
+      
+      document.getElementById('inputX').value = Math.round(x);
+      document.getElementById('inputY').value = Math.round(y);
+      document.getElementById('inputW').value = Math.round(w);
+      document.getElementById('inputH').value = Math.round(h);
+      document.getElementById('cmdX').textContent = Math.round(x);
+      document.getElementById('cmdY').textContent = Math.round(y);
+      document.getElementById('cmdW').textContent = Math.round(w);
+      document.getElementById('cmdH').textContent = Math.round(h);
+    }
+    
+    function updateFromInputs() {
+      x = parseInt(document.getElementById('inputX').value);
+      y = parseInt(document.getElementById('inputY').value);
+      w = parseInt(document.getElementById('inputW').value);
+      h = parseInt(document.getElementById('inputH').value);
+      updateOverlay();
+    }
+    
+    overlay.addEventListener('mousedown', (e) => {
+      if (e.target === resize) return;
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startLeft = x;
+      startTop = y;
+      e.preventDefault();
+    });
+    
+    resize.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startW = w;
+      startH = h;
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        x = startLeft + (e.clientX - startX);
+        y = startTop + (e.clientY - startY);
+        updateOverlay();
+      }
+      if (isResizing) {
+        w = Math.max(50, startW + (e.clientX - startX));
+        h = Math.max(50, startH + (e.clientY - startY));
+        updateOverlay();
+      }
+    });
+    
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      isResizing = false;
+    });
+    
+    function copyCmd() {
+      const cmd = `X=${Math.round(x)}, Y=${Math.round(y)}, W=${Math.round(w)}, H=${Math.round(h)}`;
+      navigator.clipboard.writeText(cmd);
+      alert('Copied: ' + cmd);
+    }
+    
+    updateOverlay();
+  </script>
+</body>
+</html>

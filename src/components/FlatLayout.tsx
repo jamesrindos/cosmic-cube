@@ -1,5 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 
+// Phone animation videos
+const PHONE_OUT_VIDEO = "/videos/phone-out.mp4";
+const PHONE_FREEZE_SUNFLOWER = "/videos/phone-freeze-sunflower.mp4";
+const PHONE_AWAY_VIDEO = "/videos/phone-away.mp4";
+
+// Tapes that use phone animation (vertical content)
+const PHONE_TAPES = ["sunflower1", "moziwash"];
+
 // Tape data - order matches the video from top to bottom
 const tapeData = [
   { id: "dirtea", label: "DIRTEA", color: "#4CAF50", content: {
@@ -84,6 +92,33 @@ const FlatLayout = () => {
   const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentVideoRef = useRef<HTMLVideoElement>(null);
+  
+  // Phone animation state
+  const [phonePhase, setPhonePhase] = useState<'none' | 'entering' | 'showing' | 'exiting'>('none');
+  const phoneVideoRef = useRef<HTMLVideoElement>(null);
+  
+  // Check if tape should use phone animation
+  const isPhoneTape = (tapeId: string) => PHONE_TAPES.includes(tapeId);
+  
+  // Handle phone animation sequence
+  const handlePhoneAnimationEnd = () => {
+    if (phonePhase === 'entering') {
+      setPhonePhase('showing');
+    } else if (phonePhase === 'exiting') {
+      setPhonePhase('none');
+      setSelectedTape(null);
+    }
+  };
+  
+  // Get phone video source based on phase
+  const getPhoneVideoSrc = () => {
+    switch (phonePhase) {
+      case 'entering': return PHONE_OUT_VIDEO;
+      case 'showing': return PHONE_FREEZE_SUNFLOWER;
+      case 'exiting': return PHONE_AWAY_VIDEO;
+      default: return '';
+    }
+  };
   
   useEffect(() => {
     const checkOrientation = () => {
@@ -335,8 +370,30 @@ const FlatLayout = () => {
         </div>
       </div>
 
-      {/* TV Screen overlay */}
-      {selectedTape && (
+      {/* Phone animation overlay */}
+      {phonePhase !== 'none' && (
+        <video
+          ref={phoneVideoRef}
+          src={getPhoneVideoSrc()}
+          autoPlay
+          playsInline
+          muted
+          loop={phonePhase === 'showing'}
+          onEnded={handlePhoneAnimationEnd}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: 200,
+          }}
+        />
+      )}
+
+      {/* TV Screen overlay - hidden when phone animation is active */}
+      {selectedTape && !isPhoneTape(selectedTape.id) && (
         <div style={{
           position: "absolute",
           top: `${tvPos.top}%`,
@@ -450,7 +507,7 @@ const FlatLayout = () => {
       )}
 
       {/* Info bar when tape selected - left vertical panel on mobile, bottom center on desktop */}
-      {selectedTape && (
+      {selectedTape && (!isPhoneTape(selectedTape.id) || phonePhase === 'showing') && (
         <>
           {/* Desktop: bottom center */}
           <div className="info-panel-desktop" style={{
@@ -509,7 +566,26 @@ const FlatLayout = () => {
       {tapeData.map((tape, i) => (
         <div
           key={tape.id}
-          onClick={() => setSelectedTape(selectedTape?.id === tape.id ? null : tape)}
+          onClick={() => {
+            if (selectedTape?.id === tape.id) {
+              // Clicking same tape - deselect
+              if (isPhoneTape(tape.id) && phonePhase === 'showing') {
+                setPhonePhase('exiting');
+              } else {
+                setSelectedTape(null);
+                setPhonePhase('none');
+              }
+            } else {
+              // Clicking new tape
+              if (isPhoneTape(tape.id)) {
+                setSelectedTape(tape);
+                setPhonePhase('entering');
+              } else {
+                setPhonePhase('none');
+                setSelectedTape(tape);
+              }
+            }
+          }}
           style={{
             position: "absolute",
             right: "0.5%",
