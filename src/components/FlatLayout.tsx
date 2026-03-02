@@ -100,6 +100,13 @@ const FlatLayout = () => {
   const [debugScale, setDebugScale] = useState(100); // 100 = normal, 150 = 1.5x zoom out
   const [debugContain, setDebugContain] = useState(false); // true = letterbox mode
   
+  // Tape click sound
+  const playTapeSound = () => {
+    const audio = new Audio('/sounds/tape-click.mp3');
+    audio.volume = 0.7;
+    audio.play().catch(() => {});
+  };
+  
   // Phone animation state
   const [phonePhase, setPhonePhase] = useState<'none' | 'entering' | 'showing' | 'exiting'>('none');
   const phoneVideoRef = useRef<HTMLVideoElement>(null);
@@ -644,6 +651,7 @@ const FlatLayout = () => {
         <div
           key={tape.id}
           onClick={() => {
+            playTapeSound();
             console.log('Tape clicked:', tape.id, 'current phase:', phonePhase);
             if (selectedTape?.id === tape.id) {
               // Clicking same tape - deselect
