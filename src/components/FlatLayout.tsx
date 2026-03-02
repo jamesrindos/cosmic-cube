@@ -1,19 +1,27 @@
 import { useState, useRef, useEffect } from "react";
 
-// Phone animation videos per tape (hosted on Catbox)
-// Note: moziwash temporarily disabled - missing phone-freeze video (only have raw vertical content)
-const PHONE_VIDEOS: Record<string, { out: string; freeze: string; away: string }> = {
+// Phone animation config per tape
+// New architecture: phone-out plays, then content overlays on screen position
+const PHONE_CONFIG: Record<string, { 
+  out: string; 
+  away: string; 
+  content: string;
+  frame: string; // Static frame to show during 'showing' phase (last frame of phone-out)
+  // Phone screen position as % of viewport (measured from phone-out last frame)
+  screen: { left: number; top: number; width: number; height: number };
+}> = {
   sunflower1: {
-    out: "https://files.catbox.moe/fwhm30.mp4",   // Trimmed faster version (5.5s, hand enters frame)
-    freeze: "https://files.catbox.moe/dtr1c9.mp4", // Phone showing sunflower content (31s loop)
-    away: "https://files.catbox.moe/gwi6wa.mp4",   // Hand putting phone away
+    out: "https://files.catbox.moe/fwhm30.mp4",   // Hand brings phone up (5.5s)
+    away: "https://files.catbox.moe/gwi6wa.mp4",  // Hand puts phone away
+    content: "https://files.catbox.moe/7gmkk0.mp4", // Actual sunflower content video
+    frame: "/images/phone-frame-sunflower.jpg",   // Static frame for showing phase
+    screen: { left: 30.7, top: 10.6, width: 17.7, height: 55.6 }, // % of 1920x1080
   },
-  // moziwash disabled until we have proper phone-freeze-moziwash video
-  // The current "freeze" is raw vertical content (1080x1920) which breaks layout
+  // moziwash disabled until we extract its phone frame
 };
 
 // Tapes that use phone animation (vertical content)
-const PHONE_TAPES = Object.keys(PHONE_VIDEOS);
+const PHONE_TAPES = Object.keys(PHONE_CONFIG);
 
 // Tape data - order matches the video from top to bottom
 const tapeData = [
@@ -106,6 +114,7 @@ const FlatLayout = () => {
   // Phone animation state
   const [phonePhase, setPhonePhase] = useState<'none' | 'entering' | 'showing' | 'exiting'>('none');
   const phoneVideoRef = useRef<HTMLVideoElement>(null);
+  const phoneContentRef = useRef<HTMLVideoElement>(null);
   
   // Check if tape should use phone animation
   const isPhoneTape = (tapeId: string) => PHONE_TAPES.includes(tapeId);
@@ -126,15 +135,31 @@ const FlatLayout = () => {
   };
   
   // Get phone video source based on phase and selected tape
+  // Note: 'showing' phase doesn't use this - content is overlaid separately
   const getPhoneVideoSrc = () => {
-    if (!selectedTape || !PHONE_VIDEOS[selectedTape.id]) return '';
-    const videos = PHONE_VIDEOS[selectedTape.id];
+    if (!selectedTape || !PHONE_CONFIG[selectedTape.id]) return '';
+    const config = PHONE_CONFIG[selectedTape.id];
     switch (phonePhase) {
-      case 'entering': return videos.out;
-      case 'showing': return videos.freeze;
-      case 'exiting': return videos.away;
+      case 'entering': return config.out;
+      case 'exiting': return config.away;
       default: return '';
     }
+  };
+  
+  // Get phone screen position for content overlay
+  const getPhoneScreenStyle = () => {
+    if (!selectedTape || !PHONE_CONFIG[selectedTape.id]) return {};
+    const { screen } = PHONE_CONFIG[selectedTape.id];
+    return {
+      position: 'absolute' as const,
+      left: `${screen.left}%`,
+      top: `${screen.top}%`,
+      width: `${screen.width}%`,
+      height: `${screen.height}%`,
+      zIndex: 210,
+      borderRadius: '20px',
+      overflow: 'hidden',
+    };
   };
   
   useEffect(() => {
@@ -387,21 +412,19 @@ const FlatLayout = () => {
         </div>
       </div>
 
-      {/* Phone animation overlay - pointerEvents none so tapes are clickable through it */}
-      {phonePhase !== 'none' && console.log('Rendering phone video:', { phase: phonePhase, tape: selectedTape?.id, loop: phonePhase === 'showing', src: getPhoneVideoSrc() })}
-      {phonePhase !== 'none' && (
+      {/* Phone animation - new overlay architecture */}
+      {/* Phone out/away video (hand animation) */}
+      {(phonePhase === 'entering' || phonePhase === 'exiting') && (
         <video
-          key={`phone-${selectedTape?.id}-${phonePhase}`} // Remount on tape or phase change for clean video switch
+          key={`phone-anim-${selectedTape?.id}-${phonePhase}`}
           ref={phoneVideoRef}
           src={getPhoneVideoSrc()}
           autoPlay
           playsInline
-          muted={phonePhase !== 'showing'} // Only play audio during content display, mute hand animations
-          loop={phonePhase === 'showing'}
+          muted
           onEnded={handlePhoneAnimationEnd}
           onError={(e) => {
             console.error('Phone video failed to load:', getPhoneVideoSrc(), e);
-            // Recover from failed video load
             setPhonePhase('none');
           }}
           style={{
@@ -412,7 +435,41 @@ const FlatLayout = () => {
             height: "100%",
             objectFit: "cover",
             zIndex: 200,
-            pointerEvents: "none", // Let clicks pass through to tape hotspots
+            pointerEvents: "none",
+          }}
+        />
+      )}
+      
+      {/* Static phone frame during 'showing' - last frame of phone-out */}
+      {phonePhase === 'showing' && selectedTape && PHONE_CONFIG[selectedTape.id] && (
+        <img
+          src={PHONE_CONFIG[selectedTape.id].frame}
+          alt=""
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: 200,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+      
+      {/* Content video overlay on phone screen */}
+      {(phonePhase === 'entering' || phonePhase === 'showing') && selectedTape && PHONE_CONFIG[selectedTape.id] && (
+        <video
+          ref={phoneContentRef}
+          src={PHONE_CONFIG[selectedTape.id].content}
+          autoPlay
+          loop
+          playsInline
+          muted={phonePhase === 'entering'} // Mute during hand animation, unmute when showing
+          style={{
+            ...getPhoneScreenStyle(),
+            opacity: phonePhase === 'showing' ? 1 : 0, // Hidden during entering, visible during showing
           }}
         />
       )}
