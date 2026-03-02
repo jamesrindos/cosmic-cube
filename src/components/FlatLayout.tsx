@@ -15,7 +15,7 @@ const PHONE_CONFIG: Record<string, {
     away: "https://files.catbox.moe/gwi6wa.mp4",  // Hand puts phone away
     content: "https://files.catbox.moe/7gmkk0.mp4", // Actual sunflower content video
     frame: "/images/phone-frame-sunflower.jpg",   // Static frame for showing phase
-    screen: { left: 30.7, top: 10.6, width: 17.7, height: 55.6 }, // % of 1920x1080
+    screen: { left: 42, top: 24, width: 18, height: 52 }, // Adjusted to match phone screen position
   },
   // moziwash disabled until we extract its phone frame
 };
@@ -470,6 +470,7 @@ const FlatLayout = () => {
           style={{
             ...getPhoneScreenStyle(),
             opacity: phonePhase === 'showing' ? 1 : 0, // Hidden during entering, visible during showing
+            border: isDebug ? '3px solid lime' : 'none', // Debug: show overlay bounds
           }}
         />
       )}
