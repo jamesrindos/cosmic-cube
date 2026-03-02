@@ -93,6 +93,9 @@ const FlatLayout = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentVideoRef = useRef<HTMLVideoElement>(null);
   
+  // Debug mode - add ?debug=1 to URL to see hotspot positions
+  const isDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
+  
   // Phone animation state
   const [phonePhase, setPhonePhase] = useState<'none' | 'entering' | 'showing' | 'exiting'>('none');
   const phoneVideoRef = useRef<HTMLVideoElement>(null);
@@ -574,11 +577,12 @@ const FlatLayout = () => {
         </>
       )}
 
-      {/* Tape hotspots - invisible, click only */}
+      {/* Tape hotspots - invisible, click only (add ?debug=1 to see them) */}
       {tapeData.map((tape, i) => (
         <div
           key={tape.id}
           onClick={() => {
+            console.log('Tape clicked:', tape.id);
             if (selectedTape?.id === tape.id) {
               // Clicking same tape - deselect
               if (isPhoneTape(tape.id) && phonePhase === 'showing') {
@@ -606,11 +610,18 @@ const FlatLayout = () => {
             height: "5%",
             cursor: "pointer",
             zIndex: 60,
-            background: "transparent",
-            color: "transparent",
+            background: isDebug ? "rgba(255,0,0,0.3)" : "transparent",
+            border: isDebug ? "2px solid red" : "none",
+            color: isDebug ? "white" : "transparent",
+            fontSize: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
           title={tape.label}
-        />
+        >
+          {isDebug && tape.label}
+        </div>
       ))}
 
       {/* Social links - bottom center */}
