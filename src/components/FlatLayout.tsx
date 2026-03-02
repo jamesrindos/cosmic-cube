@@ -103,6 +103,22 @@ const FlatLayout = () => {
   const [debugScale, setDebugScale] = useState(100); // 100 = normal, 150 = 1.5x zoom out
   const [debugContain, setDebugContain] = useState(false); // true = letterbox mode
   
+  // Debug hotspot dragging
+  const [debugTapePositions, setDebugTapePositions] = useState<number[]>([
+    8.2, 14.2, 19.9, 25.5, 31.7, 37.5, 43.4, 49.3, 55.6, 61.9, 68.1, 74.3, 80.4, 87.1
+  ]);
+  const [debugTapeRight, setDebugTapeRight] = useState<number[]>(
+    Array(14).fill(0.5) // all start at right: 0.5%
+  );
+  const [debugTapeWidth, setDebugTapeWidth] = useState<number[]>(
+    Array(14).fill(12.5) // all start at width: 12.5%
+  );
+  const [debugTapeHeight, setDebugTapeHeight] = useState<number[]>(
+    Array(14).fill(5) // all start at height: 5%
+  );
+  const [draggingTape, setDraggingTape] = useState<{ index: number; mode: 'move' | 'resize' } | null>(null);
+  const [tapeDragStart, setTapeDragStart] = useState({ x: 0, y: 0, top: 0, right: 0, width: 0, height: 0 });
+  
   // Tape click sound
   const playTapeSound = () => {
     const audio = new Audio('/sounds/tape-click.mp3');
@@ -304,6 +320,50 @@ const FlatLayout = () => {
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [tvDragging, dragStart, tvPos]);
+
+  // Handle tape hotspot dragging in debug mode
+  useEffect(() => {
+    if (!isDebug || !draggingTape) return;
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const dx = ((e.clientX - tapeDragStart.x) / window.innerWidth) * 100;
+      const dy = ((e.clientY - tapeDragStart.y) / window.innerHeight) * 100;
+      const i = draggingTape.index;
+      
+      if (draggingTape.mode === 'move') {
+        setDebugTapePositions(prev => {
+          const newPositions = [...prev];
+          newPositions[i] = Math.round((tapeDragStart.top + dy) * 10) / 10;
+          return newPositions;
+        });
+        setDebugTapeRight(prev => {
+          const newRight = [...prev];
+          // Moving right means subtracting dx (right is measured from right edge)
+          newRight[i] = Math.round((tapeDragStart.right - dx) * 10) / 10;
+          return newRight;
+        });
+      } else if (draggingTape.mode === 'resize') {
+        setDebugTapeWidth(prev => {
+          const newWidths = [...prev];
+          newWidths[i] = Math.max(2, Math.round((tapeDragStart.width + dx) * 10) / 10);
+          return newWidths;
+        });
+        setDebugTapeHeight(prev => {
+          const newHeights = [...prev];
+          newHeights[i] = Math.max(1, Math.round((tapeDragStart.height + dy) * 10) / 10);
+          return newHeights;
+        });
+      }
+    };
+    const handleMouseUp = () => setDraggingTape(null);
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDebug, draggingTape, tapeDragStart]);
 
   const logTvPos = () => {
     alert(`TV Position:\ntop: ${tvPos.top}%\nleft: ${tvPos.left}%\nwidth: ${tvPos.width}%\nheight: ${tvPos.height}%`);
@@ -763,7 +823,9 @@ const FlatLayout = () => {
       {tapeData.map((tape, i) => (
         <div
           key={tape.id}
-          onClick={() => {
+          onClick={(e) => {
+            // In debug mode, don't trigger tape selection when dragging
+            if (isDebug && draggingTape) return;
             playTapeSound();
             console.log('Tape clicked:', tape.id, 'current phase:', phonePhase);
             if (selectedTape?.id === tape.id) {
@@ -795,13 +857,27 @@ const FlatLayout = () => {
               }
             }
           }}
+          onMouseDown={(e) => {
+            if (!isDebug) return;
+            e.preventDefault();
+            e.stopPropagation();
+            setDraggingTape({ index: i, mode: 'move' });
+            setTapeDragStart({
+              x: e.clientX,
+              y: e.clientY,
+              top: debugTapePositions[i],
+              right: debugTapeRight[i],
+              width: debugTapeWidth[i],
+              height: debugTapeHeight[i],
+            });
+          }}
           style={{
             position: "absolute",
-            right: "0.5%",
-            top: `${tapePositions[i]}%`,
-            width: "12.5%",
-            height: "5%",
-            cursor: "pointer",
+            right: isDebug ? `${debugTapeRight[i]}%` : "0.5%",
+            top: isDebug ? `${debugTapePositions[i]}%` : `${tapePositions[i]}%`,
+            width: isDebug ? `${debugTapeWidth[i]}%` : "12.5%",
+            height: isDebug ? `${debugTapeHeight[i]}%` : "5%",
+            cursor: isDebug ? "move" : "pointer",
             zIndex: 250, // Above phone overlay (200)
             background: isDebug ? "rgba(255,0,0,0.3)" : "transparent",
             border: isDebug ? "2px solid red" : "none",
@@ -810,10 +886,40 @@ const FlatLayout = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            userSelect: isDebug ? "none" : undefined,
           }}
           title={tape.label}
         >
-          {isDebug && tape.label}
+          {isDebug && (
+            <>
+              <span style={{ pointerEvents: "none" }}>{tape.label}</span>
+              {/* Resize handle in bottom-right corner */}
+              <div
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDraggingTape({ index: i, mode: 'resize' });
+                  setTapeDragStart({
+                    x: e.clientX,
+                    y: e.clientY,
+                    top: debugTapePositions[i],
+                    right: debugTapeRight[i],
+                    width: debugTapeWidth[i],
+                    height: debugTapeHeight[i],
+                  });
+                }}
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  width: "12px",
+                  height: "12px",
+                  background: "lime",
+                  cursor: "nwse-resize",
+                }}
+              />
+            </>
+          )}
         </div>
       ))}
 
@@ -881,6 +987,62 @@ const FlatLayout = () => {
               : `videoCrop: "${debugCropX}% ${debugCropY}%"`}
             {debugScale !== 100 && `, scale: ${debugScale}%`}
           </div>
+        </div>
+      )}
+
+      {/* Debug hotspot positions panel */}
+      {isDebug && (
+        <div style={{
+          position: "absolute",
+          bottom: "20px",
+          right: "20px",
+          background: "rgba(0,0,0,0.95)",
+          padding: "16px",
+          borderRadius: "8px",
+          zIndex: 500,
+          color: "#fff",
+          fontFamily: "monospace",
+          fontSize: "11px",
+          maxWidth: "320px",
+          maxHeight: "50vh",
+          overflowY: "auto",
+        }}>
+          <div style={{ marginBottom: "12px", fontWeight: "bold", fontSize: "14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>📍 Hotspot Positions</span>
+            <button
+              onClick={() => {
+                const code = `const tapePositions = [\n${debugTapePositions.map((pos, i) => `  ${pos},   // ${tapeData[i].label}`).join('\n')}\n];`;
+                navigator.clipboard.writeText(code);
+                alert('Copied to clipboard!');
+              }}
+              style={{
+                background: "#4CAF50",
+                border: "none",
+                borderRadius: "4px",
+                padding: "4px 8px",
+                color: "#fff",
+                cursor: "pointer",
+                fontSize: "10px",
+              }}
+            >
+              Copy Code
+            </button>
+          </div>
+          <div style={{ fontSize: "10px", color: "#888", marginBottom: "8px" }}>
+            Drag hotspots to move • Green corner to resize
+          </div>
+          {tapeData.map((tape, i) => (
+            <div key={tape.id} style={{ 
+              marginBottom: "4px", 
+              padding: "4px",
+              background: draggingTape?.index === i ? "rgba(255,255,0,0.2)" : "transparent",
+              borderRadius: "4px",
+            }}>
+              <span style={{ color: tape.color, fontWeight: "bold" }}>{tape.label}:</span>
+              <span style={{ color: "#aaa" }}> top:{debugTapePositions[i]}% right:{debugTapeRight[i]}%</span>
+              <span style={{ color: "#666" }}> ({debugTapeWidth[i]}×{debugTapeHeight[i]})</span>
+            </div>
+          ))}
         </div>
       )}
 
