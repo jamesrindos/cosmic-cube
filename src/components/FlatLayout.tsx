@@ -209,22 +209,38 @@ const FlatLayout = () => {
     
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('autoplay', '');
     video.muted = true;
     video.defaultMuted = true;
     
     const tryPlay = () => {
-      const playPromise = video.play();
-      if (playPromise) {
-        playPromise.catch(() => {});
+      if (video.paused) {
+        const playPromise = video.play();
+        if (playPromise) {
+          playPromise.catch(() => {});
+        }
       }
     };
     
     // Try immediately
     tryPlay();
     
+    // Keep trying every 500ms until it plays
+    const interval = setInterval(() => {
+      if (!video.paused) {
+        clearInterval(interval);
+      } else {
+        tryPlay();
+      }
+    }, 500);
+    
+    // Also clear interval after 10 seconds regardless
+    setTimeout(() => clearInterval(interval), 10000);
+    
     // Retry when video is ready
     video.addEventListener('canplay', tryPlay);
     video.addEventListener('loadeddata', tryPlay);
+    video.addEventListener('loadedmetadata', tryPlay);
     
     // Retry on visibility change (tab focus)
     const handleVisibility = () => {
@@ -242,8 +258,10 @@ const FlatLayout = () => {
     document.addEventListener('click', interactionHandler);
     
     return () => {
+      clearInterval(interval);
       video.removeEventListener('canplay', tryPlay);
       video.removeEventListener('loadeddata', tryPlay);
+      video.removeEventListener('loadedmetadata', tryPlay);
       document.removeEventListener('visibilitychange', handleVisibility);
       document.removeEventListener('touchstart', interactionHandler);
       document.removeEventListener('click', interactionHandler);
@@ -322,10 +340,10 @@ const FlatLayout = () => {
       {isMobilePortrait && (
         <div style={{
           position: "fixed",
-          top: 0,
+          top: "-50px", // Extend beyond viewport to cover any browser chrome
           left: 0,
           width: "100vw",
-          height: "100vh",
+          height: "calc(100vh + 100px)", // Extra height to fully cover
           background: "#000",
           display: "flex",
           flexDirection: "column",
@@ -640,18 +658,18 @@ const FlatLayout = () => {
               {selectedTape.content.description}
             </div>
           </div>
-          {/* Mobile: left vertical panel - positioned below header */}
+          {/* Mobile: left vertical panel - positioned well below header */}
           <div className="info-panel-mobile" style={{
             position: "absolute",
             left: "4%",
-            top: "80px", // Below the header
+            top: "120px", // Well below the header
             background: "rgba(0,0,0,0.88)",
             padding: "10px 14px",
             borderRadius: "8px",
             textAlign: "left",
             zIndex: 100,
             maxWidth: "160px",
-            maxHeight: "calc(100vh - 160px)", // Account for header and footer
+            maxHeight: "calc(100vh - 200px)", // Account for header and footer
             overflowY: "auto",
           }}>
             <div style={{ color: selectedTape.color, fontSize: "18px", fontWeight: "bold" }}>
