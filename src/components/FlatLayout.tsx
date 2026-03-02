@@ -61,7 +61,7 @@ const tapeData = [
     title: "Sunflower Vol 1", subtitle: "Sobriety Remix",
     description: "this brand asked for like 40 videos in a month on top of everything else i was creating. when i was tapped out of new concepts i turned to remixing some of my favorite iconic ad campaigns around sobriety. really like how this one came out!",
     videoSrc: "https://files.catbox.moe/7gmkk0.mp4",
-    videoCrop: "center 20%", // Vertical video - crop to show upper portion
+    videoFit: "contain", // Letterbox - show full vertical video with black bars
   }},
   { id: "sunflower2", label: "SUNFLOWER Vol.2", color: "#FF9800", content: {
     title: "Sunflower Vol 2", subtitle: "Pixar Style",
