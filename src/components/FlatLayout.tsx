@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 
-// Phone animation videos
-const PHONE_OUT_VIDEO = "/videos/phone-out.mp4";
-const PHONE_FREEZE_SUNFLOWER = "/videos/phone-freeze-sunflower.mp4";
-const PHONE_AWAY_VIDEO = "/videos/phone-away.mp4";
+// Phone animation videos (hosted on Catbox - Vercel doesn't serve LFS files correctly)
+const PHONE_OUT_VIDEO = "https://files.catbox.moe/rh6e5w.mp4";
+const PHONE_FREEZE_SUNFLOWER = "https://files.catbox.moe/dtr1c9.mp4";
+const PHONE_AWAY_VIDEO = "https://files.catbox.moe/gwi6wa.mp4";
 
 // Tapes that use phone animation (vertical content)
 const PHONE_TAPES = ["sunflower1", "moziwash"];
