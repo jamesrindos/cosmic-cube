@@ -1,27 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 
-// Phone animation config per tape
-// New architecture: phone-out plays, then content overlays on screen position
-const PHONE_CONFIG: Record<string, { 
-  out: string; 
-  away: string; 
-  content: string;
-  frame: string; // Static frame to show during 'showing' phase (last frame of phone-out)
-  // Phone screen position as % of viewport (measured from phone-out last frame)
-  screen: { left: number; top: number; width: number; height: number };
-}> = {
-  sunflower1: {
-    out: "https://files.catbox.moe/fwhm30.mp4",   // Hand brings phone up (5.5s)
-    away: "https://files.catbox.moe/gwi6wa.mp4",  // Hand puts phone away
-    content: "https://files.catbox.moe/7gmkk0.mp4", // Actual sunflower content video
-    frame: "/images/phone-frame-sunflower.jpg",   // Static frame for showing phase
-    screen: { left: 42, top: 24, width: 18, height: 52 }, // Adjusted to match phone screen position
-  },
-  // moziwash disabled until we extract its phone frame
-};
-
-// Tapes that use phone animation (vertical content)
-const PHONE_TAPES = Object.keys(PHONE_CONFIG);
+// Phone animation disabled for now - using TV display with custom crop instead
+const PHONE_CONFIG: Record<string, any> = {};
+const PHONE_TAPES: string[] = [];
 
 // Tape data - order matches the video from top to bottom
 const tapeData = [
@@ -59,6 +40,7 @@ const tapeData = [
     title: "MoziWash", subtitle: "First Billboard",
     description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
     videoSrc: "https://files.catbox.moe/rnkqtz.mp4",
+    videoCrop: "center 30%", // Vertical video - crop to show upper portion
   }},
   { id: "kalshi", label: "KALSHI", color: "#E91E63", content: {
     title: "Kalshi", subtitle: "Wimbledon Spec Ad",
@@ -79,6 +61,7 @@ const tapeData = [
     title: "Sunflower Vol 1", subtitle: "Sobriety Remix",
     description: "this brand asked for like 40 videos in a month on top of everything else i was creating. when i was tapped out of new concepts i turned to remixing some of my favorite iconic ad campaigns around sobriety. really like how this one came out!",
     videoSrc: "https://files.catbox.moe/7gmkk0.mp4",
+    videoCrop: "center 20%", // Vertical video - crop to show upper portion
   }},
   { id: "sunflower2", label: "SUNFLOWER Vol.2", color: "#FF9800", content: {
     title: "Sunflower Vol 2", subtitle: "Pixar Style",
@@ -522,6 +505,7 @@ const FlatLayout = () => {
                   width: "100%", 
                   height: "100%", 
                   objectFit: "cover",
+                  objectPosition: (selectedTape.content as any).videoCrop || "center center",
                   imageRendering: "pixelated",
                 }}
               />
