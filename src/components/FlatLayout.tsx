@@ -9,43 +9,43 @@ const tapeData = [
   { id: "dirtea", label: "DIRTEA", color: "#4CAF50", content: {
     title: "Dirtea", subtitle: "UK → US Launch",
     description: "nootropics brand in the UK looking to take a big swing with a US launch. was able to help out with one of their instagram reels. this seems simple enough but unfortunately took so much time with the tools that i had at my disposal lol. the physics were so hard to nail down!!",
-    videoSrc: "https://files.catbox.moe/adbveb.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/dirtea.mp4",
   }},
   { id: "moes", label: "MOE'S", color: "#FF5722", content: {
     title: "Moe's", subtitle: "Veo Spec Ad",
     description: "another spec ad. weird one. veo had been out for maybe a week. and i was rawdogging these prompts trying to get these animals to act like people and look somewhat consistent in between scenes. what a nightmare. kind of holds up though.",
-    videoSrc: "https://files.catbox.moe/khpbp5.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/moes.mp4",
   }},
   { id: "mte", label: "MTE", color: "#00BCD4", content: {
     title: "GetMTE", subtitle: "Repurposed Ad",
     description: "one of my friends was making this ad and got let go, so i was tasked with repurposing it. i guess i think the hook came out cool.",
-    videoSrc: "https://files.catbox.moe/x626l0.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/mte.mp4",
   }},
   { id: "bolde", label: "BOLDE", color: "#9C27B0", content: {
     title: "BoldeBottle", subtitle: "NanoBanana Pro",
     description: "got this assignment right around the launch of nanobanana pro. learned that providing start frame and end frame is absolutely the move. they paid me with one of their shaker cups. i haven't used it yet though.",
-    videoSrc: "https://files.catbox.moe/da2q01.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/bolde.mp4",
   }},
   { id: "dsc", label: "DSC", color: "#3F51B5", content: {
     title: "DSC", subtitle: "Twin Lacrosse Players",
     description: "weird one. named the characters after my brothers, twin lacrosse players. don't think its a winner at all but it makes me laugh.",
-    videoSrc: "https://files.catbox.moe/6ofgy1.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/dsc.mp4",
   }},
   { id: "mudwtr", label: "MUD\\WTR", color: "#795548", content: {
     title: "MUD/WTR", subtitle: "AI Video",
     description: "my favorite video i've made probably ever? just so fucking cool. opened my eyes to what was possible with ai video despite veo being out for only a few weeks. i've directed i think 4 more like it with similar characters. but this one will always take the cake.",
-    videoSrc: "https://files.catbox.moe/53kbrr.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/mudwtr.mp4",
   }},
   { id: "moziwash", label: "MOZI WASH", color: "#FFD700", content: {
     title: "MoziWash", subtitle: "First Billboard",
     description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
-    videoSrc: "https://files.catbox.moe/rnkqtz.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/moziwash.mp4",
     videoFit: "contain", // Letterbox - show full vertical video with black bars
   }},
   { id: "kalshi", label: "KALSHI", color: "#E91E63", content: {
     title: "Kalshi", subtitle: "Wimbledon Spec Ad",
     description: "what a blast. my friend nate and i locked ourselves in a room the day before wimbledon and made this ad for kalshi as a spec ad. we were spamming our connect while she was seeing a movie until she passed it on to her higher ups. was really cool to follow up pj ace's great work on his kalshi ads with this wimbledon spot.",
-    videoSrc: "https://files.catbox.moe/6874b3.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/kalshi.mp4",
   }},
   { id: "political", label: "POLITICAL", color: "#0D47A1", content: {
     title: "Political Media", subtitle: "Biden • DNC • State Campaigns",
@@ -55,23 +55,23 @@ const tapeData = [
   { id: "bigface", label: "BIGFACE", color: "#222", content: {
     title: "BigFace", subtitle: "48 Hour Sprint",
     description: "another sleepless 48 hour period. did a ton of brand research. spent a ton of time making it look and sound like HIM but in a way that farms aura.",
-    videoSrc: "https://files.catbox.moe/l766fu.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/bigface.mp4",
   }},
   { id: "sunflower1", label: "SUNFLOWER Vol.1", color: "#FFC107", content: {
     title: "Sunflower Vol 1", subtitle: "Sobriety Remix",
     description: "this brand asked for like 40 videos in a month on top of everything else i was creating. when i was tapped out of new concepts i turned to remixing some of my favorite iconic ad campaigns around sobriety. really like how this one came out!",
-    videoSrc: "https://files.catbox.moe/7gmkk0.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/sunflower1.mp4",
     videoFit: "contain", // Letterbox - show full vertical video with black bars
   }},
   { id: "sunflower2", label: "SUNFLOWER Vol.2", color: "#FF9800", content: {
     title: "Sunflower Vol 2", subtitle: "Pixar Style",
     description: "people in the office told me this one hit emotionally but i just think the art style carried.",
-    videoSrc: "https://files.catbox.moe/c1t0vc.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/sunflower2.mp4",
   }},
   { id: "audien", label: "AUDIEN HEARING", color: "#2196F3", content: {
     title: "Audien Hearing", subtitle: "AI CTV Ads",
     description: "this hearing aid company saw early potential for ai ctv ads and this is just one of many many ideas that we experimented with.",
-    videoSrc: "https://files.catbox.moe/ijczhr.mp4",
+    videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/audien.mp4",
   }},
   { id: "about", label: "ABOUT ME", color: "#FFF", content: {
     title: "James Rindos", subtitle: "Creative Technologist",
@@ -452,7 +452,7 @@ const FlatLayout = () => {
       {/* Background: looping video */}
       <video
         ref={videoRef}
-        src="https://files.catbox.moe/jyg0zn.mp4"
+        src="https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/videos/tv-loop.mp4"
         poster="/images/tv-bg.png"
         autoPlay
         loop
