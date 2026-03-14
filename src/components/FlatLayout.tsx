@@ -8,74 +8,74 @@ const PHONE_TAPES: string[] = [];
 const tapeData = [
   { id: "dirtea", label: "DIRTEA", color: "#4CAF50", content: {
     title: "Dirtea", subtitle: "UK → US Launch",
-    description: "nootropics brand in the UK looking to take a big swing with a US launch. was able to help out with one of their instagram reels. this seems simple enough but unfortunately took so much time with the tools that i had at my disposal lol. the physics were so hard to nail down!!",
+    description: "Nootropics brand in the UK looking to take a big swing with a US launch. Was able to help out with one of their Instagram reels. This seems simple enough but actually took some time to get the physics right.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/dirtea.mp4",
   }},
   { id: "moes", label: "MOE'S", color: "#FF5722", content: {
     title: "Moe's", subtitle: "Veo Spec Ad",
-    description: "another spec ad. weird one. veo had been out for maybe a week. and i was rawdogging these prompts trying to get these animals to act like people and look somewhat consistent in between scenes. what a nightmare. kind of holds up though.",
+    description: "Veo 3 had been out for maybe a week when I made this one for Moe's. I'm not sure if they ever used it but it was a lot of fun to make!",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/moes.mp4",
   }},
   { id: "mte", label: "MTE", color: "#00BCD4", content: {
     title: "GetMTE", subtitle: "Repurposed Ad",
-    description: "one of my friends was making this ad and got let go, so i was tasked with repurposing it. i guess i think the hook came out cool.",
+    description: "One of my friends was making this ad while they got let go. So it fell on me to repurpose it. The concept is a bit funky but I like the hook a lot.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/mte.mp4",
   }},
   { id: "bolde", label: "BOLDE", color: "#9C27B0", content: {
     title: "BoldeBottle", subtitle: "NanoBanana Pro",
-    description: "got this assignment right around the launch of nanobanana pro. learned that providing start frame and end frame is absolutely the move. they paid me with one of their shaker cups. i haven't used it yet though.",
+    description: "Got this assignment right around the launch of NanoBanana Pro. Learned that providing start frame and end frame is absolutely the move. They paid me with one of their shaker cups. I haven't used it yet though.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/bolde.mp4",
   }},
   { id: "dsc", label: "DSC", color: "#3F51B5", content: {
     title: "DSC", subtitle: "Twin Lacrosse Players",
-    description: "weird one. named the characters after my brothers, twin lacrosse players. don't think its a winner at all but it makes me laugh.",
+    description: "Client requested a spin-off of their Almost Friday content. I showed it to some friends in the office. Nobody laughed... which made me laugh harder.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/dsc.mp4",
   }},
   { id: "mudwtr", label: "MUD\\WTR", color: "#795548", content: {
     title: "MUD/WTR", subtitle: "AI Video",
-    description: "my favorite video i've made probably ever? just so fucking cool. opened my eyes to what was possible with ai video despite veo being out for only a few weeks. i've directed i think 4 more like it with similar characters. but this one will always take the cake.",
+    description: "My favorite video I've made probably ever? Just so fucking cool. Opened my eyes to what was possible with AI video despite Veo being out for only a few weeks. I've directed I think 4 more for them similar to this, but this one will always take the cake.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/mudwtr.mp4",
   }},
   { id: "moziwash", label: "MOZI WASH", color: "#FFD700", content: {
     title: "MoziWash", subtitle: "First Billboard",
-    description: "my first billboard! i turned this around in 48 hours. no sleep, fueled by a few big gulps and breakfast burritos. got to work on it with one of my best friends which made it extra special.",
+    description: "My first billboard! I turned this around in 48 hours. No sleep, fueled by a few Big Gulps and breakfast burritos. Got to work on it with one of my best friends which made it extra special.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/moziwash.mp4",
     videoFit: "contain", // Letterbox - show full vertical video with black bars
   }},
   { id: "kalshi", label: "KALSHI", color: "#E91E63", content: {
     title: "Kalshi", subtitle: "Wimbledon Spec Ad",
-    description: "what a blast. my friend nate and i locked ourselves in a room the day before wimbledon and made this ad for kalshi as a spec ad. we were spamming our connect while she was seeing a movie until she passed it on to her higher ups. was really cool to follow up pj ace's great work on his kalshi ads with this wimbledon spot.",
+    description: "What a blast. My friend Nate and I locked ourselves in a room the day before Wimbledon and made this ad for Kalshi as a spec ad. We were spamming our connect while she was seeing a movie until she passed it on to her higher ups. Was really cool to follow up PJ Ace's Kalshi ads with this Wimbledon spot.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/kalshi.mp4",
   }},
   { id: "political", label: "POLITICAL", color: "#0D47A1", content: {
     title: "Political Media", subtitle: "Biden • DNC • State Campaigns",
-    description: "i worked with mzl media and z tribeca for a year producing political campaign content for presidents, senators, congresspeople, and mayoral candidates across 12+ states. incredible experience!!",
+    description: "I worked with MZL Media and Z Tribeca for a year producing political campaign content for presidents, senators, congresspeople, and mayoral candidates across 12+ states. Incredible experience!!",
     imageSrc: "/images/politics_web.jpg",
   }},
   { id: "bigface", label: "BIGFACE", color: "#222", content: {
     title: "BigFace", subtitle: "48 Hour Sprint",
-    description: "another sleepless 48 hour period. did a ton of brand research. spent a ton of time making it look and sound like HIM but in a way that farms aura.",
+    description: "Another sleepless 48 hour period. Did a ton of brand research. Spent a ton of time making it look and sound like Jimmy Butler.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/bigface.mp4",
   }},
   { id: "sunflower1", label: "SUNFLOWER Vol.1", color: "#FFC107", content: {
     title: "Sunflower Vol 1", subtitle: "Sobriety Remix",
-    description: "this brand asked for like 40 videos in a month on top of everything else i was creating. when i was tapped out of new concepts i turned to remixing some of my favorite iconic ad campaigns around sobriety. really like how this one came out!",
+    description: "This brand asked for like 40 videos in a month on top of everything else I was creating. When I was tapped out of new concepts I turned to remixing some of my favorite iconic ad campaigns around sobriety. Really like how this one came out!",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/sunflower1.mp4",
     videoFit: "contain", // Letterbox - show full vertical video with black bars
   }},
   { id: "sunflower2", label: "SUNFLOWER Vol.2", color: "#FF9800", content: {
     title: "Sunflower Vol 2", subtitle: "Pixar Style",
-    description: "people in the office told me this one hit emotionally but i just think the art style carried.",
+    description: "People in the office told me this one hit emotionally but I just think the art style carried.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/sunflower2.mp4",
   }},
   { id: "audien", label: "AUDIEN HEARING", color: "#2196F3", content: {
     title: "Audien Hearing", subtitle: "AI CTV Ads",
-    description: "this hearing aid company saw early potential for ai ctv ads and this is just one of many many ideas that we experimented with.",
+    description: "This hearing aid company saw early potential for AI CTV ads and this is just one of many many ideas that we experimented with.",
     videoSrc: "https://pub-2a2d8b0e1f1141d2954e34f927a43126.r2.dev/audien.mp4",
   }},
   { id: "about", label: "ABOUT ME", color: "#FFF", content: {
     title: "James Rindos", subtitle: "Creative Technologist",
-    description: "transparently, i'm in a bit of a discovery phase. i spent the last year building AI creative and agent-based systems. putting ads on everything from Instagram to Times Square billboards. the year before that i was in political media, producing campaign content for congresspeople, senators, and a president. competition runs in my veins. whatever we work on together, i want us to win... and selfishly i hope to learn more about myself on the way.\n\nlets chat: jamesrindos1@gmail.com",
+    description: "Transparently, I'm in a bit of a discovery phase. I spent the last year building AI creative and agent-based systems. Putting ads on everything from Instagram to Times Square billboards. The year before that I was in political media, producing campaign content for congresspeople, senators, and a president. Competition runs in my veins. Whatever we work on together, I want us to win... and selfishly I hope to learn more about myself on the way.\n\nLets chat: jamesrindos1@gmail.com",
     imageSrc: "/images/james-about.jpg",
     links: { 
       twitter: { handle: "@slimjimm318", url: "https://twitter.com/slimjimm318" },
