@@ -11,7 +11,9 @@ export default function handler(req, res) {
   if (!cd) { res.statusCode = 302; res.setHeader('Location', APP_PATH); return res.end(); }
   const st = status(cd);
   const url = SITE + APP_PATH + encodeURIComponent(key);
-  const img = `${SITE}/api/until-og?k=${encodeURIComponent(key)}&t=${Math.floor(Date.now() / 36e5)}`;
+  const hour = Math.floor(Date.now() / 36e5);
+  const img = `${SITE}/api/until-og?k=${encodeURIComponent(key)}&t=${hour}`;
+  const vid = `${SITE}/api/until-video?k=${encodeURIComponent(key)}&t=${hour}`;
   const title = st.done ? `${cd.short} is here` : cd.tba ? `Waiting on ${cd.short}` : `${cd.short}: ${st.label}`;
   const desc = cd.tba ? 'Date TBA. Watch the hourglass on until.'
     : st.done ? `The sand ran out. ${landsText(cd)}.`
@@ -35,6 +37,11 @@ export default function handler(req, res) {
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="${esc(cd.short)} hourglass, ${esc(st.label.toLowerCase())}">
+<meta property="og:video" content="${esc(vid)}">
+<meta property="og:video:secure_url" content="${esc(vid)}">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="540">
+<meta property="og:video:height" content="640">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(desc)}">

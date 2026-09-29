@@ -112,7 +112,7 @@ const hex = h => { const n = parseInt(h.replace('#', ''), 16); return [n >> 16 &
 const toHex = a => '#' + a.map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
 // The site's tone mapping renders sand a little lighter and softer than its hex colour.
 function lit(h, desat = 0.2, lift = 0.12) { const [r, g, b] = hex(h), L = 0.2126 * r + 0.7152 * g + 0.0722 * b; return toHex([r, g, b].map(v => { const d = v + (L - v) * desat; return d + (255 - d) * lift; })); }
-function sandSVG(f, sand) {
+function sandSVG(f, sand, opt = {}) {
   const [c0, c1, c2] = sand.split(',').map((c, i) => lit(c, i ? 0.05 : 0.08, i ? 0.04 : 0.08));
   const tp = topProfile(f * SAND), bp = bottomProfile((1 - f) * SAND);
   const defs = `<defs>
@@ -132,7 +132,7 @@ function sandSVG(f, sand) {
     const pts = bp.pts, first = pts[1], shapes = body(pts.slice(1)) + ' ' + ring(first.x, first.y); clip += shapes;
     bot = fillSand('clipBot', shapes, 'shadeH');
   }
-  if (f > 0 && f < 1) { const [x0, y0] = cam(0, 0, 0), [, y1] = cam(0, bp.peak, 0); stream = `<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x0.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="${c0}" stroke-width="2.4"/>`; }
+  if (f > 0 && f < 1 && opt.stream !== false) { const [x0, y0] = cam(0, 0, 0), [, y1] = cam(0, bp.peak, 0); stream = `<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x0.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="${c0}" stroke-width="2.4"/>`; }
   return { defs, body: top + bot + stream, clip: clip.trim() };
 }
 
@@ -146,13 +146,35 @@ function fitTitle(text) {
 }
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-function glassLayers(f, sand, uri) {
-  const sd = sandSVG(f, sand), img = extra => `<image href="${uri}" x="0" y="0" width="${GW}" height="${GH}"${extra}/>`;
+function glassLayers(f, sand, uri, opt = {}) {
+  const sd = sandSVG(f, sand, opt), img = extra => `<image href="${uri}" x="0" y="0" width="${GW}" height="${GH}"${extra}/>`;
   return `${img('')}${sd.defs}<defs>
     <filter id="soft" x="0" y="0" width="100%" height="100%"><feComponentTransfer><feFuncR type="linear" slope=".38" intercept=".62"/><feFuncG type="linear" slope=".38" intercept=".62"/><feFuncB type="linear" slope=".38" intercept=".62"/></feComponentTransfer></filter>
     <filter id="hl" x="0" y="0" width="100%" height="100%"><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  3.3 3.3 3.3 0 -9.3"/></filter>
     ${sd.clip ? `<clipPath id="sandAll"><path d="${sd.clip}"/></clipPath>` : ''}</defs>
   ${sd.body}${sd.clip ? `<g style="mix-blend-mode:multiply">${img(' filter="url(#soft)" clip-path="url(#sandAll)"')}</g>${img(' filter="url(#hl)" clip-path="url(#sandAll)"')}` : ''}`;
+}
+
+/* ---------- video: the hourglass alone, plus where the stream falls ---------- */
+export const VW = 540, VH = 640;
+const VX = (VW - GW) / 2, VY = (VH - GH) / 2 + 6;
+export function videoBaseSVG(cd, glassDataURI, now = Date.now()) {
+  const st = status(cd, now);
+  return { f: st.f, svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${VW}" height="${VH}" viewBox="0 0 ${VW} ${VH}"><rect width="${VW}" height="${VH}" fill="#FFFFFF"/><g transform="translate(${VX},${VY})">${glassLayers(st.f, cd.sand, glassDataURI, { stream: false })}</g></svg>` };
+}
+// Neck and pile top in video pixels, for the falling grains. null when the sand isn't flowing.
+export function streamGeom(f) {
+  if (!(f > 0 && f < 1)) return null;
+  const bp = bottomProfile((1 - f) * SAND), [x0, y0] = cam(0, 0, 0), [, y1] = cam(0, bp.peak, 0);
+  return { x: x0 + VX, y0: y0 + VY + 3, y1: y1 + VY - 2 };
+}
+export function sandColor(sand) { return hex(lit(sand.split(',')[0], 0.08, 0.02)); }
+// White glass silhouette on black, for masking the glint to the glass.
+export function glassMaskSVG() {
+  const L = [], R = [];
+  for (let i = 0; i <= 80; i++) { const y = -1 + 2 * i / 80, r = rOut(Math.abs(y)) - 0.01; L.push(cam(-r, y, 0)); R.push(cam(r, y, 0)); }
+  const d = 'M' + L.map(pt).join('L') + 'L' + R.reverse().map(pt).join('L') + 'Z';
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${VW}" height="${VH}"><rect width="${VW}" height="${VH}" fill="#000"/><g transform="translate(${VX},${VY})"><path d="${d}" fill="#fff"/></g></svg>`;
 }
 
 export function ogSVG(cd, glassDataURI, now = Date.now()) {

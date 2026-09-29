@@ -1,9 +1,20 @@
 {
   "rewrites": [
-    { "source": "/until/:key", "destination": "/api/until-share?k=:key" }
+    {
+      "source": "/until/:key",
+      "destination": "/api/until-share?k=:key"
+    }
   ],
   "functions": {
-    "api/until-og.js": { "includeFiles": "api/_until/**" },
-    "api/until-share.js": { "includeFiles": "api/_until/**" }
+    "api/until-og.js": {
+      "includeFiles": "api/_until/**"
+    },
+    "api/until-share.js": {
+      "includeFiles": "api/_until/**"
+    },
+    "api/until-video.js": {
+      "includeFiles": "api/_until/**",
+      "maxDuration": 30
+    }
   }
 }
