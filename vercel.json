@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/until/:key", "destination": "/api/until-share?k=:key" }
+  ],
+  "functions": {
+    "api/until-og.js": { "includeFiles": "api/_until/**" },
+    "api/until-share.js": { "includeFiles": "api/_until/**" }
+  }
+}
