@@ -105,7 +105,8 @@ const cam = (() => {
   return (x, y, z) => { const d = sub([x, y, z], pos), depth = dot(d, f); return [(dot(d, r) / (depth * tn * a) + 1) / 2 * GW, (1 - dot(d, u) / (depth * tn)) / 2 * GH]; };
 })();
 const pt = ([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`;
-function ring(r, y, n = 48) { const pts = []; for (let i = 0; i < n; i++) { const th = i / n * Math.PI * 2; pts.push(cam(r * Math.cos(th), y, r * Math.sin(th))); } return 'M' + pts.map(pt).join('L') + 'Z'; }
+// rev winds the ring the other way, so it joins the top pile's outline instead of cutting a hole where they overlap
+function ring(r, y, n = 48, rev = false) { const pts = []; for (let i = 0; i < n; i++) { const th = (rev ? n - i : i) / n * Math.PI * 2; pts.push(cam(r * Math.cos(th), y, r * Math.sin(th))); } return 'M' + pts.map(pt).join('L') + 'Z'; }
 function body(profile) { const L = profile.map(q => cam(-q.x, q.y, 0)), R = profile.map(q => cam(q.x, q.y, 0)); return 'M' + L.map(pt).join('L') + 'L' + R.reverse().map(pt).join('L') + 'Z'; }
 
 const hex = h => { const n = parseInt(h.replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
@@ -125,7 +126,7 @@ function sandSVG(f, sand, opt = {}) {
   const fillSand = (id, d, shade) => `<clipPath id="${id}"><path d="${d}"/></clipPath><g clip-path="url(#${id})"><path d="${d}" fill="${c0}"/><rect width="${GW}" height="${GH}" filter="url(#specA)" opacity=".38"/><rect width="${GW}" height="${GH}" filter="url(#specB)" opacity=".3"/><rect width="${GW}" height="${GH}" filter="url(#grit)" opacity=".07"/><path d="${d}" fill="url(#${shade})"/></g>`;
   let top = '', bot = '', stream = '', clip = '';
   if (tp) {
-    const rim = tp[36], shapes = body(tp.slice(36)) + ' ' + ring(rim.x, rim.y); clip += shapes + ' ';
+    const rim = tp[36], shapes = body(tp.slice(36)) + ' ' + ring(rim.x, rim.y, 48, true); clip += shapes + ' ';
     top = fillSand('clipTop', shapes, 'shadeV') + `<path d="${ring(rim.x * 0.985, rim.y)}" fill="#fff" fill-opacity=".08"/>`;
   }
   if (bp.pts) {
