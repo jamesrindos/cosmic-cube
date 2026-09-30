@@ -3747,6 +3747,11 @@ function decodeCustom(key){
 }
 const resolve=k=>OFF_BY[k]||decodeCustom(k);
 // On its own site each countdown shares as /until/<key>, which serves a link preview for that hourglass.
+/* sands left: every glass's sand is counted in grains that fall at 100 a second, so the count and the level always agree */
+const SPS=100;
+const sandsLeft=(cd,now)=>cd.tba||!isFinite(cd.target)?null:Math.floor(Math.max(0,cd.target-now)/1000*SPS);
+const grouped=n=>n.toLocaleString('en-US');
+const compactSands=n=>n>=9.995e9?(n/1e9).toFixed(1)+'B':n>=999.95e6?(n/1e9).toFixed(2)+'B':n>=999950?(n/1e6).toFixed(1)+'M':n>=1000?(n/1e3).toFixed(1)+'K':String(n);
 const PRETTY=!/^https?:\/\//.test(SHARE_BASE_RAW)&&/^https?:$/.test(location.protocol);
 const linkFor=cd=>PRETTY?location.origin+location.pathname.replace(/[^/]*$/,'')+encodeURIComponent(cd.key):SHARE_BASE+'#'+cd.key;
 
@@ -3805,7 +3810,7 @@ let toastT=null;function toast(m){const t=$('#toast');t.textContent=m;t.classLis
 const CARDS=new Set();
 function cardEl(cd,i){
   const a=document.createElement('a');a.className='card';a.href='#'+cd.key;a._cd=cd;
-  a.innerHTML='<div class="c-top"><span class="c-idx"></span><span class="c-cat"></span></div><div class="c-render"><div class="c-ov c-ov-top"><span>Sand left</span><span class="c-pct"></span></div><div class="c-ov c-ov-bot"></div></div><div class="c-meta"><div class="c-title"></div><div class="c-lands"></div></div>';
+  a.innerHTML='<div class="c-top"><span class="c-idx"></span><span class="c-cat"></span></div><div class="c-render"><div class="c-ov c-ov-top"><span>Sands left</span><span class="c-pct"></span></div><div class="c-ov c-ov-bot"></div></div><div class="c-meta"><div class="c-title"></div><div class="c-lands"></div></div>';
   $('.c-idx',a).textContent=pad(i+1);$('.c-cat',a).textContent=cd.cat;$('.c-title',a).textContent=cd.short;$('.c-lands',a).textContent=landsStr(cd);
   if(cd.hot){const h=document.createElement('div');h.className='c-hot';h.textContent=cd.hot;$('.c-meta',a).appendChild(h)}
   $('.c-render',a).prepend(glass(cd,{pad:0.34}));
@@ -3820,7 +3825,7 @@ function cardEl(cd,i){
 }
 function paintCard(a,now){
   const cd=a._cd,f=sandLeft(cd,now);
-  $('.c-pct',a).textContent=(f*100).toFixed(2)+'%';
+  {const n=sandsLeft(cd,now);$('.c-pct',a).textContent=n==null?'Held':compactSands(n)}
   const box=$('.c-ov-bot',a),u=units(cd,now,true),key=u.map(x=>x[1]).join();
   if(box._k!==key){box._k=key;box.innerHTML=u.map(()=>'<div class="c-u"><b></b><span></span></div>').join('')}
   $$('.c-u',box).forEach((el,i)=>{el.firstChild.textContent=u[i][0];el.lastChild.textContent=u[i][1]});
@@ -4168,15 +4173,15 @@ function paintDetail(now){
   $$('.ru',box).forEach((el,i)=>{el.firstChild.textContent=u[i][0];el.lastChild.textContent=u[i][1]});
   if(now%1000<260)box.setAttribute('aria-label',u.map(x=>x[0]+' '+x[1]).join(', '));
   const f=sandLeft(cd,now);
-  const pct=(f*100).toFixed(f<0.001&&f>0?6:4)+'%';
+  const sl=sandsLeft(cd,now);
   const lands=cd.tba||!isFinite(cd.target)?'TBA':(()=>{const t=new Date(cd.target);return `${ymd(t)} ${pad(t.getHours())}:${pad(t.getMinutes())}`})();
-  const rows=[['Sand left',pct],['Started',cd.startStr],['Lands',lands]];
+  const rows=[['Sands left',sl==null?'Held':grouped(sl)],['Started',cd.startStr],['Lands',lands]];
   const sp=$('#dSpec');
   if(sp._n!==cd.key){sp._n=cd.key;sp.innerHTML=rows.map(()=>'<div><span></span><span></span></div>').join('')+(cd.src?'<div><span>Source</span><span><a target="_blank" rel="noopener"></a></span></div>':(cd.official?'':'<div><span>Source</span><span></span></div>'));
     if(cd.src){const a=$('a',sp);a.href=cd.src[1];a.textContent=cd.src[0]+' ↗'}else if(!cd.official)sp.lastChild.lastChild.textContent=cd.from==='wiki'?'Date from Wikipedia':cd.from==='claude'?'Date suggested by Claude':'Your date'}
   const rs=$$('div',sp);rows.forEach((r,i)=>{rs[i].firstChild.textContent=r[0];rs[i].lastChild.textContent=r[1]});
   const p=isFinite(cd.target)&&!cd.tba?parts(cd.target,now):null;
-  $('#stDays').textContent=!p?'Date TBA':(p.sec===0?'It’s here':`${p.d} days to go · Sand left ${(f*100).toFixed(1)}%`);
+  $('#stDays').textContent=!p?'Date TBA':(p.sec===0?'It’s here':`${p.d} days to go · ${compactSands(sl)} sands left`);
 }
 function syncTrack(){const b=$('#dTrack'),on=isYours(current.key);b.setAttribute('aria-pressed',String(on));b.textContent=on?'✓ Tracking':'+ Track'}
 $('#dTrack').onclick=()=>{if(current)toggleYours(current.key)};
@@ -4316,6 +4321,8 @@ document.addEventListener('click',e=>{if(TOUCH&&!e.target.closest('.card'))for(c
 
 /* ---------- ticks ---------- */
 setInterval(()=>{const now=Date.now();if(current)paintDetail(now)},250);
+// the sands-left count ticks every frame, straight from the clock
+(function sandsFrame(){if(current&&!$('#detail').hidden){const r=$('#dSpec div');if(r&&r.lastChild){const n=sandsLeft(current,Date.now());r.lastChild.textContent=n==null?'Held':grouped(n)}}requestAnimationFrame(sandsFrame)})();
 setInterval(()=>{const now=Date.now();for(const c of CARDS)if(c.isConnected&&(c.matches(':hover')||c.classList.contains('pinned')||c.matches(':focus-visible')))paintCard(c,now)},1000);
 
 $('#yoursCount').textContent=pad(yours.length);

@@ -47,6 +47,11 @@ export function resolve(key) {
   return { key, short: title, title, cat, target, allDay, start: a ? parseDay(a) : Date.now(), sand, metal, tba: tba || !isFinite(target) };
 }
 
+// Every glass's sand is counted in grains that fall at 100 a second, so the count and the level always agree.
+export const SANDS_PER_SECOND = 100;
+export function sandsLeft(cd, now = Date.now()) { return cd.tba || !isFinite(cd.target) ? null : Math.floor(Math.max(0, cd.target - now) / 1000 * SANDS_PER_SECOND); }
+export const compactSands = n => n >= 9.995e9 ? (n / 1e9).toFixed(1) + 'B' : n >= 999.95e6 ? (n / 1e9).toFixed(2) + 'B' : n >= 999950 ? (n / 1e6).toFixed(1) + 'M' : n >= 1000 ? (n / 1e3).toFixed(1) + 'K' : String(n);
+
 export function status(cd, now = Date.now()) {
   if (cd.tba || !isFinite(cd.target)) return { f: 1, label: 'Date TBA', big: 'TBA', unit: 'DATE TO BE ANNOUNCED', done: false };
   const left = cd.target - now;
@@ -184,7 +189,8 @@ export function ogSVG(cd, glassDataURI, now = Date.now()) {
   const ty = 158 + title.size * 0.72;
   const titleSVG = title.lines.map((l, i) => `<text x="64" y="${(ty + i * title.size * 0.86).toFixed(1)}" font-family="Barlow Condensed SemiBold" font-weight="600" font-size="${title.size}" fill="${ink}">${esc(l)}</text>`).join('');
   const bigSize = 118, bigW = widthOf(st.big, bigSize);
-  const pct = st.done ? 'SAND LEFT 0%' : cd.tba ? 'SAND FULL' : `SAND LEFT ${(st.f * 100).toFixed(1)}%`;
+  const left = sandsLeft(cd, now);
+  const pct = cd.tba ? 'SANDS HELD' : `SANDS LEFT ${compactSands(left)}`;
   const meta = `${cd.cat.toUpperCase()} · ${landsText(cd).toUpperCase()}`;
   const gx = 1200 - GW - 36, gy = 10;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">

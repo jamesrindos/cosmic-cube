@@ -1,7 +1,7 @@
 // GET /sands/<key> (rewritten here; old /until links redirect there)  ->  a tiny page whose link-preview tags describe that one
 // countdown right now. Link previewers (iMessage, WhatsApp, X, Slack) read the tags; people are
 // sent straight on to the countdown in the app.
-import { resolve, status, landsText, SITE, APP_PATH } from './_until/lib.js';
+import { resolve, status, landsText, sandsLeft, compactSands, SITE, APP_PATH } from './_until/lib.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -17,7 +17,7 @@ export default function handler(req, res) {
   const title = st.done ? `${cd.short} is here` : cd.tba ? `Waiting on ${cd.short}` : `${cd.short}: ${st.label}`;
   const desc = cd.tba ? 'Date TBA. Watch the glass on Sands.'
     : st.done ? `The sand ran out. ${landsText(cd)}.`
-    : `Sand left ${(st.f * 100).toFixed(1)}%. Lands ${landsText(cd)}.`;
+    : `${compactSands(sandsLeft(cd))} sands left. Lands ${landsText(cd)}.`;
   const app = APP_PATH + '#' + key;
   const html = `<!doctype html>
 <html lang="en"><head>
