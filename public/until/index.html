@@ -118,6 +118,24 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .cp-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 @media (max-width:760px){.create{grid-template-columns:1fr;padding:16px}.cp-prev{border-left:0;border-top:1px solid var(--rule);min-height:280px}.fields{grid-template-columns:1fr 1fr}.fields .fld:first-child{grid-column:1/-1}}
 
+/* suggestions */
+.cp-suggest{grid-column:1/-1;display:flex;flex-direction:column;gap:16px}
+.sg-list{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.sg-item{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:18px;align-items:center;padding:16px 0;border:0;border-bottom:1px solid var(--rule);background:none;color:var(--ink);text-align:left;font:inherit}
+.sg-item:hover .sg-go{background:var(--ink-h)}
+.sg-sw{width:18px;height:44px;border-radius:2px;display:flex;flex-direction:column;overflow:hidden;justify-self:center;box-shadow:0 0 0 1px var(--rule)}
+.sg-sw i{flex:1}.sg-sw i:first-child{flex:4}
+.sg-tx{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sg-tx b{font:600 28px/.95 var(--f-d);text-transform:uppercase}
+.sg-why{font-size:15px;line-height:1.4}
+.sg-sub{font:500 11px/1.3 var(--f-m);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sg-go{height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:2px;background:var(--ink);color:var(--on-ink);font:600 14px/1 var(--f-b);white-space:nowrap}
+.sg-loading{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--muted)}
+.sg-msg{margin:0;font-size:15px}
+.sg-new{align-self:flex-start;height:48px;padding:0 20px;border:1px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);font:600 15px/1 var(--f-b)}
+.sg-new:hover{background:var(--ink);color:var(--on-ink)}
+@media (max-width:640px){.sg-item{grid-template-columns:18px minmax(0,1fr);gap:12px}.sg-go{grid-column:2;justify-self:start;height:36px}.sg-tx b{font-size:24px}}
+
 /* sections */
 .sec{padding-top:128px;display:flex;flex-direction:column;gap:28px}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
@@ -296,6 +314,13 @@ hourglass-view{display:block;width:100%;height:100%}
       <div class="perr" id="perr" hidden role="alert"><span id="perrText"></span><button class="b-text" type="button" id="perrRetry">Try again</button><button class="b-text" type="button" id="perrManual">Add the date myself</button></div>
       <section class="create" id="create" hidden aria-label="New countdown" aria-live="polite">
         <div class="cp-look" id="cpLooking" hidden><span class="spin" aria-hidden="true"></span><span id="cpQuery">Looking up</span><button class="b-text" type="button" id="cpStop" style="height:40px;margin-left:auto">Stop</button></div>
+        <div class="cp-suggest" id="cpSuggest" hidden>
+          <div class="cp-head"><span class="lab" id="sgTitle">Did you mean</span><button class="b-text" type="button" id="sgClose" style="height:32px;padding:0">Close</button></div>
+          <div class="sg-list" id="sgList"></div>
+          <div class="sg-loading" id="sgLoading" hidden><span class="spin" aria-hidden="true"></span><span>Searching the web for the latest dates</span></div>
+          <p class="sg-msg" id="sgMsg" hidden></p>
+          <button class="sg-new" type="button" id="sgNew">Make it yourself</button>
+        </div>
         <form class="cp-main" id="cpDraft" hidden novalidate>
           <div class="cp-head"><span class="lab">New countdown</span><button class="b-text" type="button" id="cpClose" style="height:32px;padding:0">Close</button></div>
           <div class="fields">
@@ -307,7 +332,7 @@ hourglass-view{display:block;width:100%;height:100%}
           <div class="fld"><span class="lab" id="catLab">Category</span><div class="row-chips" id="cpCats" role="radiogroup" aria-labelledby="catLab"></div></div>
           <div class="fld"><span class="lab" id="sandLab">Sand</span><div class="row-chips" id="cpSand" role="radiogroup" aria-labelledby="sandLab"></div></div>
           <div class="fld"><span class="lab" id="metalLab">Caps</span><div class="row-chips" id="cpMetal" role="radiogroup" aria-labelledby="metalLab"></div></div>
-          <div class="cp-actions"><button class="b-text" type="button" id="cpCancel">Cancel</button><button class="b-ink" type="submit" id="cpCta">Create countdown</button></div>
+          <div class="cp-actions"><button class="b-text" type="button" id="cpBack" hidden>Back to suggestions</button><button class="b-text" type="button" id="cpCancel">Cancel</button><button class="b-ink" type="submit" id="cpCta">Create countdown</button></div>
         </form>
         <div class="cp-prev" id="cpPrev" hidden></div>
       </section>
@@ -3699,7 +3724,7 @@ const OFF=OFFICIAL.map(o=>{
   const look=LOOK[o.id]||['#dcc9a4,#bda57b,#efe5d0','steel'];
   const cat=CAT_MAP[o.cat]||'Event';
   return {key:o.id,official:true,title:o.title,short:o.short||o.title,cat,group:GROUP[cat],target:parseAt(o.at),allDay:o.at.length===10,start:parseAt(from),startStr:from.slice(0,10),
-    tag:o.tag||'',extra:EXTRA[o.id]||o.extra||'',src:o.src||null,note:o.note||'',x:o.x||'',alias:o.alias||[],posts,buzz,hot:HOT[o.id]||o.hot||'',community:COMMUNITY[o.id]||o.community||null,sand:look[0],metal:look[1]};
+    tag:o.tag||'',extra:EXTRA[o.id]||o.extra||'',src:o.src||null,note:o.note||'',x:o.x||'',alias:o.alias||[],maker:o.maker||'',posts,buzz,hot:HOT[o.id]||o.hot||'',community:COMMUNITY[o.id]||o.community||null,sand:look[0],metal:look[1]};
 });
 const OFF_BY=Object.fromEntries(OFF.map(o=>[o.key,o]));
 function decodeCustom(key){
@@ -3801,7 +3826,7 @@ function paintCard(a,now){
 }
 
 /* ---------- home ---------- */
-let filter='All',sortBy='Soonest';
+let filter='All',sortBy='Hype';
 const FILTERS=['All','Movies','Games','Sports','Events & holidays'],SORTS=['Soonest','Hype'];
 /* Hype: an editorial 1-100 score from the buzz gathered for each event (trailer and reveal views, sell-outs, wishlists, viewership, how loud the discourse is). Checked Sep 28, 2026. */
 const HYPE={'gta-vi':99,'avengers-doomsday':97,'super-bowl-lxi':90,'christmas':88,'halloween':86,'dune-part-three':85,'knicks-banner-night-2026':84,'sunrise-on-the-reaping':83,'world-series-2026-game-1':82,'beyond-the-spider-verse':81,'times-square-ball-drop':80,'call-of-duty-modern-warfare-4':79,'the-legend-of-zelda':78,'god-of-war-laufey':77,'avengers-secret-wars':76,'the-batman-part-ii':74,'man-of-tomorrow':72,'shrek-5':71,'star-wars-starfighter':70,'macys-parade-100':70,'coachella-2027':69,'narnia':68,'final-fantasy-vii-revelation':68,'grammys-2027':67,'zelda-ocarina-of-time-switch-2':67,'oscars-2027':66,'gears-of-war-e-day':66,'la28-opening-ceremony':65,'total-solar-eclipse-2027':64,'cfp-national-championship-2027':63,'f1-las-vegas-gp-2026':62,'fable':62,'masters-2027':61,'street-fighter':60,'diwali-2026':60,'fifa-womens-world-cup-2027-opener':58,'lunar-new-year-2027':58,'phantom-blade-zero':57,'metroid-ravenous':56,'nyc-marathon-2026':55,'metro-2039':55,'persona-4-revival':54,'australian-open-2027':52,'rugby-world-cup-2027-opener':50,'hanukkah-2026':48};
@@ -3911,9 +3936,10 @@ const samplePromise=use('sample');let DOWNLOADS=null,aiOff=false;
 use('downloads').then(d=>{DOWNLOADS=d});
 
 let draft=null,lookupCtl=null,lastQuery='';
-function showPanel(which){$('#create').hidden=!which;$('#cpLooking').hidden=which!=='looking';$('#cpDraft').hidden=which!=='draft';$('#cpPrev').hidden=which!=='draft'}
+function showPanel(which){$('#create').hidden=!which;$('#cpSuggest').hidden=which!=='suggest';$('#cpLooking').hidden=which!=='looking';$('#cpDraft').hidden=which!=='draft';$('#cpPrev').hidden=which!=='draft'}
 function setPromptError(msg){const e=$('#perr');if(msg){$('#perrText').textContent=msg;e.hidden=false}else e.hidden=true}
 function openDraft(s){
+  $('#cpBack').hidden=true;
   const title=s.title||'',cat=CATS.includes(s.cat)?s.cat:guessCat(title);
   draft={title,date:s.date||'',time:s.time||'',cat,tag:s.tag||'',posts:s.posts||[],status:s.status||'mine',noteText:s.noteText||'',from:s.from||'you',claudeDate:s.from==='claude'?(s.date||''):'',sand:s.sand||CAT_SAND[cat]||SANDS[0][1],sandAuto:s.sand?'claude':'',metal:s.metal||(cat==='Trip'||cat==='Event'?'oak':'steel')};
   setPromptError(null);showPanel('draft');
@@ -3980,25 +4006,102 @@ async function onPrompt(q){
   const off=matchOfficial(q);if(off){$('#promptInput').value='';closeDraft();go(off.key);return}
   const local=localParse(q);
   if(local.date){openDraft({title:local.title||'Countdown',date:local.date,time:local.time,from:'you',status:'mine'});return}
-  const title=local.title||clean(q,80);
-  showPanel('looking');$('#cpQuery').textContent=`Looking up “${title}”`;
-  const sample=await samplePromise;
-  if(!sample||aiOff){openDraft({title,status:'nolookup',noteText:'Automatic lookup is off here. Add the date yourself.'});return}
-  lookupCtl=new AbortController();
-  try{const res=await sample.json(buildPrompt(q),{modelTier:'quick',signal:lookupCtl.signal});openDraft(fromLookup(res,q,local))}
-  catch(e){
-    const code=e&&e.code;
-    if(code==='cancelled'){openDraft({title,status:'nolookup',noteText:'Lookup stopped. Add the date yourself.'});return}
-    if(['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].includes(code)){aiOff=true;openDraft({title,status:'nolookup',noteText:'Automatic lookup is off here. Add the date yourself.'});return}
-    showPanel(null);
-    setPromptError(code==='rate_limited'?'Too many lookups right now. Try again in a minute, or add the date yourself.':"Couldn't reach the date lookup. Try again, or add the date yourself.");
-  }finally{lookupCtl=null}
+  openSuggest(q);
 }
-function closeDraft(){if(lookupCtl)lookupCtl.abort();showPanel(null);draft=null;$('#cpPrev').textContent=''}
+function closeDraft(){if(lookupCtl)lookupCtl.abort();if(sgCtl)sgCtl.abort();showPanel(null);draft=null;$('#cpPrev').textContent=''}
 $('#promptForm').addEventListener('submit',e=>{e.preventDefault();onPrompt($('#promptInput').value)});
 $('#perrRetry').onclick=()=>onPrompt(lastQuery);
 $('#perrManual').onclick=()=>{setPromptError(null);const l=localParse(lastQuery);openDraft({title:l.title||clean(lastQuery,80),status:'nodate'})};
 $('#cpStop').onclick=()=>{if(lookupCtl)lookupCtl.abort()};
+
+/* ---------- suggestions: "Did you mean ...?" ---------- */
+const STOP=new Set('the a an my new next upcoming latest movie movies film show series season release date when is it coming out come comes of for to and in on with his her their its game games gaming video tour concert event episode trailer premiere'.split(' '));
+const toks=s=>norm(s).split(' ').map(w=>w.replace(/s$/,'')).filter(w=>w.length>1&&!STOP.has(w));
+function libraryMatches(q){
+  let s=norm(q);for(let i=0;i<2;i++)s=s.replace(FILLER,'');
+  const qt=toks(s);if(!qt.length)return [];
+  const out=[];
+  for(const o of OFF){
+    if(isFinite(o.target)&&o.target<Date.now()-864e5*2)continue;
+    const hay=toks([o.title,o.short,...o.alias,o.maker,o.tag].join(' '));
+    const hit=qt.filter(w=>hay.some(h=>h===w||(w.length>3&&h.length>3&&(h.startsWith(w)||w.startsWith(h))))).length;
+    if(hit&&hit/qt.length>=0.5)out.push([hit/qt.length,o]);
+  }
+  return out.sort((a,b)=>b[0]-a[0]||a[1].target-b[1].target).slice(0,3).map(x=>x[1]);
+}
+function suggestPrompt(q){
+  return `Someone typed this into a countdown website's search box: ${JSON.stringify(q)}. Today is ${ymd(new Date())}.
+They may misremember the name or describe it vaguely. Work out what they most likely mean and reply with only one JSON object, no other text:
+{"suggestions":[{"title": official name, "category": one of Movie, Game, Sports, Event, Trip, Holiday, "date": "YYYY-MM-DD" or null, "time": "HH:MM" or null, "utc_offset": "+HH:MM" or null, "status": "confirmed" or "estimated" or "unknown", "why": what it is in under 14 words, "tagline": an original line of at most 9 words, "sand": three hex colors evoking its world, "source": null}]}
+Give 1 to 3 candidates, most likely first. Never invent a date. For personal events, or if nothing real fits, reply {"suggestions":[]}.`;
+}
+function vs(x){
+  if(!x||typeof x!=='object')return null;const title=clean(x.title,80);if(!title)return null;
+  const date=typeof x.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)?x.date:null;
+  const time=date&&typeof x.time==='string'&&/^\d{2}:\d{2}$/.test(x.time)?x.time:null;
+  const sand=typeof x.sand==='string'&&/^(#[0-9a-f]{6},){2}#[0-9a-f]{6}$/i.test(x.sand)?x.sand:(Array.isArray(x.sand)&&x.sand.length>=3&&x.sand.slice(0,3).every(c=>/^#[0-9a-f]{6}$/i.test(c))?x.sand.slice(0,3).join(','):'');
+  const src=x.source&&typeof x.source.url==='string'&&/^https:\/\//.test(x.source.url)?{name:clean(x.source.name,60),url:x.source.url}:null;
+  return {title,category:CATS.includes(x.category)?x.category:guessCat(title),date,time,utc_offset:time&&/^[+-]\d{2}:\d{2}$/.test(x.utc_offset||'')?x.utc_offset:null,status:date?(['confirmed','estimated'].includes(x.status)?x.status:'estimated'):'unknown',why:clean(x.why,120),tagline:clean(x.tagline,100),sand:sand.toLowerCase(),source:src};
+}
+async function research(q,signal){
+  if(PRETTY){
+    const r=await fetch('/api/until-suggest?q='+encodeURIComponent(q),{signal});
+    if(r.status===503)return {off:true,list:[]};
+    if(r.status===429)throw {code:'rate_limited'};
+    if(!r.ok)throw {code:'failed'};
+    return {list:((await r.json()).suggestions||[]).map(vs).filter(Boolean)};
+  }
+  const sample=await samplePromise;if(!sample||aiOff)return {off:true,list:[]};
+  const res=await sample.json(suggestPrompt(q),{modelTier:'quick',signal});
+  return {list:(res&&Array.isArray(res.suggestions)?res.suggestions:[]).map(vs).filter(Boolean).slice(0,3)};
+}
+let sgCtl=null,sg={q:'',lib:[],res:[],loading:false,msg:''};
+async function openSuggest(q){
+  sg={q,lib:libraryMatches(q),res:[],loading:true,msg:''};
+  showPanel('suggest');renderSuggest();
+  $('#create').scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'nearest'});
+  const ctl=sgCtl=new AbortController();
+  try{
+    const r=await research(q,ctl.signal);if(ctl.signal.aborted)return;
+    sg.res=r.list.filter(x=>!sg.lib.some(o=>[norm(o.title),norm(o.short)].includes(norm(x.title))));
+  }catch(e){
+    if(ctl.signal.aborted||(e&&(e.name==='AbortError'||e.code==='cancelled')))return;
+    sg.msg=e&&e.code==='rate_limited'?'Too many searches right now. Try again in a minute.':'The web search didn’t go through. You can still make it yourself.';
+  }finally{if(sgCtl===ctl){sgCtl=null;sg.loading=false;if(!$('#cpSuggest').hidden)renderSuggest()}}
+}
+function sgWhen(x){
+  if(!x.date)return 'No date announced yet';
+  let date=x.date,time=x.time||'';
+  if(time&&x.utc_offset){const d=new Date(Date.parse(`${date}T${time}:00${x.utc_offset}`));if(isFinite(d)){date=ymd(d);time=`${pad(d.getHours())}:${pad(d.getMinutes())}`}}
+  return niceDate(date,time)+(x.status==='confirmed'?'':' (reported)');
+}
+function sgItem(d,fn){
+  const b=document.createElement('button');b.type='button';b.className='sg-item';
+  b.innerHTML='<span class="sg-sw"></span><span class="sg-tx"><b></b><span class="sg-why"></span><span class="sg-sub"></span></span><span class="sg-go"></span>';
+  $('.sg-sw',b).innerHTML=d.sand.split(',').map(c=>`<i style="background:${c}"></i>`).join('');
+  $('b',b).textContent=d.title;$('.sg-why',b).textContent=d.why||'';$('.sg-why',b).hidden=!d.why;$('.sg-sub',b).textContent=d.sub;$('.sg-go',b).textContent=d.action;
+  b.onclick=fn;return b;
+}
+function renderSuggest(){
+  const box=$('#sgList'),any=sg.lib.length||sg.res.length;box.textContent='';
+  $('#sgTitle').textContent=any?'Did you mean':(sg.loading?`Searching for “${sg.q}”`:`No match for “${sg.q}”`);
+  sg.lib.forEach(o=>box.appendChild(sgItem({title:o.short,why:o.tag,sub:'In the library, '+landsStr(o).replace(/^Lands /,'lands '),sand:o.sand,action:'Open'},()=>{closeDraft();$('#promptInput').value='';go(o.key)})));
+  sg.res.forEach(x=>box.appendChild(sgItem({title:x.title,why:x.why,sub:sgWhen(x)+(x.source?' · '+x.source.name:''),sand:x.sand||CAT_SAND[x.category]||SANDS[0][1],action:'Use this'},()=>useSuggestion(x))));
+  box.hidden=!any;$('#sgLoading').hidden=!sg.loading;
+  $('#sgMsg').textContent=sg.msg;$('#sgMsg').hidden=!sg.msg;
+  const l=localParse(sg.q);$('#sgNew').textContent=`Make “${l.title||clean(sg.q,60)}” yourself`;
+}
+function useSuggestion(x){
+  let date=x.date||'',time=x.time||'';
+  if(date&&time&&x.utc_offset){const d=new Date(Date.parse(`${date}T${time}:00${x.utc_offset}`));if(isFinite(d)){date=ymd(d);time=`${pad(d.getHours())}:${pad(d.getMinutes())}`}}
+  const where=x.source?` Found on ${x.source.name}.`:'';
+  openDraft({title:x.title,cat:x.category,date,time,tag:x.tagline,status:date?x.status:'unknown',from:date?'claude':'you',sand:x.sand||'',posts:[],
+    noteText:(date?`${x.status==='confirmed'?'Announced for':'Reported for'} ${niceDate(date,time)}.`:'No date announced yet.')+where+' Check the details, then create it.'});
+  $('#cpBack').hidden=false;
+}
+$('#sgNew').onclick=()=>{const l=localParse(sg.q);openDraft({title:l.title||clean(sg.q,80),status:'nodate'});$('#cpBack').hidden=false};
+$('#sgClose').onclick=()=>closeDraft();
+$('#cpBack').onclick=()=>{showPanel('suggest');renderSuggest()};
 $('#cpClose').onclick=$('#cpCancel').onclick=closeDraft;
 $('#dTitle').addEventListener('input',e=>{if(draft)draft.title=e.target.value});
 $('#dDate').addEventListener('input',e=>{if(!draft)return;draft.date=e.target.value;renderDraftState();renderPreview()});

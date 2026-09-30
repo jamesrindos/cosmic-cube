@@ -15,6 +15,9 @@
     "api/until-video.js": {
       "includeFiles": "api/_until/**",
       "maxDuration": 30
+    },
+    "api/until-suggest.js": {
+      "maxDuration": 30
     }
   }
 }
