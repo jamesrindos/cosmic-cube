@@ -15,7 +15,7 @@ function init() {
 
 export default async function handler(req, res) {
   const cd = resolve(String((req.query && req.query.k) || ''));
-  if (!cd) { res.statusCode = 302; res.setHeader('Location', '/until/og.png'); return res.end(); }
+  if (!cd) { res.statusCode = 302; res.setHeader('Location', '/sands/og.png'); return res.end(); }
   try {
     const fonts = await init();
     const glass = await readFile(new URL(`glass/${cd.metal}.png`, dir));
@@ -26,6 +26,6 @@ export default async function handler(req, res) {
     res.end(Buffer.from(png));
   } catch (e) {
     console.error('until-og', e);
-    res.statusCode = 302; res.setHeader('Location', '/until/og.png'); res.end();
+    res.statusCode = 302; res.setHeader('Location', '/sands/og.png'); res.end();
   }
 }

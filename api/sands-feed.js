@@ -1,4 +1,4 @@
-// GET /api/until-feed  ->  the library as JSON, for the iPhone app and its widgets.
+// GET /api/sands-feed  ->  the library as JSON, for the iPhone app and its widgets.
 // Times are milliseconds since 1970 (UTC). Date-only events count down to midnight US Eastern.
 import { EVENTS } from './_until/events.js';
 

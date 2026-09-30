@@ -9,15 +9,15 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="until.">
-<meta property="og:title" content="until. Count down to anything.">
+<meta property="og:site_name" content="Sands">
+<meta property="og:title" content="sands. Count down to anything.">
 <meta property="og:description" content="3D hourglasses that drain in real time for the movies, games, sports and holidays you can't wait for.">
-<meta property="og:image" content="https://www.jamesrindos.com/until/og.png">
+<meta property="og:image" content="https://www.jamesrindos.com/sands/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://www.jamesrindos.com/until/og.png">
-<title>until. Count down to anything</title>
+<meta name="twitter:image" content="https://www.jamesrindos.com/sands/og.png">
+<title>sands. Count down to anything</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -289,7 +289,7 @@ hourglass-view{display:block;width:100%;height:100%}
 
 <header class="hdr">
   <div class="wrap"><div class="hdr-in">
-    <a class="wordmark" href="#" id="logo" aria-label="until. home">until.</a>
+    <a class="wordmark" href="#" id="logo" aria-label="sands. home">sands.</a>
     <nav class="nav" aria-label="Main">
       <a href="#" id="navLib" class="hide-s on">Library</a>
       <button type="button" id="navYours">Yours <span id="yoursCount">00</span></button>
@@ -357,7 +357,7 @@ hourglass-view{display:block;width:100%;height:100%}
       <div class="empty" id="yoursEmpty" hidden><p>Nothing tracked yet. Open any hourglass and press Track, or make your own above.</p><button class="b-line" type="button" id="emptyMake">Make one</button></div>
     </section>
 
-    <footer class="foot"><span class="wordmark">until.</span><span>Dates checked Sep 28, 2026</span></footer>
+    <footer class="foot"><span class="wordmark">sands.</span><span>Dates checked Sep 28, 2026</span></footer>
   </div>
 </main>
 
@@ -382,7 +382,7 @@ hourglass-view{display:block;width:100%;height:100%}
     <section class="send" id="send" aria-labelledby="sendHead">
       <div class="send-copy"><h2 class="h2" id="sendHead">Send it</h2><p>The hourglass is the share image. The link opens this page with the sand where it is right now.</p></div>
       <div class="story" id="story" aria-label="Story image preview" role="img">
-        <div class="sw-mark">until.</div>
+        <div class="sw-mark">sands.</div>
         <div class="st-glass" id="stGlass"></div>
         <div class="st-title" id="stTitle"></div>
         <div class="st-days" id="stDays"></div>
@@ -409,7 +409,7 @@ hourglass-view{display:block;width:100%;height:100%}
       <div class="grid" id="moreGrid"></div>
     </section>
 
-    <footer class="foot"><span class="wordmark">until.</span><span id="dFoot">Dates checked Sep 28, 2026</span></footer>
+    <footer class="foot"><span class="wordmark">sands.</span><span id="dFoot">Dates checked Sep 28, 2026</span></footer>
   </div>
 </main>
 
@@ -4142,11 +4142,11 @@ $('#cpDraft').addEventListener('submit',e=>{
 let current=null,ruKey='';
 function renderDetail(cd){
   current=cd;
-  document.title=cd.short+' · until.';
+  document.title=cd.short+' · sands.';
   const gl=$('#dGlass');gl.textContent='';gl.appendChild(glass(cd,{hero:true,spin:0.12,pad:0.32}));
   $('#dCat').textContent=cd.cat;$('#dWhen').textContent=whenStr(cd);
   $('#dTitle1').textContent=cd.title;
-  $('#dSub').textContent=[cd.tag,cd.extra].filter(Boolean).join(' ')||(cd.official?'':'Made on until.');
+  $('#dSub').textContent=[cd.tag,cd.extra].filter(Boolean).join(' ')||(cd.official?'':'Made on Sands');
   $('#dCal').hidden=!!cd.tba||!isFinite(cd.target);if(!$('#dCal').hidden)$('#dCal').href=gcalUrl(cd);
   syncTrack();ruKey='';paintDetail(Date.now());
   // send it
@@ -4159,7 +4159,7 @@ function renderDetail(cd){
   const now=Date.now(),pool=upcoming().filter(o=>o.key!==cd.key&&o.target>now);
   const sameGroup=pool.filter(o=>o.group===cd.group),rest=pool.filter(o=>o.group!==cd.group);
   [...sameGroup.slice(0,2),...rest].slice(0,4).forEach((o,i)=>more.appendChild(cardEl(o,i)));
-  $('#dFoot').textContent=cd.official?'Dates checked Sep 28, 2026':'Made on until.';
+  $('#dFoot').textContent=cd.official?'Dates checked Sep 28, 2026':'Made on Sands';
 }
 function paintDetail(now){
   const cd=current;if(!cd)return;
@@ -4184,7 +4184,7 @@ function gcalUrl(cd){
   const t=new Date(cd.target);let dates;
   if(cd.allDay){const e=new Date(t.getFullYear(),t.getMonth(),t.getDate()+1);dates=`${t.getFullYear()}${pad(t.getMonth()+1)}${pad(t.getDate())}/${e.getFullYear()}${pad(e.getMonth()+1)}${pad(e.getDate())}`}
   else{const u=d=>`${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;dates=`${u(t)}/${u(new Date(cd.target+36e5))}`}
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(cd.title)+'&dates='+dates+'&details='+encodeURIComponent('Counting down on until.: '+linkFor(cd));
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(cd.title)+'&dates='+dates+'&details='+encodeURIComponent('Counting down on Sands: '+linkFor(cd));
 }
 function shareText(cd){const p=isFinite(cd.target)&&!cd.tba?parts(cd.target,Date.now()):null;return p?(p.sec===0?`${cd.short} is here ⌛`:`${p.d} days until ${cd.short} ⌛`):`Waiting on ${cd.short} ⌛`}
 async function copyText(txt,btn,label){
@@ -4197,7 +4197,7 @@ $('#shCopy').onclick=()=>copyText(linkFor(current),$('#shCopy'),'Copied');
 const EMBED=(()=>{try{return window.top!==window.self}catch(e){return true}})();
 const PHONE=matchMedia('(pointer:coarse)').matches&&!EMBED;
 async function nativeShare(data){if(!PHONE||!navigator.share)return false;try{await navigator.share(data);return true}catch(e){return e&&e.name==='AbortError'}}
-$('#dShare').onclick=async()=>{if(!current)return;if(await nativeShare({title:current.short+' | until.',text:shareText(current),url:linkFor(current)}))return;const ok=await copyText(linkFor(current),$('#dShare'),'Link copied');if(ok)toast('Link copied');$('#send').scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'start'})};
+$('#dShare').onclick=async()=>{if(!current)return;if(await nativeShare({title:current.short+' | sands.',text:shareText(current),url:linkFor(current)}))return;const ok=await copyText(linkFor(current),$('#dShare'),'Link copied');if(ok)toast('Link copied');$('#send').scrollIntoView({behavior:REDUCED?'auto':'smooth',block:'start'})};
 function renderTargets(cd){
   const box=$('#targets');box.textContent='';
   const msg=shareText(cd)+' '+linkFor(cd);
@@ -4218,7 +4218,7 @@ async function storyCanvas(cd){
   const W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
   x.fillStyle=TH.bg;x.fillRect(0,0,W,H);const ink=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#141414';
   x.fillStyle=ink;x.strokeStyle=ink;x.textAlign='center';x.textBaseline='alphabetic';
-  x.font='600 60px "Barlow Condensed", sans-serif';x.fillText('until.',W/2,96+50);
+  x.font='600 60px "Barlow Condensed", sans-serif';x.fillText('sands.',W/2,96+50);
   const link=linkFor(cd).replace(/^https:\/\//,'');x.font='500 30px "JetBrains Mono", monospace';x.fillText(link,W/2,H-110);
   const bandBot=H-110-60,bandTop=bandBot-80;x.lineWidth=2;x.beginPath();x.moveTo(80,bandTop);x.lineTo(W-80,bandTop);x.moveTo(80,bandBot);x.lineTo(W-80,bandBot);x.stroke();
   const p=isFinite(cd.target)&&!cd.tba?parts(cd.target,Date.now()):null,f=sandLeft(cd,Date.now());
@@ -4303,7 +4303,7 @@ function render(){
   const key=decodeURIComponent(location.hash.slice(1));
   const cd=key?resolve(key):null;
   if(cd){if(!$('#home').hidden)homeY=window.scrollY;$('#home').hidden=true;$('#detail').hidden=false;$('#navLib').classList.remove('on');renderDetail(cd);window.scrollTo(0,0)}
-  else{const back=!$('#detail').hidden&&!toTop;toTop=false;current=null;document.title='until. Count down to anything';$('#detail').hidden=true;$('#home').hidden=false;$('#navLib').classList.add('on');for(const c of $$('#detail .card'))CARDS.delete(c);$('#dGlass').textContent='';$('#stGlass').textContent='';renderHome();if(key)history.replaceState(null,'',location.pathname+location.search);if(back)window.scrollTo(0,homeY)}
+  else{const back=!$('#detail').hidden&&!toTop;toTop=false;current=null;document.title='sands. Count down to anything';$('#detail').hidden=true;$('#home').hidden=false;$('#navLib').classList.add('on');for(const c of $$('#detail .card'))CARDS.delete(c);$('#dGlass').textContent='';$('#stGlass').textContent='';renderHome();if(key)history.replaceState(null,'',location.pathname+location.search);if(back)window.scrollTo(0,homeY)}
 }
 window.addEventListener('hashchange',render);
 const leave=()=>{toTop=true;location.hash=''};

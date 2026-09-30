@@ -1,10 +1,10 @@
-// Until share previews: data lookup, countdown math and the 1200x630 preview image.
+// Sands share previews: data lookup, countdown math and the 1200x630 preview image.
 // The sand geometry and camera below are ported from the site's hourglass renderer so the
 // drawn sand lines up with the pre-rendered glass (glass/<metal>.png, 440x610, pad 0.04).
 import { EVENTS } from './events.js';
 
 export const SITE = 'https://www.jamesrindos.com';
-export const APP_PATH = '/until/';
+export const APP_PATH = '/sands/';
 const METALS = ['oak', 'steel', 'brass', 'chrome', 'silver', 'bronze', 'gunmetal', 'ebony', 'lacquer', 'patina'];
 const CATS = ['Movie', 'Game', 'Sports', 'Event', 'Trip', 'Holiday'];
 const CAT_SAND = { Trip: '#f2a65a,#f7d9a8,#2f8f9d', Holiday: '#e0652a,#f2b233,#2a211d', Sports: '#4e7f3a,#c8d6a0,#6b4a2e', Game: '#8fd3ff,#e8f4fb,#3a7bd5', Movie: '#2c2b40,#7c3aed,#ffd36b', Event: '#dcc9a4,#bda57b,#efe5d0' };
@@ -190,14 +190,14 @@ export function ogSVG(cd, glassDataURI, now = Date.now()) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="#FFFFFF"/>
   <g transform="translate(${gx},${gy})">${glassLayers(st.f, cd.sand, glassDataURI)}</g>
-  <text x="64" y="84" font-family="Barlow Condensed SemiBold" font-weight="600" font-size="46" fill="${ink}">until.</text>
+  <text x="64" y="84" font-family="Barlow Condensed SemiBold" font-weight="600" font-size="46" fill="${ink}">sands.</text>
   <text x="64" y="132" font-family="JetBrains Mono" font-weight="500" font-size="17" letter-spacing="1.4" fill="${muted}">${esc(meta)}</text>
   ${titleSVG}
   <line x1="64" y1="446" x2="664" y2="446" stroke="${ink}" stroke-width="2"/>
   <text x="64" y="552" font-family="Barlow Condensed SemiBold" font-weight="600" font-size="${bigSize}" fill="${ink}">${esc(st.big)}</text>
   <text x="${(64 + bigW + 20).toFixed(0)}" y="550" font-family="JetBrains Mono" font-weight="500" font-size="24" letter-spacing="1.5" fill="${ink}">${esc(st.unit)}</text>
   <line x1="64" y1="574" x2="664" y2="574" stroke="${ink}" stroke-opacity=".25" stroke-width="1.5"/>
-  <text x="64" y="606" font-family="JetBrains Mono" font-weight="500" font-size="17" letter-spacing="1" fill="${muted}">jamesrindos.com/until</text>
+  <text x="64" y="606" font-family="JetBrains Mono" font-weight="500" font-size="17" letter-spacing="1" fill="${muted}">jamesrindos.com/sands</text>
   <text x="664" y="606" text-anchor="end" font-family="JetBrains Mono" font-weight="500" font-size="17" letter-spacing="1" fill="${muted}">${esc(pct)}</text>
 </svg>`;
 }
