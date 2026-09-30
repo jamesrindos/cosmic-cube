@@ -125,6 +125,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .sg-item:hover .sg-go{background:var(--ink-h)}
 .sg-sw{width:18px;height:44px;border-radius:2px;display:flex;flex-direction:column;overflow:hidden;justify-self:center;box-shadow:0 0 0 1px var(--rule)}
 .sg-sw i{flex:1}.sg-sw i:first-child{flex:4}
+.sg-sw.pic{width:28px;height:40px;box-shadow:0 0 0 1px var(--rule)}.sg-sw.pic{background:#fff}.sg-sw.pic img{width:100%;height:100%;object-fit:contain;display:block}
 .sg-tx{display:flex;flex-direction:column;gap:5px;min-width:0}
 .sg-tx b{font:600 28px/.95 var(--f-d);text-transform:uppercase}
 .sg-why{font-size:15px;line-height:1.4}
@@ -134,7 +135,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .sg-msg{margin:0;font-size:15px}
 .sg-new{align-self:flex-start;height:48px;padding:0 20px;border:1px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);font:600 15px/1 var(--f-b)}
 .sg-new:hover{background:var(--ink);color:var(--on-ink)}
-@media (max-width:640px){.sg-item{grid-template-columns:18px minmax(0,1fr);gap:12px}.sg-go{grid-column:2;justify-self:start;height:36px}.sg-tx b{font-size:24px}}
+@media (max-width:640px){.sg-item{grid-template-columns:28px minmax(0,1fr);gap:12px}.sg-go{grid-column:2;justify-self:start;height:36px}.sg-tx b{font-size:24px}}
 
 /* sections */
 .sec{padding-top:128px;display:flex;flex-direction:column;gap:28px}
@@ -3742,7 +3743,7 @@ function decodeCustom(key){
   const sand=typeof o.sd==='string'&&/^(#[0-9a-f]{6},){2}#[0-9a-f]{6}$/i.test(o.sd)?o.sd:(CAT_SAND[cat]||SANDS[0][1]);
   const metal=METALS.includes(o.mt)?o.mt:'oak';
   const posts=Array.isArray(o.p)?o.p.filter(p=>Array.isArray(p)&&/^\d{4}-\d{2}-\d{2}$/.test(p[0])&&typeof p[1]==='string').slice(0,4).map(p=>({d:p[0],t:clean(p[1],200),n:'Claude',u:''})):[];
-  return {key,official:false,title,short:title,cat,group:GROUP[cat],target,allDay,tba,start:parseAt(a),startStr:a,tag:clean(o.g,100),extra:'',src:null,note:'',x:'',posts,postsBy:posts.length?'claude':'',buzz:[],hot:'',community:null,sand,metal,from:o.s==='claude'?'claude':'you'};
+  return {key,official:false,title,short:title,cat,group:GROUP[cat],target,allDay,tba,start:parseAt(a),startStr:a,tag:clean(o.g,100),extra:'',src:null,note:'',x:'',posts,postsBy:posts.length?'claude':'',buzz:[],hot:'',community:null,sand,metal,from:['claude','wiki'].includes(o.s)?o.s:'you'};
 }
 const resolve=k=>OFF_BY[k]||decodeCustom(k);
 // On its own site each countdown shares as /until/<key>, which serves a link preview for that hourglass.
@@ -3876,9 +3877,12 @@ function renderHome(){if(!homeBuilt){homeBuilt=true;renderFilters();renderLibrar
 /* ---------- prompt → countdown ---------- */
 const norm=s=>s.toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 const FILLER=/^(?:please )?(?:(?:create|make|start|build|add|set up) )?(?:(?:a|an|my) )?(?:countdown|timer|clock) (?:for|to|until|till|til) |^(?:how long|how many days) (?:until|till|til|to|before) |^(?:days|time) (?:until|till|til|to) |^count ?down to |^(?:until|till) /;
+const GENERIC=new Set('movie movies film game games trailer release released date new next the a countdown season tour album show match final day night live premiere launch event official 2026 2027 2028'.split(' '));
 function matchOfficial(q){
   let s=norm(q);for(let i=0;i<2;i++)s=s.replace(FILLER,'');s=s.replace(/^the /,'').trim();if(!s)return null;
-  for(const o of OFF){for(const n of [norm(o.title),norm(o.short),...o.alias.map(norm)]){const nn=n.replace(/^the /,'');if(s===nn||(s.includes(nn)&&s.length<=nn.length+8)||(nn.includes(s)&&s.length>=4))return o}}
+  // "gta 6 release" opens GTA VI, but "cricket world cup" must not open the football one: extra words may only be generic
+  const extraOk=nn=>s.replace(nn,' ').split(/\s+/).filter(Boolean).every(w=>GENERIC.has(w));
+  for(const o of OFF){for(const n of [norm(o.title),norm(o.short),...o.alias.map(norm)]){const nn=n.replace(/^the /,'');if(s===nn||(s.includes(nn)&&s.length<=nn.length+8&&extraOk(nn))||(nn.includes(s)&&s.length>=4))return o}}
   return null;
 }
 const MONTHS=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
@@ -3941,7 +3945,7 @@ function setPromptError(msg){const e=$('#perr');if(msg){$('#perrText').textConte
 function openDraft(s){
   $('#cpBack').hidden=true;
   const title=s.title||'',cat=CATS.includes(s.cat)?s.cat:guessCat(title);
-  draft={title,date:s.date||'',time:s.time||'',cat,tag:s.tag||'',posts:s.posts||[],status:s.status||'mine',noteText:s.noteText||'',from:s.from||'you',claudeDate:s.from==='claude'?(s.date||''):'',sand:s.sand||CAT_SAND[cat]||SANDS[0][1],sandAuto:s.sand?'claude':'',metal:s.metal||(cat==='Trip'||cat==='Event'?'oak':'steel')};
+  draft={title,date:s.date||'',time:s.time||'',cat,tag:s.tag||'',posts:s.posts||[],status:s.status||'mine',noteText:s.noteText||'',from:s.from||'you',claudeDate:s.from&&s.from!=='you'?(s.date||''):'',sand:s.sand||CAT_SAND[cat]||SANDS[0][1],sandAuto:s.sand?'claude':'',metal:s.metal||(cat==='Trip'||cat==='Event'?'oak':'steel')};
   setPromptError(null);showPanel('draft');
   $('#dTitle').value=draft.title;$('#dDate').value=draft.date;$('#dTime').value=draft.time;
   renderCats();renderSand();renderMetal();renderDraftState();renderPreview();
@@ -3952,7 +3956,7 @@ function draftStatus(){
   const s=draft;if(!s.date)return ['unknown','nolookup'].includes(s.status)?s.status:'nodate';
   const t=parseAt(s.time?`${s.date}T${s.time}`:s.date);
   if(t<Date.now()-(s.time?0:864e5))return 'passed';
-  if(s.from==='claude'&&s.date!==s.claudeDate)return 'mine';
+  if(s.from&&s.from!=='you'&&s.date!==s.claudeDate)return 'mine';
   return ['confirmed','estimated'].includes(s.status)?s.status:'mine';
 }
 function renderDraftState(){
@@ -4041,9 +4045,15 @@ function vs(x){
   const time=date&&typeof x.time==='string'&&/^\d{2}:\d{2}$/.test(x.time)?x.time:null;
   const sand=typeof x.sand==='string'&&/^(#[0-9a-f]{6},){2}#[0-9a-f]{6}$/i.test(x.sand)?x.sand:(Array.isArray(x.sand)&&x.sand.length>=3&&x.sand.slice(0,3).every(c=>/^#[0-9a-f]{6}$/i.test(c))?x.sand.slice(0,3).join(','):'');
   const src=x.source&&typeof x.source.url==='string'&&/^https:\/\//.test(x.source.url)?{name:clean(x.source.name,60),url:x.source.url}:null;
-  return {title,category:CATS.includes(x.category)?x.category:guessCat(title),date,time,utc_offset:time&&/^[+-]\d{2}:\d{2}$/.test(x.utc_offset||'')?x.utc_offset:null,status:date?(['confirmed','estimated'].includes(x.status)?x.status:'estimated'):'unknown',why:clean(x.why,120),tagline:clean(x.tagline,100),sand:sand.toLowerCase(),source:src};
+  return {title,category:CATS.includes(x.category)?x.category:guessCat(title),date,time,utc_offset:time&&/^[+-]\d{2}:\d{2}$/.test(x.utc_offset||'')?x.utc_offset:null,status:date?(['confirmed','estimated'].includes(x.status)?x.status:'estimated'):'unknown',why:clean(x.why,120),tagline:clean(x.tagline,100),sand:sand.toLowerCase(),source:src,thumb:typeof x.thumb==='string'&&/^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(x.thumb)?x.thumb:null};
 }
+const SUGGEST_API='https://www.jamesrindos.com/api/until-suggest';
 async function research(q,signal){
+  if(!PRETTY){
+    // outside the site (a preview), try the site's search first, then fall back to Claude
+    try{const r=await fetch(SUGGEST_API+'?q='+encodeURIComponent(q),{signal});if(r.ok)return {list:((await r.json()).suggestions||[]).map(vs).filter(Boolean)}}
+    catch(e){if(signal.aborted)throw e}
+  }
   if(PRETTY){
     const r=await fetch('/api/until-suggest?q='+encodeURIComponent(q),{signal});
     if(r.status===503)return {off:true,list:[]};
@@ -4078,15 +4088,19 @@ function sgWhen(x){
 function sgItem(d,fn){
   const b=document.createElement('button');b.type='button';b.className='sg-item';
   b.innerHTML='<span class="sg-sw"></span><span class="sg-tx"><b></b><span class="sg-why"></span><span class="sg-sub"></span></span><span class="sg-go"></span>';
-  $('.sg-sw',b).innerHTML=d.sand.split(',').map(c=>`<i style="background:${c}"></i>`).join('');
+  const sw=$('.sg-sw',b);sw.innerHTML=d.sand.split(',').map(c=>`<i style="background:${c}"></i>`).join('');
+  if(d.thumb){const im=new Image();im.alt='';im.decoding='async';im.referrerPolicy='no-referrer';im.onload=()=>{sw.textContent='';sw.appendChild(im);sw.classList.add('pic')};im.src=d.thumb}
   $('b',b).textContent=d.title;$('.sg-why',b).textContent=d.why||'';$('.sg-why',b).hidden=!d.why;$('.sg-sub',b).textContent=d.sub;$('.sg-go',b).textContent=d.action;
   b.onclick=fn;return b;
 }
 function renderSuggest(){
   const box=$('#sgList'),any=sg.lib.length||sg.res.length;box.textContent='';
   $('#sgTitle').textContent=any?'Did you mean':(sg.loading?`Searching for “${sg.q}”`:`No match for “${sg.q}”`);
-  sg.lib.forEach(o=>box.appendChild(sgItem({title:o.short,why:o.tag,sub:'In the library, '+landsStr(o).replace(/^Lands /,'lands '),sand:o.sand,action:'Open'},()=>{closeDraft();$('#promptInput').value='';go(o.key)})));
-  sg.res.forEach(x=>box.appendChild(sgItem({title:x.title,why:x.why,sub:sgWhen(x)+(x.source?' · '+x.source.name:''),sand:x.sand||CAT_SAND[x.category]||SANDS[0][1],action:'Use this'},()=>useSuggestion(x))));
+  // whatever names every word they typed goes first (“cricket world cup” puts the cricket one above the football one)
+  let s=norm(sg.q);for(let i=0;i<2;i++)s=s.replace(FILLER,'');const qt=toks(s).filter(w=>!GENERIC.has(w));
+  const full=t=>{const h=toks(t);return qt.every(w=>h.some(x=>x===w||(w.length>3&&x.startsWith(w))))};
+  const rows=[...sg.lib.map(o=>({full:full([o.title,o.short,...o.alias].join(' ')),add:()=>box.appendChild(sgItem({title:o.short,why:o.tag,sub:'In the library, '+landsStr(o).replace(/^Lands /,'lands '),sand:o.sand,action:'Open'},()=>{closeDraft();$('#promptInput').value='';go(o.key)}))})),...sg.res.map(x=>({full:full(x.title),add:()=>box.appendChild(sgItem({title:x.title,why:x.why,sub:sgWhen(x)+(x.source?' · '+x.source.name:''),sand:x.sand||CAT_SAND[x.category]||SANDS[0][1],thumb:x.thumb,action:'Use this'},()=>useSuggestion(x)))}))];
+  rows.map((r,i)=>[r,i]).sort((a,b)=>(b[0].full-a[0].full)||a[1]-b[1]).forEach(([r])=>r.add());
   box.hidden=!any;$('#sgLoading').hidden=!sg.loading;
   $('#sgMsg').textContent=sg.msg;$('#sgMsg').hidden=!sg.msg;
   const l=localParse(sg.q);$('#sgNew').textContent=`Make “${l.title||clean(sg.q,60)}” yourself`;
@@ -4095,7 +4109,7 @@ function useSuggestion(x){
   let date=x.date||'',time=x.time||'';
   if(date&&time&&x.utc_offset){const d=new Date(Date.parse(`${date}T${time}:00${x.utc_offset}`));if(isFinite(d)){date=ymd(d);time=`${pad(d.getHours())}:${pad(d.getMinutes())}`}}
   const where=x.source?` Found on ${x.source.name}.`:'';
-  openDraft({title:x.title,cat:x.category,date,time,tag:x.tagline,status:date?x.status:'unknown',from:date?'claude':'you',sand:x.sand||'',posts:[],
+  openDraft({title:x.title,cat:x.category,date,time,tag:x.tagline,status:date?x.status:'unknown',from:date?(x.source&&x.source.name==='Wikipedia'?'wiki':'claude'):'you',sand:x.sand||'',posts:[],
     noteText:(date?`${x.status==='confirmed'?'Announced for':'Reported for'} ${niceDate(date,time)}.`:'No date announced yet.')+where+' Check the details, then create it.'});
   $('#cpBack').hidden=false;
 }
@@ -4117,7 +4131,7 @@ $('#cpDraft').addEventListener('submit',e=>{
   if(cta._mode==='tba')o.u=1;else{o.d=s.date;if(s.time){o.h=s.time;o.z=offsetFor(s.date,s.time)}}
   if(s.tag)o.g=s.tag;
   if(s.posts.length)o.p=s.posts.map(p=>[p.d,p.t]);
-  if(s.from==='claude'&&s.date===s.claudeDate)o.s='claude';
+  if(s.from&&s.from!=='you'&&s.date===s.claudeDate)o.s=s.from;
   const key='c.'+b64urlEnc(JSON.stringify(o));
   if(!isYours(key)){yours.unshift(key);saveYours()}
   closeDraft();$('#promptInput').value='';$('#ptyped').hidden=false;
@@ -4159,7 +4173,7 @@ function paintDetail(now){
   const rows=[['Sand left',pct],['Started',cd.startStr],['Lands',lands]];
   const sp=$('#dSpec');
   if(sp._n!==cd.key){sp._n=cd.key;sp.innerHTML=rows.map(()=>'<div><span></span><span></span></div>').join('')+(cd.src?'<div><span>Source</span><span><a target="_blank" rel="noopener"></a></span></div>':(cd.official?'':'<div><span>Source</span><span></span></div>'));
-    if(cd.src){const a=$('a',sp);a.href=cd.src[1];a.textContent=cd.src[0]+' ↗'}else if(!cd.official)sp.lastChild.lastChild.textContent=cd.from==='claude'?'Date suggested by Claude':'Your date'}
+    if(cd.src){const a=$('a',sp);a.href=cd.src[1];a.textContent=cd.src[0]+' ↗'}else if(!cd.official)sp.lastChild.lastChild.textContent=cd.from==='wiki'?'Date from Wikipedia':cd.from==='claude'?'Date suggested by Claude':'Your date'}
   const rs=$$('div',sp);rows.forEach((r,i)=>{rs[i].firstChild.textContent=r[0];rs[i].lastChild.textContent=r[1]});
   const p=isFinite(cd.target)&&!cd.tba?parts(cd.target,now):null;
   $('#stDays').textContent=!p?'Date TBA':(p.sec===0?'It’s here':`${p.d} days to go · Sand left ${(f*100).toFixed(1)}%`);
