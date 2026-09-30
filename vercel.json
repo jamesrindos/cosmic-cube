@@ -1,0 +1,40 @@
+{
+  "redirects": [
+    {
+      "source": "/until",
+      "destination": "/sands/",
+      "permanent": true
+    },
+    {
+      "source": "/until/",
+      "destination": "/sands/",
+      "permanent": true
+    },
+    {
+      "source": "/until/:path*",
+      "destination": "/sands/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/sands/:key",
+      "destination": "/api/until-share?k=:key"
+    }
+  ],
+  "functions": {
+    "api/until-og.js": {
+      "includeFiles": "api/_until/**"
+    },
+    "api/until-share.js": {
+      "includeFiles": "api/_until/**"
+    },
+    "api/until-video.js": {
+      "includeFiles": "api/_until/**",
+      "maxDuration": 30
+    },
+    "api/until-suggest.js": {
+      "maxDuration": 30
+    }
+  }
+}
