@@ -97,8 +97,12 @@ button:disabled{cursor:default;opacity:.5}
 .met .bar i.bad{background:var(--bad)}
 .met .val{color:var(--ink-3);font-family:var(--f-m);font-size:11px;min-width:34px;text-align:right}
 .met .note{grid-column:1/-1;color:var(--ink-2);font-size:13px;margin:-4px 0 2px;padding-left:2px}
-.lesson{padding:12px 14px;border-top:1px solid var(--line);color:var(--ink-2);font-size:14px;line-height:1.55}
-.lesson b{color:var(--ink);display:block;margin-bottom:4px}
+.lesson{padding:10px 14px 14px;color:var(--ink-2);font-size:14px;line-height:1.55}
+.topnote{margin:0;padding:0 14px 10px;color:var(--ink);font-size:15px;line-height:1.5}
+.topnote:empty{display:none}
+.disclose{display:flex;gap:16px;padding:4px 14px 12px;flex-wrap:wrap}
+.link{border:0;background:none;padding:0;color:var(--ink-2);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.link:hover{color:var(--ink)}
 .actions{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
 
 /* buttons */
@@ -184,6 +188,7 @@ input[type=range].kelvin::-moz-range-track{background:linear-gradient(90deg,#ff8
   .wordmark span{display:none}
   .row{grid-template-columns:70px 1fr 52px}
   .score-big{font-size:52px}
+  .score-row{flex-direction:column;align-items:flex-start;gap:4px}
   .met{grid-template-columns:96px 1fr auto}
 }
 </style>
@@ -232,8 +237,10 @@ input[type=range].kelvin::-moz-range-track{background:linear-gradient(90deg,#ff8
         <div class="score-big"><span id="score-n">0</span><small>/100</small></div>
         <div class="verdict"><b id="verdict-h"></b><span id="verdict-p"></span></div>
       </div>
-      <div class="metrics" id="metrics"></div>
-      <div class="lesson" id="lesson"></div>
+      <p class="topnote" id="topnote"></p>
+      <div class="disclose"><button class="link" id="btn-breakdown">See the breakdown</button><button class="link" id="btn-why">What the director was going for</button></div>
+      <div class="metrics" id="metrics" hidden></div>
+      <div class="lesson" id="lesson" hidden></div>
       <div class="actions">
         <button class="btn primary" id="btn-share">Share result</button>
         <button class="btn" id="btn-tweak">Keep tweaking</button>
@@ -247,7 +254,7 @@ input[type=range].kelvin::-moz-range-track{background:linear-gradient(90deg,#ff8
     <section class="card plan">
       <div class="card-h"><span class="mono">Floor plan</span><span class="mono" id="plan-live"></span></div>
       <svg id="plan" viewBox="0 0 400 400" aria-label="Top-down floor plan. Drag a light to move it."></svg>
-      <div class="hint">Drag a light to move it around the set. Camera is at the bottom.</div>
+      <div class="hint">Drag a light to place it — angle and distance come from the plan, height from the slider. Camera is at the bottom.</div>
     </section>
 
     <div class="lights" id="lights"></div>
@@ -263,24 +270,21 @@ input[type=range].kelvin::-moz-range-track{background:linear-gradient(90deg,#ff8
   <div class="box">
     <div class="box-h"><b>How to play</b><button class="x" data-close>✕</button></div>
     <div class="box-b">
-      <p>Every day there's a new scene and a director's brief. Rig the set with the lights you're given — position, height, distance, output, colour — then <b>roll camera</b>. You get one official take per difficulty per day, graded 0–100 on how close you got to what the director had in mind.</p>
-      <h4>Difficulty</h4>
+      <p>A new scene and a director's brief every day. Drag your lights around the floor plan, set height, output and colour, then <b>roll camera</b>. One take per difficulty per day, graded 0–100 against the director's own rig.</p>
       <dl>
-        <dt>Easy</dt><dd>The brief comes with a spec sheet and the fixtures are pre-chosen. Generous grading.</dd>
-        <dt>Medium</dt><dd>The director describes the look in plain language. You choose hard or soft and any gels.</dd>
-        <dt>Expert</dt><dd>You get the scene and the mood. Full fixture choice. Tight grading.</dd>
+        <dt>Easy</dt><dd>Spec sheet included, fixtures pre-chosen, forgiving.</dd>
+        <dt>Medium</dt><dd>A director's note in plain language. Hard or soft.</dd>
+        <dt>Expert</dt><dd>Scene and mood only. Every fixture, distance and gel. Strict.</dd>
       </dl>
-      <h4>Crash course</h4>
+      <h4>Cheat sheet</h4>
       <dl>
-        <dt>Key</dt><dd>The main light. Its angle decides where the shadows fall.</dd>
-        <dt>Fill</dt><dd>A weaker light from the other side that lifts the shadows.</dd>
-        <dt>Ratio</dt><dd>How much brighter the lit side of the face is than the shadow side. 2:1 is flat and friendly, 4:1 is cinematic, 8:1+ is drama.</dd>
-        <dt>Rim / back</dt><dd>A light from behind that edges the hair and shoulders so the subject separates from the background.</dd>
-        <dt>Short side</dt><dd>When a subject turns away from camera, the "short" side is the one we see less of. Lighting it is slimming and dimensional.</dd>
-        <dt>Kelvin</dt><dd>Colour temperature. 2000–3200K is candle/tungsten warm, 5600K is daylight, 7000K+ is blue shade.</dd>
-        <dt>Hard / soft</dt><dd>Small sources throw crisp shadows; big sources wrap and flatter.</dd>
+        <dt>Key</dt><dd>The main light. Its angle decides where shadows fall.</dd>
+        <dt>Fill</dt><dd>Weaker, opposite side, lifts the shadows.</dd>
+        <dt>Ratio</dt><dd>Lit side vs shadow side. 2:1 friendly, 4:1 cinematic, 8:1+ drama.</dd>
+        <dt>Back / rim</dt><dd>From behind, edges the subject off the background.</dd>
+        <dt>Kelvin</dt><dd>2000–3200K candle/tungsten, 5600K daylight, 7000K+ blue.</dd>
       </dl>
-      <p style="margin-top:12px">After your take you can keep tweaking with a live score, and flip between your rig and the director's.</p>
+      <p style="margin-top:12px;font-size:13px;color:var(--ink-3)">Mannequin head: Lee Perry-Smith scan by Infinite-Realities (CC BY). Built with three.js.</p>
     </div>
   </div>
 </div>
@@ -298,6 +302,7 @@ input[type=range].kelvin::-moz-range-track{background:linear-gradient(90deg,#ff8
 
 <div class="toast" id="toast"></div>
 
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <script type="module" src="app.js"></script>
 </body>
 </html>

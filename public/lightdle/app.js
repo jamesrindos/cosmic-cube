@@ -1,5 +1,7 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PUZZLES, FIXTURES, GELS, EPOCH } from './puzzles.js';
+import { SETS, mannequin, fixtureGizmo, placeGizmo, mat, mesh } from './sets.js';
 
 /* ───────────────────────── utils ───────────────────────── */
 const $ = (s, el = document) => el.querySelector(s);
@@ -7,7 +9,8 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, t) => a + (b - a) * t;
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
-const HY = 1.42; // head height (seated)
+let HY = 1.42; // head height: 1.42 seated, 1.62 standing (set per puzzle)
+let CEIL = 3.0, OUTDOOR = false; // lights can't go above the ceiling of the set
 const MODES = ['easy', 'medium', 'expert'];
 const MODE_LABEL = { easy: 'Easy', medium: 'Medium', expert: 'Expert' };
 const TOL_MULT = { easy: 1.7, medium: 1.0, expert: 0.62 };
@@ -55,7 +58,7 @@ function groupCenter(p) { return [0, HY, 0]; }
 function targetPoint(p, l) { return l.t >= 0 && l.t < p.subjects.length ? subjectHead(p, l.t) : groupCenter(p); }
 function lightPos(p, l) {
   const c = targetPoint(p, l), ce = Math.cos(l.el * D2R);
-  return [c[0] - l.d * Math.sin(l.az * D2R) * ce, HY + l.d * Math.sin(l.el * D2R), l.d * Math.cos(l.az * D2R) * ce];
+  return [c[0] - l.d * Math.sin(l.az * D2R) * ce, Math.min(HY + l.d * Math.sin(l.el * D2R), CEIL - 0.15), l.d * Math.cos(l.az * D2R) * ce];
 }
 const vsub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const vlen = a => Math.hypot(a[0], a[1], a[2]);
@@ -63,13 +66,14 @@ const vnorm = a => { const l = vlen(a) || 1; return [a[0] / l, a[1] / l, a[2] / 
 const vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const rotY = (v, deg) => { const c = Math.cos(deg * D2R), s = Math.sin(deg * D2R); return [v[0] * c - v[2] * s, v[1], v[0] * s + v[2] * c]; };
 function faceNormal(sub) { const t = 10 * D2R; return [-Math.sin(sub.yaw * D2R) * Math.cos(t), Math.sin(t), Math.cos(sub.yaw * D2R) * Math.cos(t)]; }
-const CAM = { single: { pos: [0, 1.46, 2.2], fov: 27, look: 1.3 }, two: { pos: [0, 1.5, 3.4], fov: 31, look: 1.22 }, three: { pos: [0, 1.55, 4.4], fov: 36, look: 1.15 } };
+const CAM = { single: { dz: 2.2, dy: 0.04, fov: 27, look: -0.12 }, two: { dz: 3.4, dy: 0.08, fov: 31, look: -0.2 }, three: { dz: 4.4, dy: 0.13, fov: 36, look: -0.27 } };
+const camPos = p => { const c = CAM[p.shot]; return [0, HY + c.dy, c.dz]; };
 
 /* ───────────────────────── illumination model + scoring ───────────────────────── */
 const AMB = 0.015;
 function analyse(p, rig) {
   const lights = rig.filter(l => l.on && l.p > 0);
-  const cam = CAM[p.shot].pos;
+  const cam = camPos(p);
   const subs = p.subjects.map((sub, j) => {
     const head = subjectHead(p, j), f = faceNormal(sub), nL = rotY(f, 60), nR = rotY(f, -60);
     const tiltF = deg => vnorm([f[0] * Math.cos(deg * D2R), f[1] * Math.cos(deg * D2R) + Math.sin(deg * D2R), f[2] * Math.cos(deg * D2R)]);
@@ -93,10 +97,11 @@ function analyse(p, rig) {
       return { l, E, Lhat, behind, fE };
     });
     const patches = [cheekL, cheekR, brow, chin];
-    const ratio = Math.min(32, Math.max(...patches) / Math.min(...patches));
+    const ratio = Math.min(32, Math.max(cheekL, cheekR) / Math.min(cheekL, cheekR)); // conventional key:fill, side to side
+    const ratioV = Math.min(32, Math.max(brow, chin) / Math.min(brow, chin)); // top-to-bottom modelling
     const expo = Math.max(...patches);
     const rims = contrib.filter(c => c.behind && c.E > 0).sort((a, b) => b.E - a.E);
-    return { front, expo, cheekL, cheekR, ratio, rim, rimStops: Math.log2((rim + 0.004) / expo), key, keyE, rimTop: rims[0] || null, contrib, bright: cheekL >= cheekR ? 'L' : 'R' };
+    return { front, expo, cheekL, cheekR, ratio, ratioV, rim, rimStops: Math.log2((rim + 0.004) / expo), key, keyE, rimTop: rims[0] || null, contrib, bright: cheekL >= cheekR ? 'L' : 'R' };
   });
   const hero = subs[Math.floor(p.subjects.length / 2)];
   const fronts = subs.map(s => s.expo);
@@ -139,9 +144,11 @@ function score(p, rig, mode) {
 
   // 2. contrast ratio
   {
-    const err = Math.abs(Math.log2(A.hero.ratio) - Math.log2(S.hero.ratio));
+    const errH = Math.abs(Math.log2(A.hero.ratio) - Math.log2(S.hero.ratio)), errV = Math.abs(Math.log2(A.hero.ratioV) - Math.log2(S.hero.ratioV));
+    const err = 0.65 * errH + 0.35 * errV;
     const s = sc(err, 0.5, 2.6, m);
     let note = s >= 1 ? `Contrast is on the money (${fmtRatio(A.hero.ratio)}).` :
+      errH < 0.6 ? (A.hero.ratioV < S.hero.ratioV ? 'Side-to-side the ratio is close, but the face is lit too evenly top to bottom — the director wanted more shadow under the brow and chin. Check the key height.' : 'Side-to-side the ratio is close, but there\'s too much top-to-bottom shadow. Bring the key down toward the eyeline.') :
       A.hero.ratio < S.hero.ratio ? `Too flat — yours is about ${fmtRatio(A.hero.ratio)}, the director wanted around ${fmtRatio(S.hero.ratio)}. Pull the fill down or move the key around.` :
         `Too contrasty — yours is about ${fmtRatio(A.hero.ratio)}, the director wanted around ${fmtRatio(S.hero.ratio)}. Add some fill.`;
     if (S.hero.bright !== A.hero.bright && Math.abs(Math.log2(A.hero.ratio)) > 0.6 && Math.abs(Math.log2(S.hero.ratio)) > 0.6) note += ' Also: the bright side of the face is the wrong side.';
@@ -239,7 +246,7 @@ function specSheet(p) {
   const r = roles(p, p.solution), A = analyse(p, p.solution);
   const lines = p.solution.map((l, i) => {
     const el = Math.round(l.el);
-    return `<div><b>${r[i] || 'Light'} ${p.solution.length > 1 ? i + 1 : ''}</b> — ${FIXTURES[l.fx].label}${l.gel !== 'none' ? ' + ' + GELS[l.gel].label + ' gel' : ''}, ${fmtAz(l.az)}, ${Math.abs(el)}° ${el < 0 ? 'below' : 'above'} eyeline, ${l.d.toFixed(1)} m, ${l.p}%, ${l.k}K${p.subjects.length > 1 ? (l.t < 0 ? ', aimed at the group' : ', aimed at ' + subjectName(p, l.t)) : ''}</div>`;
+    return `<div><b>${r[i] || 'Light'} ${p.solution.length > 1 ? i + 1 : ''}</b> — ${FIXTURES[l.fx].label}${l.gel !== 'none' ? ' + ' + GELS[l.gel].label + ' gel' : ''}, ${fmtAz(l.az)}, ${Math.abs(el)}° ${el < 0 ? 'below' : 'above'} eyeline, ${l.d.toFixed(1)} m out, ${l.p}%, ${l.k}K${p.subjects.length > 1 ? (l.t < 0 ? ', aimed at the group' : ', aimed at ' + subjectName(p, l.t)) : ''}</div>`;
   });
   lines.push(`<div><b>Ratio</b> ≈ ${fmtRatio(A.hero.ratio)}</div>`);
   return lines.join('');
@@ -265,68 +272,41 @@ const spots = [0, 1, 2].map(() => {
   s.castShadow = true; s.shadow.mapSize.set(1024, 1024); s.shadow.camera.near = 0.3; s.shadow.camera.far = 14; s.shadow.bias = -0.0004; s.shadow.normalBias = 0.01;
   s.visible = false; scene.add(s); scene.add(s.target); return s;
 });
-const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.7, metalness: 0, ...o });
-function mesh(geo, m, x = 0, y = 0, z = 0) { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; return o; }
 
+let headTemplate = null, headNormal = null, skyDome = null;
+const gizmos = [null, null, null];
 function buildSet(p) {
   while (setGroup.children.length) setGroup.remove(setGroup.children[0]);
-  scene.background = new THREE.Color(p.set.wall).multiplyScalar(0.25); hemi.color.set(p.set.wall).lerp(new THREE.Color(0xffffff), 0.3);
-  const floor = mesh(new THREE.PlaneGeometry(14, 14), mat(p.set.floor, { roughness: 0.92 })); floor.rotation.x = -Math.PI / 2; floor.castShadow = false; setGroup.add(floor);
-  const wall = mesh(new THREE.BoxGeometry(14, 4.5, 0.2), mat(p.set.wall, { roughness: 0.95 }), 0, 2.25, -3.2); wall.castShadow = false; setGroup.add(wall);
-  const props = p.set.props || [];
-  if (props.includes('desk')) {
-    const w = mat('#2b2b30', { roughness: 0.4 });
-    setGroup.add(mesh(new THREE.BoxGeometry(2.6, 0.06, 0.7), w, 0, 0.98, 0.5));
-    setGroup.add(mesh(new THREE.BoxGeometry(2.6, 0.96, 0.08), mat('#1f2a44', { roughness: 0.5 }), 0, 0.49, 0.84));
+  const env = (SETS[p.set] || SETS.interview)(setGroup, p, HY);
+  scene.background = new THREE.Color(env.bg); CEIL = env.outdoor ? 99 : (env.ceil ?? 3.0); OUTDOOR = !!env.outdoor;
+  hemi.color.set(env.sky); hemi.groundColor.set(env.ground); hemi.intensity = env.amb;
+  scene.fog = env.fog ? new THREE.FogExp2(new THREE.Color(env.bg), env.fog) : null;
+  if (skyDome) { scene.remove(skyDome); skyDome = null; }
+  if (env.outdoor) {
+    const geo = new THREE.SphereGeometry(30, 24, 12), top = new THREE.Color(env.skyTop), bot = new THREE.Color(env.skyBottom);
+    const cols = []; const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) { const t = clamp(pos.getY(i) / 30 * 1.6 + 0.2, 0, 1); const c = bot.clone().lerp(top, t); cols.push(c.r, c.g, c.b); }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+    skyDome = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false })); scene.add(skyDome);
+    if (env.stars) { const sg = new THREE.BufferGeometry(), sp = []; const rnd = mulberry(99); for (let i = 0; i < 400; i++) { const a = rnd() * Math.PI * 2, e = rnd() * 0.9 + 0.1; sp.push(Math.cos(a) * Math.cos(e) * 28, Math.sin(e) * 28, Math.sin(a) * Math.cos(e) * 28); } sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); skyDome.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, fog: false }))); }
   }
-  if (props.includes('table')) {
-    const w = mat('#3a2a1e', { roughness: 0.5 });
-    setGroup.add(mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.05, 32), w, 0, 0.74, 0.25));
-    setGroup.add(mesh(new THREE.CylinderGeometry(0.05, 0.08, 0.72, 12), w, 0, 0.36, 0.25));
-  }
-  if (props.includes('chart')) {
-    const m = mat('#9a9a9a', { roughness: 0.9 });
-    for (let y = 0.6; y <= 2.2; y += 0.2) { const bar = mesh(new THREE.BoxGeometry(y % 0.4 < 0.01 ? 3.2 : 2.6, 0.02, 0.01), m, 0, y, -3.09); bar.castShadow = false; setGroup.add(bar); }
-  }
-  p.subjects.forEach(s => setGroup.add(figure(s)));
-  const c = CAM[p.shot]; camera.position.set(...c.pos); camera.fov = c.fov; camera.updateProjectionMatrix(); camera.lookAt(0, c.look, 0);
+  p.subjects.forEach(s => { const mq = headTemplate ? mannequin({ head: headTemplate, normalMap: headNormal, tint: s.tint, pose: p.pose, yaw: s.yaw, HY }) : fallbackFigure(s); mq.position.x = s.x; setGroup.add(mq); });
+  const c = CAM[p.shot]; camera.position.set(...camPos(p)); camera.fov = c.fov; camera.updateProjectionMatrix(); camera.lookAt(0, HY + c.look, 0);
 }
-function figure(s) {
-  const g = new THREE.Group(); g.position.set(s.x, 0, 0); g.rotation.y = s.yaw * D2R;
-  const skin = mat(s.skin, { roughness: 0.42 }), hair = mat(s.hair, { roughness: 0.5 }), cloth = mat(s.shirt, { roughness: 0.62 }), dark = mat('#101010', { roughness: 0.45 });
-  const stool = mat('#2a2a2a', { roughness: 0.6, metalness: 0.3 });
-  // stool
-  g.add(mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.04, 24), stool, 0, 0.72, 0));
-  g.add(mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.7, 8), stool, 0, 0.36, 0));
-  g.add(mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.02, 24), stool, 0, 0.02, 0));
-  // body
-  const torso = mesh(new THREE.CapsuleGeometry(0.19, 0.3, 6, 16), cloth, 0, 0.98, 0); torso.scale.set(1.05, 1, 0.68); g.add(torso);
-  const collar = mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.05, 16), cloth, 0, 1.24, 0); g.add(collar);
-  g.add(mesh(new THREE.SphereGeometry(0.095, 20, 14), cloth, -0.215, 1.2, 0));
-  g.add(mesh(new THREE.SphereGeometry(0.095, 20, 14), cloth, 0.215, 1.2, 0));
-  for (const sx of [-1, 1]) {
-    const ua = mesh(new THREE.CapsuleGeometry(0.052, 0.3, 4, 10), cloth, sx * 0.265, 1.03, 0.02); ua.rotation.z = sx * -0.12; g.add(ua);
-    const fa = mesh(new THREE.CapsuleGeometry(0.045, 0.28, 4, 10), cloth, sx * 0.25, 0.86, 0.2); fa.rotation.x = Math.PI / 2 - 0.25; g.add(fa);
-    g.add(mesh(new THREE.SphereGeometry(0.045, 14, 10), skin, sx * 0.24, 0.84, 0.37));
-    g.add(mesh(new THREE.BoxGeometry(0.15, 0.13, 0.45), dark, sx * 0.1, 0.72, 0.25));
-    g.add(mesh(new THREE.BoxGeometry(0.13, 0.46, 0.14), dark, sx * 0.1, 0.42, 0.44));
-  }
-  g.add(mesh(new THREE.CylinderGeometry(0.05, 0.058, 0.16, 16), skin, 0, 1.3, 0.0));
-  // head
-  const head = mesh(new THREE.SphereGeometry(0.115, 40, 30), skin, 0, HY, 0); head.scale.set(0.9, 1.1, 0.98); g.add(head);
-  const brow = mesh(new THREE.SphereGeometry(0.1, 20, 12), skin, 0, HY + 0.035, 0.028); brow.scale.set(0.86, 0.26, 0.9); g.add(brow);
-  const nose = mesh(new THREE.ConeGeometry(0.02, 0.05, 12), skin, 0, HY - 0.012, 0.118); nose.rotation.x = Math.PI / 2; g.add(nose);
-  const chin = mesh(new THREE.SphereGeometry(0.06, 16, 12), skin, 0, HY - 0.085, 0.035); chin.scale.set(1, 0.7, 0.9); g.add(chin);
-  for (const sx of [-1, 1]) {
-    const eye = mesh(new THREE.SphereGeometry(0.014, 12, 8), dark, sx * 0.04, HY + 0.012, 0.096); g.add(eye);
-    g.add(mesh(new THREE.SphereGeometry(0.03, 12, 8), skin, sx * 0.1, HY - 0.005, -0.01));
-  }
-  const mouth = mesh(new THREE.BoxGeometry(0.045, 0.008, 0.01), mat('#6a3a3a'), 0, HY - 0.058, 0.108); g.add(mouth);
-  const hairGeo = new THREE.SphereGeometry(0.122, 40, 24, 0, Math.PI * 2, 0, Math.PI * 0.56);
-  const hr = mesh(hairGeo, hair, 0, HY + 0.015, -0.015); hr.scale.set(0.92, 1.08, 1.0); g.add(hr);
-  return g;
+function fallbackFigure(s) {
+  const g = new THREE.Group(); g.position.set(s.x, 0, 0); const m = mat(s.tint, { roughness: 0.55 });
+  g.add(mesh(new THREE.SphereGeometry(0.115, 32, 24), m, 0, HY, 0)); g.add(mesh(new THREE.CapsuleGeometry(0.17, 0.3, 6, 16), m, 0, HY - 0.45, 0)); return g;
 }
-
+async function loadHead() {
+  try {
+    const gltf = await new GLTFLoader().loadAsync('assets/head.glb');
+    let m = null; gltf.scene.traverse(o => { if (o.isMesh && !m) m = o; });
+    const bb = new THREE.Box3().setFromObject(m); const sc = 0.42 / (bb.max.y - bb.min.y);
+    const geo = m.geometry.clone(); geo.applyMatrix4(m.matrixWorld); geo.scale(sc, sc, sc); geo.computeVertexNormals();
+    headTemplate = new THREE.Mesh(geo, mat('#c9b2a0'));
+    headNormal = await new THREE.TextureLoader().loadAsync('assets/head-normal.jpg');
+  } catch (e) { console.warn('head model failed to load, using fallback', e); }
+}
 function applyRig(p, rig) {
   spots.forEach((s, i) => {
     const l = rig[i];
@@ -336,6 +316,15 @@ function applyRig(p, rig) {
     s.color.setRGB(c[0], c[1], c[2], THREE.LinearSRGBColorSpace);
     s.intensity = (l.p / 100) * 9 * fx.eff * OUTPUT_K;
     s.angle = fx.angle; s.penumbra = fx.pen; s.shadow.radius = fx.blur; s.shadow.blurSamples = 8 + fx.blur;
+  });
+  // visible fixtures
+  spots.forEach((s, i) => {
+    const l = rig[i], on = l && l.on && l.p > 0;
+    if (gizmos[i] && (!on || gizmos[i].userData.fx !== l.fx)) { scene.remove(gizmos[i]); gizmos[i] = null; }
+    if (!on || OUTDOOR) return;
+    if (!gizmos[i]) { gizmos[i] = fixtureGizmo(l.fx); gizmos[i].userData.fx = l.fx; scene.add(gizmos[i]); }
+    const c = lightRGB(l); const face = gizmos[i].userData.face; face.emissive.setRGB(c[0], c[1], c[2], THREE.LinearSRGBColorSpace); face.emissiveIntensity = 0.6 + 3 * l.p / 100;
+    placeGizmo(gizmos[i], lightPos(p, l), targetPoint(p, l), l.fx, CEIL);
   });
 }
 function resize() {
@@ -385,7 +374,7 @@ const PS = 38, PCX = 200, PCY = 226;
 const toPlan = (x, z) => [PCX + x * PS, PCY + z * PS];
 function drawPlan() {
   const p = puzzle, r = view === 'theirs' ? p.solution : rig(), locked = view === 'theirs' || (done() && !tweaking);
-  const camPos = CAM[p.shot].pos, cp = toPlan(camPos[0], Math.min(camPos[2], 3.55));
+  const cpos = camPos(p), cp = toPlan(cpos[0], Math.min(cpos[2], 3.55));
   const rl = roles(p, r);
   let s = `<rect x="0" y="0" width="400" height="400" rx="10" fill="#111114"/>`;
   s += `<line x1="0" y1="${PCY - 3.2 * PS}" x2="400" y2="${PCY - 3.2 * PS}" stroke="#2a2a31" stroke-width="6"/>`;
@@ -439,21 +428,19 @@ function buildCards() {
   lightsEl.innerHTML = '';
   rig().forEach((l, i) => {
     const el = document.createElement('div'); el.className = 'light'; el.dataset.i = i;
-    const multi = puzzle.subjects.length > 1;
+    const multi = puzzle.subjects.length > 1, usesGel = puzzle.solution.some(l => l.gel !== 'none');
     const fxOpts = Object.entries(FIXTURES).map(([k, f]) => `<option value="${k}">${f.label}</option>`).join('');
     const gelOpts = Object.entries(GELS).map(([k, g]) => `<option value="${k}">${g.label}</option>`).join('');
     el.innerHTML = `
       <div class="lh"><span class="dot"></span><span class="nm">Light ${i + 1}<small class="role"></small></span><button class="sw" data-k="on" aria-label="Light ${i + 1} on/off"></button></div>
       <div class="lb">
         ${multi ? `<div class="row sel"><label>Aim at</label><div class="seg" data-k="t"><button data-v="-1">Group</button>${puzzle.subjects.map((_, j) => `<button data-v="${j}">${subjectName(puzzle, j)[0].toUpperCase() + subjectName(puzzle, j).slice(1)}</button>`).join('')}</div></div>` : ''}
-        <div class="row sel"><label>Fixture</label>
-          ${mode === 'easy' ? `<div class="fixed" style="color:var(--ink);font-size:13px"></div>` : mode === 'medium' ? `<div class="seg" data-k="fx"><button data-v="fresnel">Hard</button><button data-v="softbox">Soft</button></div>` : `<select data-k="fx">${fxOpts}</select>`}
-        </div>
-        ${mode !== 'easy' ? `<div class="fxdesc"></div>` : ''}
-        <div class="row sel"><label>Gel</label>${mode === 'easy' ? `<div class="fixedgel" style="color:var(--ink);font-size:13px"></div>` : `<select data-k="gel">${gelOpts}</select>`}</div>
+        ${mode === 'easy' ? '' : `<div class="row sel"><label>Fixture</label>${mode === 'medium' ? `<div class="seg" data-k="fx"><button data-v="fresnel">Hard</button><button data-v="softbox">Soft</button></div>` : `<select data-k="fx">${fxOpts}</select>`}</div>`}
+        ${mode === 'expert' ? `<div class="fxdesc"></div>` : ''}
+        ${mode === 'expert' || usesGel ? `<div class="row sel"><label>Gel</label>${mode === 'easy' ? `<div class="fixedgel" style="color:var(--ink);font-size:13px"></div>` : `<select data-k="gel">${gelOpts}</select>`}</div>` : ''}
         <div class="row"><label>Angle</label><input type="range" data-k="az" min="-180" max="180" step="1"><output></output></div>
         <div class="row"><label>Height</label><input type="range" data-k="el" min="-45" max="85" step="1"><output></output></div>
-        <div class="row"><label>Distance</label><input type="range" data-k="d" min="0.8" max="5" step="0.1"><output></output></div>
+        ${mode === 'expert' ? `<div class="row"><label>Distance</label><input type="range" data-k="d" min="0.8" max="5" step="0.1"><output></output></div>` : ''}
         <div class="row"><label>Output</label><input type="range" data-k="p" min="0" max="100" step="1"><output></output></div>
         <div class="row"><label>Kelvin</label><input type="range" class="kelvin" data-k="k" min="2000" max="9000" step="100"><output></output></div>
       </div>`;
@@ -517,9 +504,11 @@ function renderResult(res, animate) {
   const n = $('#score-n');
   if (animate) { const t0 = performance.now(); const step = t => { const u = clamp((t - t0) / 1100, 0, 1); n.textContent = Math.round(res.total * (1 - Math.pow(1 - u, 3))); if (u < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
   else n.textContent = res.total;
-  $('#metrics').innerHTML = res.metrics.map(m => `<div class="met"><span class="lab">${m.label}</span><span class="bar"><i class="${m.s >= .8 ? '' : m.s >= .5 ? 'mid' : 'bad'}" style="width:${animate ? 0 : Math.round(m.s * 100)}%"></i></span><span class="val">${m.val}</span><span class="note">${m.note}</span></div>`).join('');
-  if (animate) requestAnimationFrame(() => requestAnimationFrame(() => $$('#metrics .bar i').forEach((b, i) => b.style.width = Math.round(res.metrics[i].s * 100) + '%')));
-  $('#lesson').innerHTML = `<b>What the director was going for</b>${puzzle.lesson}`;
+  const worst = [...res.metrics].sort((a, b) => a.s - b.s)[0];
+  $('#topnote').textContent = res.total >= 95 ? '' : worst.note;
+  $('#metrics').hidden = true; $('#btn-breakdown').textContent = 'See the breakdown'; $('#lesson').hidden = true; $('#btn-why').textContent = 'What the director was going for';
+  $('#metrics').innerHTML = res.metrics.map(m => `<div class="met"><span class="lab">${m.label}</span><span class="bar"><i class="${m.s >= .8 ? '' : m.s >= .5 ? 'mid' : 'bad'}" data-w="${Math.round(m.s * 100)}" style="width:0%"></i></span><span class="val">${m.val}</span><span class="note">${m.note}</span></div>`).join('');
+  $('#lesson').textContent = puzzle.lesson;
   const next = MODES[MODES.indexOf(mode) + 1];
   const nb = $('#btn-next-mode'); nb.hidden = !next || !!results[dayKey]?.[next]; if (next) nb.textContent = `Try ${MODE_LABEL[next]} →`;
 }
@@ -593,6 +582,8 @@ $('#btn-share').onclick = async () => {
 };
 $$('#cmp button').forEach(b => b.onclick = () => { view = b.dataset.view; update(); });
 $('#btn-help').onclick = () => $('#m-help').hidden = false;
+$('#btn-breakdown').onclick = () => { const m = $('#metrics'); m.hidden = !m.hidden; $('#btn-breakdown').textContent = m.hidden ? 'See the breakdown' : 'Hide the breakdown'; if (!m.hidden) $$('#metrics .bar i').forEach((b, i) => b.style.width = b.dataset.w + '%'); };
+$('#btn-why').onclick = () => { const l = $('#lesson'); l.hidden = !l.hidden; };
 $('#btn-practice').onclick = () => { const others = PUZZLES.filter(p => p.id !== puzzle.id); const pick = others[Math.floor(Math.random() * others.length)]; location.href = `./?p=${pick.id}&mode=${mode}`; };
 $('#btn-stats').onclick = showStats;
 $$('.modal').forEach(m => { m.onclick = e => { if (e.target === m || e.target.closest('[data-close]')) m.hidden = true; }; });
@@ -603,6 +594,8 @@ if (!store.get('ld_seen_help', false)) { $('#m-help').hidden = false; store.set(
 const tcEl = $('#tc'), t0 = performance.now();
 setInterval(() => { const f = Math.floor((performance.now() - t0) / 1000 * 24); const s = Math.floor(f / 24), m = Math.floor(s / 60), h = Math.floor(m / 60); tcEl.textContent = [h, m % 60, s % 60, f % 24].map(x => String(x).padStart(2, '0')).join(':'); }, 1000 / 24);
 
+HY = puzzle.pose === 'standing' ? 1.62 : 1.42;
+await loadHead();
 buildSet(puzzle);
 switchMode(mode);
 resize();
