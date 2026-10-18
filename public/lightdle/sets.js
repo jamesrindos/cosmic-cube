@@ -24,18 +24,21 @@ export function mannequin({ head, normalMap, tint, pose, yaw, HY }) {
   const bustBottom = HY + 0.14 - (bb.max.y - bb.min.y);
   const seated = pose !== 'standing';
   const hip = seated ? 0.72 : 0.86;
-  // torso (dress-form) from just inside the bust down to the hips
-  const torsoH = bustBottom + 0.06 - hip;
-  const torso = mesh(cyl(0.165, 0.135, torsoH, 20), clay, 0, hip + torsoH / 2, 0); torso.scale.z = 0.68; g.add(torso);
-  const pelvis = mesh(sph(0.15, 20), clay, 0, hip, 0); pelvis.scale.set(1.05, 0.55, 0.7); g.add(pelvis);
-  // arms
+  // the scan is cut off just below the collarbones (~0.45 m across the shoulder caps, base set back).
+  // chest: an ellipsoid tucked up inside the bust's shoulder mass so the seam disappears
+  const chest = mesh(sph(1, 28), clay, 0, bustBottom + 0.005, 0.0); chest.scale.set(0.185, 0.105, 0.1); g.add(chest);
+  // torso: tapered, narrower than the shoulders, down to the hips
+  const torsoTop = bustBottom + 0.02, torsoH = torsoTop - hip;
+  const torso = mesh(cyl(0.15, 0.12, torsoH, 24), clay, 0, hip + torsoH / 2, 0.0); torso.scale.z = 0.62; g.add(torso);
+  const pelvis = mesh(sph(0.15, 20), clay, 0, hip, 0); pelvis.scale.set(1.0, 0.5, 0.68); g.add(pelvis);
+  // arms: hang from the bust's own shoulder caps, joints tucked just inside them
   for (const sx of [-1, 1]) {
-    const sy = bustBottom + 0.1, sxp = sx * 0.21;
-    g.add(mesh(sph(0.052), joint, sxp, sy, 0));
-    const ua = mesh(cap(0.045, 0.24), clay, sxp + sx * 0.03, sy - 0.16, 0.01); ua.rotation.z = sx * -0.1; g.add(ua);
-    const ey = sy - 0.32; g.add(mesh(sph(0.042), joint, sxp + sx * 0.05, ey, 0.01));
-    if (seated) { const fa = mesh(cap(0.038, 0.22), clay, sxp + sx * 0.03, ey - 0.07, 0.15); fa.rotation.x = PI / 2 - 0.35; g.add(fa); g.add(mesh(sph(0.04), joint, sxp + sx * 0.02, ey - 0.13, 0.3)); }
-    else { const fa = mesh(cap(0.038, 0.22), clay, sxp + sx * 0.055, ey - 0.16, 0.02); g.add(fa); g.add(mesh(sph(0.04), joint, sxp + sx * 0.055, ey - 0.33, 0.03)); }
+    const sy = bustBottom + 0.045, sxp = sx * 0.205;
+    g.add(mesh(sph(0.042), joint, sxp, sy, 0));
+    const ua = mesh(cap(0.04, 0.23), clay, sxp + sx * 0.035, sy - 0.16, 0.01); ua.rotation.z = sx * -0.1; g.add(ua);
+    const ey = sy - 0.31; g.add(mesh(sph(0.036), joint, sxp + sx * 0.05, ey, 0.01));
+    if (seated) { const fa = mesh(cap(0.033, 0.22), clay, sxp + sx * 0.04, ey - 0.07, 0.15); fa.rotation.x = PI / 2 - 0.35; g.add(fa); g.add(mesh(sph(0.036), joint, sxp + sx * 0.03, ey - 0.13, 0.3)); }
+    else { const fa = mesh(cap(0.033, 0.22), clay, sxp + sx * 0.06, ey - 0.16, 0.02); g.add(fa); g.add(mesh(sph(0.036), joint, sxp + sx * 0.06, ey - 0.33, 0.03)); }
   }
   // legs
   for (const sx of [-1, 1]) {
