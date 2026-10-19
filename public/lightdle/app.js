@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PUZZLES, FIXTURES, GELS, EPOCH } from './puzzles.js';
-import { SETS, mannequin, fixtureGizmo, placeGizmo, mat, mesh } from './sets.js';
+import { SETS, mannequin, prepareMannequin, trimHead, fixtureGizmo, placeGizmo, mat, mesh } from './sets.js';
 
 /* ───────────────────────── utils ───────────────────────── */
 const $ = (s, el = document) => el.querySelector(s);
@@ -273,7 +273,7 @@ const spots = [0, 1, 2].map(() => {
   s.visible = false; scene.add(s); scene.add(s.target); return s;
 });
 
-let headTemplate = null, headNormal = null, skyDome = null;
+let bodyTemplate = null, headGeo = null, headNormal = null, skyDome = null;
 const gizmos = [null, null, null];
 function buildSet(p) {
   while (setGroup.children.length) setGroup.remove(setGroup.children[0]);
@@ -290,22 +290,20 @@ function buildSet(p) {
     skyDome = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false })); scene.add(skyDome);
     if (env.stars) { const sg = new THREE.BufferGeometry(), sp = []; const rnd = mulberry(99); for (let i = 0; i < 400; i++) { const a = rnd() * Math.PI * 2, e = rnd() * 0.9 + 0.1; sp.push(Math.cos(a) * Math.cos(e) * 28, Math.sin(e) * 28, Math.sin(a) * Math.cos(e) * 28); } sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); skyDome.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, fog: false }))); }
   }
-  p.subjects.forEach(s => { const mq = headTemplate ? mannequin({ head: headTemplate, normalMap: headNormal, tint: s.tint, pose: p.pose, yaw: s.yaw, HY }) : fallbackFigure(s); mq.position.x = s.x; setGroup.add(mq); });
+  p.subjects.forEach(s => { const mq = bodyTemplate ? mannequin({ body: bodyTemplate, headGeo, normalMap: headNormal, tint: s.tint, pose: p.pose, yaw: s.yaw }).group : fallbackFigure(s); mq.position.x = s.x; setGroup.add(mq); });
   const c = CAM[p.shot]; camera.position.set(...camPos(p)); camera.fov = c.fov; camera.updateProjectionMatrix(); camera.lookAt(0, HY + c.look, 0);
 }
 function fallbackFigure(s) {
   const g = new THREE.Group(); g.position.set(s.x, 0, 0); const m = mat(s.tint, { roughness: 0.55 });
   g.add(mesh(new THREE.SphereGeometry(0.115, 32, 24), m, 0, HY, 0)); g.add(mesh(new THREE.CapsuleGeometry(0.17, 0.3, 6, 16), m, 0, HY - 0.45, 0)); return g;
 }
-async function loadHead() {
+async function loadModels() {
   try {
-    const gltf = await new GLTFLoader().loadAsync('assets/head.glb');
-    let m = null; gltf.scene.traverse(o => { if (o.isMesh && !m) m = o; });
-    const bb = new THREE.Box3().setFromObject(m); const sc = 0.42 / (bb.max.y - bb.min.y);
-    const geo = m.geometry.clone(); geo.applyMatrix4(m.matrixWorld); geo.scale(sc, sc, sc); geo.computeVertexNormals();
-    headTemplate = new THREE.Mesh(geo, mat('#c9b2a0'));
-    headNormal = await new THREE.TextureLoader().loadAsync('assets/head-normal.jpg');
-  } catch (e) { console.warn('head model failed to load, using fallback', e); }
+    const loader = new GLTFLoader();
+    const [body, head, nm] = await Promise.all([loader.loadAsync('assets/body.glb'), loader.loadAsync('assets/head.glb'), new THREE.TextureLoader().loadAsync('assets/head-normal.jpg')]);
+    let hm = null; head.scene.updateMatrixWorld(true); head.scene.traverse(o => { if (o.isMesh && !hm) hm = o; });
+    headGeo = trimHead(hm, 0.17, 0.46); headNormal = nm; bodyTemplate = body.scene;
+  } catch (e) { console.warn('models failed to load, using fallback', e); }
 }
 function applyRig(p, rig) {
   spots.forEach((s, i) => {
@@ -594,8 +592,8 @@ if (!store.get('ld_seen_help', false)) { $('#m-help').hidden = false; store.set(
 const tcEl = $('#tc'), t0 = performance.now();
 setInterval(() => { const f = Math.floor((performance.now() - t0) / 1000 * 24); const s = Math.floor(f / 24), m = Math.floor(s / 60), h = Math.floor(m / 60); tcEl.textContent = [h, m % 60, s % 60, f % 24].map(x => String(x).padStart(2, '0')).join(':'); }, 1000 / 24);
 
-HY = puzzle.pose === 'standing' ? 1.62 : 1.42;
-await loadHead();
+await loadModels();
+HY = bodyTemplate ? prepareMannequin({ body: bodyTemplate, headGeo, normalMap: headNormal }, puzzle.pose).HY : (puzzle.pose === 'standing' ? 1.62 : 1.42);
 buildSet(puzzle);
 switchMode(mode);
 resize();

@@ -11,51 +11,69 @@ const sph = (r, s = 16) => new THREE.SphereGeometry(r, s, Math.max(8, s / 2));
 const cap = (r, l) => new THREE.CapsuleGeometry(r, l, 4, 12);
 
 /* ───────────── mannequin ───────────── */
-// head: a Mesh template (the scanned bust, already scaled so its height is ~0.42 m)
-export function mannequin({ head, normalMap, tint, pose, yaw, HY }) {
-  const g = new THREE.Group(); g.rotation.y = yaw * PI / 180;
-  const clay = mat(tint, { roughness: 0.55 });
-  const headMat = mat(tint, { roughness: 0.52, normalMap, normalScale: new THREE.Vector2(0.55, 0.55) });
-  const joint = mat(new THREE.Color(tint).multiplyScalar(0.8), { roughness: 0.45 });
-  // bust: top of bust ≈ HY + 0.14 (head centre sits a little above the bust's centre)
-  const bust = head.clone(); bust.material = headMat; bust.castShadow = bust.receiveShadow = true;
-  const bb = new THREE.Box3().setFromObject(bust); bust.position.y = HY + 0.14 - bb.max.y; bust.position.x = -(bb.min.x + bb.max.x) / 2; bust.position.z = -(bb.min.z + bb.max.z) / 2 - 0.02;
-  g.add(bust);
-  const bustBottom = HY + 0.14 - (bb.max.y - bb.min.y);
-  const seated = pose !== 'standing';
-  const hip = seated ? 0.72 : 0.86;
-  // the scan is cut off just below the collarbones (~0.45 m across the shoulder caps, base set back).
-  // chest: an ellipsoid tucked up inside the bust's shoulder mass so the seam disappears
-  const chest = mesh(sph(1, 28), clay, 0, bustBottom + 0.005, 0.0); chest.scale.set(0.185, 0.105, 0.1); g.add(chest);
-  // torso: tapered, narrower than the shoulders, down to the hips
-  const torsoTop = bustBottom + 0.02, torsoH = torsoTop - hip;
-  const torso = mesh(cyl(0.15, 0.12, torsoH, 24), clay, 0, hip + torsoH / 2, 0.0); torso.scale.z = 0.62; g.add(torso);
-  const pelvis = mesh(sph(0.15, 20), clay, 0, hip, 0); pelvis.scale.set(1.0, 0.5, 0.68); g.add(pelvis);
-  // arms: hang from the bust's own shoulder caps, joints tucked just inside them
-  for (const sx of [-1, 1]) {
-    const sy = bustBottom + 0.045, sxp = sx * 0.205;
-    g.add(mesh(sph(0.042), joint, sxp, sy, 0));
-    const ua = mesh(cap(0.04, 0.23), clay, sxp + sx * 0.035, sy - 0.16, 0.01); ua.rotation.z = sx * -0.1; g.add(ua);
-    const ey = sy - 0.31; g.add(mesh(sph(0.036), joint, sxp + sx * 0.05, ey, 0.01));
-    if (seated) { const fa = mesh(cap(0.033, 0.22), clay, sxp + sx * 0.04, ey - 0.07, 0.15); fa.rotation.x = PI / 2 - 0.35; g.add(fa); g.add(mesh(sph(0.036), joint, sxp + sx * 0.03, ey - 0.13, 0.3)); }
-    else { const fa = mesh(cap(0.033, 0.22), clay, sxp + sx * 0.06, ey - 0.16, 0.02); g.add(fa); g.add(mesh(sph(0.036), joint, sxp + sx * 0.06, ey - 0.33, 0.03)); }
+// A Mixamo X Bot body (CC0-style sample from the three.js examples) posed by bone, with the
+// Lee Perry-Smith head scan mounted on its neck so faces actually take light.
+import { clone as skelClone } from 'three/addons/utils/SkeletonUtils.js';
+const D = PI / 180;
+export let SEAT = 0.64; // seat height, measured from the posed model's hips (set by prepareMannequin)
+export function trimHead(headMesh, cut = 0.17, height = 0.46) {
+  const src = headMesh.geometry.index ? headMesh.geometry.toNonIndexed() : headMesh.geometry.clone();
+  src.applyMatrix4(headMesh.matrixWorld);
+  const bb = new THREE.Box3().setFromBufferAttribute(src.attributes.position); const sc = height / (bb.max.y - bb.min.y); src.scale(sc, sc, sc); src.computeBoundingBox();
+  const y0 = src.boundingBox.min.y + cut, pos = src.attributes.position, nrm = src.attributes.normal, uv = src.attributes.uv; const P = [], N = [], U = [];
+  for (let i = 0; i < pos.count; i += 3) {
+    if (pos.getY(i) < y0 || pos.getY(i + 1) < y0 || pos.getY(i + 2) < y0) continue;
+    for (let j = 0; j < 3; j++) { P.push(pos.getX(i + j), pos.getY(i + j), pos.getZ(i + j)); N.push(nrm.getX(i + j), nrm.getY(i + j), nrm.getZ(i + j)); if (uv) U.push(uv.getX(i + j), uv.getY(i + j)); }
   }
-  // legs
-  for (const sx of [-1, 1]) {
-    const hx = sx * 0.1;
-    if (seated) {
-      const th = mesh(cap(0.07, 0.3), clay, hx, hip - 0.02, 0.2); th.rotation.x = PI / 2; g.add(th);
-      g.add(mesh(sph(0.065), joint, hx, hip - 0.04, 0.4));
-      g.add(mesh(cap(0.055, 0.32), clay, hx, hip - 0.28, 0.44));
-      const ft = mesh(box(0.09, 0.05, 0.22), clay, hx, 0.03, 0.5); g.add(ft);
-    } else {
-      g.add(mesh(cap(0.07, 0.32), clay, hx, hip - 0.24, 0));
-      g.add(mesh(sph(0.065), joint, hx, hip - 0.46, 0));
-      g.add(mesh(cap(0.055, 0.32), clay, hx, hip - 0.68, 0));
-      g.add(mesh(box(0.09, 0.05, 0.24), clay, hx, 0.03, 0.05));
-    }
-  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); if (uv) g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
+  g.computeBoundingBox(); const b = g.boundingBox; g.translate(-(b.min.x + b.max.x) / 2, -b.min.y, -(b.min.z + b.max.z) / 2);
   return g;
+}
+export function mannequin({ body, headGeo, normalMap, tint, pose, yaw }) {
+  const rig = skelClone(body);
+  const base = new THREE.Color(tint);
+  const surf = mat(base, { roughness: 0.58 }), jnt = mat(base.clone().multiplyScalar(0.78), { roughness: 0.45 });
+  rig.traverse(o => { if (o.isMesh || o.isSkinnedMesh) { o.castShadow = o.receiveShadow = true; o.frustumCulled = false; o.material = /joint/i.test(o.name) ? jnt : surf; } });
+  const B = {}; rig.traverse(o => { if (o.isBone) B[o.name.replace('mixamorig', '')] = o; });
+  const P = (b, x, y, z) => { if (B[b]) B[b].rotation.set(x * D, y * D, z * D); };
+  const seated = pose !== 'standing';
+  const bodyYaw = yaw * 0.55, neckYaw = yaw - bodyYaw;
+  P('Neck', -4, neckYaw, 0);
+  if (seated) {
+    P('LeftArm', 8, 0, -72); P('RightArm', 8, 0, 72);
+    P('LeftForeArm', 0, -62, 0); P('RightForeArm', 0, 62, 0);
+    P('LeftUpLeg', -84, 0, 4); P('RightUpLeg', -84, 0, -4);
+    P('LeftLeg', 86, 0, 0); P('RightLeg', 86, 0, 0);
+    P('LeftFoot', 0, 0, 0); P('RightFoot', 0, 0, 0);
+    P('Spine', 4, 0, 0);
+  } else {
+    P('LeftArm', 0, 0, -76); P('RightArm', 0, 0, 76);
+    P('LeftForeArm', 0, -10, 0); P('RightForeArm', 0, 10, 0);
+    P('LeftUpLeg', 0, 0, 3); P('RightUpLeg', 0, 0, -3);
+  }
+  // swap heads
+  if (headGeo && B.Head && B.Neck) {
+    B.Head.scale.setScalar(0.001);
+    const holder = new THREE.Group(); B.Neck.add(holder);
+    const ws = new THREE.Vector3(); rig.updateMatrixWorld(true); B.Neck.getWorldScale(ws); holder.scale.setScalar(1 / ws.y);
+    holder.position.set(0, 0.05, 0.0);
+    const hm = new THREE.Mesh(headGeo, mat(base, { roughness: 0.52, normalMap, normalScale: new THREE.Vector2(0.55, 0.55) })); hm.castShadow = hm.receiveShadow = true;
+    holder.add(hm);
+  }
+  rig.updateMatrixWorld(true);
+  // ground the figure: lowest of the foot bones minus the sole
+  const v = new THREE.Vector3(); let minY = 9;
+  for (const n of ['LeftFoot', 'RightFoot', 'LeftToeBase', 'RightToeBase', 'LeftToe_End', 'RightToe_End']) if (B[n]) { B[n].getWorldPosition(v); minY = Math.min(minY, v.y); }
+  const sole = seated ? 0.06 : 0.1;
+  const g = new THREE.Group(); g.add(rig); rig.position.y = -(minY - sole); g.rotation.y = bodyYaw * D; g.updateMatrixWorld(true);
+  B.Head.getWorldPosition(v); const eyeY = v.y + 0.09; B.Hips.getWorldPosition(v); const hipY = v.y;
+  return { group: g, eyeY, hipY };
+}
+export function prepareMannequin(parts, pose) {
+  // measure a reference figure so the camera, lights and seats agree with the model
+  const m = mannequin({ ...parts, tint: '#888', pose, yaw: 0 });
+  SEAT = m.hipY - 0.07;
+  return { HY: m.eyeY, hipY: m.hipY };
 }
 
 /* ───────────── light fixtures (visual only) ───────────── */
@@ -107,17 +125,17 @@ function room(g, { w = 9, d = 7, h = 3.2, wall, floor, ceiling = null, back = -3
   if (ceiling) { const c = mesh(box(w, 0.2, d + 6), mat(ceiling, { roughness: 1 }), 0, h + 0.1, (back + 3) / 2, false); g.add(c); }
 }
 function stool(g, x, z, yaw, color = '#2a2a2e') {
-  const m = mat(color, { roughness: 0.5, metalness: 0.3 }); const s = new THREE.Group(); s.position.set(x, 0, z); s.rotation.y = yaw * PI / 180;
-  s.add(mesh(cyl(0.19, 0.19, 0.04, 24), m, 0, 0.7, 0)); s.add(mesh(cyl(0.025, 0.025, 0.68, 8), m, 0, 0.35, 0)); s.add(mesh(cyl(0.22, 0.22, 0.02, 24), m, 0, 0.01, 0)); g.add(s);
+  const m = mat(color, { roughness: 0.5, metalness: 0.3 }); const s = new THREE.Group(); s.position.set(x, 0, z); s.rotation.y = yaw * PI / 180; const h = SEAT;
+  s.add(mesh(cyl(0.19, 0.19, 0.04, 24), m, 0, h, 0)); s.add(mesh(cyl(0.025, 0.025, h - 0.02, 8), m, 0, h / 2, 0)); s.add(mesh(cyl(0.22, 0.22, 0.02, 24), m, 0, 0.01, 0)); g.add(s);
 }
 function chair(g, x, z, yaw, { seat = '#3a3a3e', frame = '#1a1a1c', director = false } = {}) {
-  const c = new THREE.Group(); c.position.set(x, 0, z); c.rotation.y = yaw * PI / 180;
+  const c = new THREE.Group(); c.position.set(x, 0, z); c.rotation.y = yaw * PI / 180; const h = SEAT;
   const fm = mat(frame, { roughness: 0.5, metalness: 0.4 }), sm = mat(seat, { roughness: 0.85 });
-  c.add(mesh(box(0.46, 0.05, 0.46), sm, 0, 0.7, 0));
-  c.add(mesh(box(0.46, director ? 0.22 : 0.5, 0.04), sm, 0, director ? 1.08 : 0.96, -0.22));
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) c.add(mesh(cyl(0.015, 0.015, 0.7, 8), fm, sx * 0.2, 0.35, sz * 0.2));
-  for (const sx of [-1, 1]) c.add(mesh(cyl(0.015, 0.015, 0.52, 8), fm, sx * 0.2, 0.96, -0.22));
-  if (director) for (const sx of [-1, 1]) c.add(mesh(box(0.04, 0.03, 0.4), fm, sx * 0.24, 0.92, 0.02));
+  c.add(mesh(box(0.46, 0.05, 0.46), sm, 0, h, 0));
+  c.add(mesh(box(0.46, director ? 0.22 : 0.5, 0.04), sm, 0, h + (director ? 0.38 : 0.26), -0.22));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) c.add(mesh(cyl(0.015, 0.015, h, 8), fm, sx * 0.2, h / 2, sz * 0.2));
+  for (const sx of [-1, 1]) c.add(mesh(cyl(0.015, 0.015, 0.52, 8), fm, sx * 0.2, h + 0.26, -0.22));
+  if (director) for (const sx of [-1, 1]) c.add(mesh(box(0.04, 0.03, 0.4), fm, sx * 0.24, h + 0.22, 0.02));
   g.add(c);
 }
 function table(g, x, z, { r = 0.5, color = '#3a2a1e', h = 0.74 } = {}) {
@@ -151,9 +169,9 @@ function tree(g, x, z, { trunk = '#3b2a1a', leaves = '#3f6b32', h = 3.5, r = 1.2
 function bench(g, x, z, yaw) {
   const b = new THREE.Group(); b.position.set(x, 0, z); b.rotation.y = yaw * PI / 180;
   const w = mat('#5a3f28', { roughness: 0.8 }), m = mat('#2a2a2a', { roughness: 0.6, metalness: 0.4 });
-  for (let i = 0; i < 3; i++) b.add(mesh(box(1.6, 0.04, 0.12), w, 0, 0.7, -0.08 + i * 0.14));
-  for (let i = 0; i < 2; i++) b.add(mesh(box(1.6, 0.12, 0.04), w, 0, 0.95 + i * 0.16, -0.24));
-  for (const sx of [-1, 1]) { b.add(mesh(box(0.06, 0.7, 0.5), m, sx * 0.7, 0.35, 0.02)); b.add(mesh(box(0.06, 0.5, 0.04), m, sx * 0.7, 0.95, -0.24)); }
+  const h = SEAT; for (let i = 0; i < 3; i++) b.add(mesh(box(1.6, 0.04, 0.12), w, 0, h, -0.08 + i * 0.14));
+  for (let i = 0; i < 2; i++) b.add(mesh(box(1.6, 0.12, 0.04), w, 0, h + 0.25 + i * 0.16, -0.24));
+  for (const sx of [-1, 1]) { b.add(mesh(box(0.06, h, 0.5), m, sx * 0.7, h / 2, 0.02)); b.add(mesh(box(0.06, 0.5, 0.04), m, sx * 0.7, h + 0.25, -0.24)); }
   g.add(b);
 }
 function cityWall(g, z, w = 10, h = 3.2, rnd) {
@@ -336,7 +354,7 @@ export const SETS = {
     g.add(mesh(sph(0.14, 10).scale(1, 1.6, 1), emis('#ff7a1a', 2.5), 0, 0.25, 1.1, false));
     for (const a of [0, 1, 2, 3, 4, 5]) g.add(mesh(sph(0.16, 8), mat('#4a4a48', { roughness: 1 }), Math.cos(a) * 0.5, 0.08, 1.1 + Math.sin(a) * 0.5));
     g.add(mesh(cyl(0.2, 0.22, 0.4, 10), mat('#3a2a1a'), -1.2, 0.2, 0.4)); g.add(mesh(cyl(0.2, 0.22, 0.4, 10), mat('#3a2a1a'), 1.3, 0.2, 0.5));
-    if (p.pose !== 'standing') p.subjects.forEach(s => g.add(mesh(cyl(0.24, 0.26, 0.7, 12), mat('#3a2a1a', { roughness: 0.95 }), s.x, 0.35, 0)));
+    if (p.pose !== 'standing') p.subjects.forEach(s => g.add(mesh(cyl(0.24, 0.26, SEAT, 12), mat('#3a2a1a', { roughness: 0.95 }), s.x, SEAT / 2, 0)));
     return { bg: '#06070c', sky: '#1a2240', ground: '#1a1a14', amb: 0.1, outdoor: true, skyTop: '#05070f', skyBottom: '#1a2240', stars: true };
   },
   courtroom(g, p, HY) {
