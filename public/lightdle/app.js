@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PUZZLES, FIXTURES, GELS, EPOCH } from './puzzles.js';
-import { SETS, mannequin, prepareMannequin, trimHead, fixtureGizmo, placeGizmo, mat, mesh } from './sets.js';
+import { SETS, npc, prepareNpc, fixtureGizmo, placeGizmo, mat, mesh } from './sets.js';
 
 /* ───────────────────────── utils ───────────────────────── */
 const $ = (s, el = document) => el.querySelector(s);
@@ -66,7 +66,7 @@ const vnorm = a => { const l = vlen(a) || 1; return [a[0] / l, a[1] / l, a[2] / 
 const vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const rotY = (v, deg) => { const c = Math.cos(deg * D2R), s = Math.sin(deg * D2R); return [v[0] * c - v[2] * s, v[1], v[0] * s + v[2] * c]; };
 function faceNormal(sub) { const t = 10 * D2R; return [-Math.sin(sub.yaw * D2R) * Math.cos(t), Math.sin(t), Math.cos(sub.yaw * D2R) * Math.cos(t)]; }
-const CAM = { single: { dz: 2.2, dy: 0.04, fov: 27, look: -0.12 }, two: { dz: 3.4, dy: 0.08, fov: 31, look: -0.2 }, three: { dz: 4.4, dy: 0.13, fov: 36, look: -0.27 } };
+const CAM = { single: { dz: 3.0, dy: 0.0, fov: 27, look: -0.3 }, two: { dz: 4.2, dy: 0.05, fov: 31, look: -0.38 }, three: { dz: 5.2, dy: 0.1, fov: 36, look: -0.45 } };
 const camPos = p => { const c = CAM[p.shot]; return [0, HY + c.dy, c.dz]; };
 
 /* ───────────────────────── illumination model + scoring ───────────────────────── */
@@ -273,7 +273,7 @@ const spots = [0, 1, 2].map(() => {
   s.visible = false; scene.add(s); scene.add(s.target); return s;
 });
 
-let bodyTemplate = null, headGeo = null, headNormal = null, skyDome = null;
+let bodyTemplate = null, skins = {}, skyDome = null;
 const gizmos = [null, null, null];
 function buildSet(p) {
   while (setGroup.children.length) setGroup.remove(setGroup.children[0]);
@@ -290,19 +290,19 @@ function buildSet(p) {
     skyDome = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false })); scene.add(skyDome);
     if (env.stars) { const sg = new THREE.BufferGeometry(), sp = []; const rnd = mulberry(99); for (let i = 0; i < 400; i++) { const a = rnd() * Math.PI * 2, e = rnd() * 0.9 + 0.1; sp.push(Math.cos(a) * Math.cos(e) * 28, Math.sin(e) * 28, Math.sin(a) * Math.cos(e) * 28); } sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); skyDome.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, fog: false }))); }
   }
-  p.subjects.forEach(s => { const mq = bodyTemplate ? mannequin({ body: bodyTemplate, headGeo, normalMap: headNormal, tint: s.tint, pose: p.pose, yaw: s.yaw }).group : fallbackFigure(s); mq.position.x = s.x; setGroup.add(mq); });
+  p.subjects.forEach(s => { const mq = bodyTemplate ? npc({ body: bodyTemplate, skin: skins[s.skin], pose: p.pose, yaw: s.yaw }).group : fallbackFigure(s); mq.position.x = s.x; setGroup.add(mq); });
   const c = CAM[p.shot]; camera.position.set(...camPos(p)); camera.fov = c.fov; camera.updateProjectionMatrix(); camera.lookAt(0, HY + c.look, 0);
 }
 function fallbackFigure(s) {
-  const g = new THREE.Group(); g.position.set(s.x, 0, 0); const m = mat(s.tint, { roughness: 0.55 });
+  const g = new THREE.Group(); g.position.set(s.x, 0, 0); const m = mat('#c9b2a0', { roughness: 0.55 });
   g.add(mesh(new THREE.SphereGeometry(0.115, 32, 24), m, 0, HY, 0)); g.add(mesh(new THREE.CapsuleGeometry(0.17, 0.3, 6, 16), m, 0, HY - 0.45, 0)); return g;
 }
 async function loadModels() {
   try {
-    const loader = new GLTFLoader();
-    const [body, head, nm] = await Promise.all([loader.loadAsync('assets/body.glb'), loader.loadAsync('assets/head.glb'), new THREE.TextureLoader().loadAsync('assets/head-normal.jpg')]);
-    let hm = null; head.scene.updateMatrixWorld(true); head.scene.traverse(o => { if (o.isMesh && !hm) hm = o; });
-    headGeo = trimHead(hm, 0.17, 0.46); headNormal = nm; bodyTemplate = body.scene;
+    const tl = new THREE.TextureLoader(), names = [...new Set(puzzle.subjects.map(s => s.skin))];
+    const [body, ...texs] = await Promise.all([new GLTFLoader().loadAsync('assets/npc.glb'), ...names.map(n => tl.loadAsync(`assets/skins/${n}.png`))]);
+    texs.forEach((t, i) => { t.colorSpace = THREE.SRGBColorSpace; t.flipY = false; skins[names[i]] = t; });
+    bodyTemplate = body.scene;
   } catch (e) { console.warn('models failed to load, using fallback', e); }
 }
 function applyRig(p, rig) {
@@ -593,7 +593,7 @@ const tcEl = $('#tc'), t0 = performance.now();
 setInterval(() => { const f = Math.floor((performance.now() - t0) / 1000 * 24); const s = Math.floor(f / 24), m = Math.floor(s / 60), h = Math.floor(m / 60); tcEl.textContent = [h, m % 60, s % 60, f % 24].map(x => String(x).padStart(2, '0')).join(':'); }, 1000 / 24);
 
 await loadModels();
-HY = bodyTemplate ? prepareMannequin({ body: bodyTemplate, headGeo, normalMap: headNormal }, puzzle.pose).HY : (puzzle.pose === 'standing' ? 1.62 : 1.42);
+HY = bodyTemplate ? prepareNpc(bodyTemplate, puzzle.pose).HY : (puzzle.pose === 'standing' ? 1.62 : 1.42);
 buildSet(puzzle);
 switchMode(mode);
 resize();

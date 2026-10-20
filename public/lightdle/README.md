@@ -6,8 +6,7 @@ Daily lighting puzzle at `/lightdle`. Static, self-contained (same pattern as `/
 - `app.js` — Three.js set, illumination model, scoring, floor plan, UI, localStorage stats
 - `puzzles.js` — the scene library (`PUZZLES`), fixture and gel tables, and `EPOCH` (the date of Lightdle #1)
 - `sets.js` — mannequin builder, visible light fixtures, and the environment library (`SETS`: interview, noir, tvstudio, basement, atelier, latenight, scifi, dinner, park, headshot, lineup, warehouse, bar, bedroom, campfire, courtroom)
-- `assets/body.glb` — the mannequin body: Mixamo "X Bot" (via the three.js examples), stripped of animations/textures and quantized with gltf-transform; posed by bone at runtime (`sets.js › mannequin`)
-- `assets/head.glb` — the head: Lee Perry-Smith scan by Infinite-Realities, CC BY 3.0 (via the three.js examples), trimmed at the neck and mounted on the body's neck bone; `head-normal.jpg` its tangent normal map
+- `assets/npc.glb` — the character: Kenney "Animated Characters" body (CC0, kenney.nl), converted from FBX with FBX2glTF; posed by bone at runtime (`sets.js › npc`). `assets/skins/*.png` are Kenney's painted skins, one per character; a scene's `subjects[].skin` picks one
 
 ## Adding a scene
 

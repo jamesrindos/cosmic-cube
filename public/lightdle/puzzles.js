@@ -37,7 +37,7 @@ export const PUZZLES = [
     id: 'doc-interview',
     title: 'The Documentary Interview',
     shot: 'single',
-    subjects: [{ x: 0, yaw: 22, tint: '#c9b2a0' }],
+    subjects: [{ x: 0, yaw: 22, skin: 'skaterFemaleA' }],
     set: 'interview', pose: 'seated',
     lights: 3,
     brief: {
@@ -55,7 +55,7 @@ export const PUZZLES = [
     id: 'interrogation',
     title: 'Interrogation Room',
     shot: 'single',
-    subjects: [{ x: 0, yaw: 0, tint: '#8f8f8b' }],
+    subjects: [{ x: 0, yaw: 0, skin: 'criminalMaleA' }],
     set: 'noir', pose: 'seated',
     lights: 2,
     brief: {
@@ -72,8 +72,8 @@ export const PUZZLES = [
     title: 'Morning Show Two-Shot',
     shot: 'two',
     subjects: [
-      { x: -0.72, yaw: -14, tint: '#b5704f' },
-      { x: 0.72, yaw: 14, tint: '#ddd5c6' },
+      { x: -0.72, yaw: -14, skin: 'survivorMaleB' },
+      { x: 0.72, yaw: 14, skin: 'skaterFemaleA' },
     ],
     set: 'tvstudio', pose: 'seated',
     lights: 3,
@@ -93,9 +93,9 @@ export const PUZZLES = [
     title: 'The Basement',
     shot: 'three',
     subjects: [
-      { x: -1.05, yaw: 18, tint: '#ddd5c6' },
-      { x: 0, yaw: 0, tint: '#c9b2a0' },
-      { x: 1.05, yaw: -18, tint: '#8a6a4a' },
+      { x: -1.05, yaw: 18, skin: 'skaterMaleA' },
+      { x: 0, yaw: 0, skin: 'skaterFemaleA' },
+      { x: 1.05, yaw: -18, skin: 'humanMaleA' },
     ],
     set: 'basement', pose: 'seated',
     lights: 2,
@@ -113,7 +113,7 @@ export const PUZZLES = [
     id: 'rembrandt',
     title: 'The Old Master',
     shot: 'single',
-    subjects: [{ x: 0, yaw: -14, tint: '#c8a98a' }],
+    subjects: [{ x: 0, yaw: -14, skin: 'humanMaleA' }],
     set: 'atelier', pose: 'seated',
     lights: 2,
     brief: {
@@ -130,7 +130,7 @@ export const PUZZLES = [
     id: 'late-night',
     title: 'Late Night Desk',
     shot: 'single',
-    subjects: [{ x: 0, yaw: 6, tint: '#c9b2a0' }],
+    subjects: [{ x: 0, yaw: 6, skin: 'survivorMaleB' }],
     set: 'latenight', pose: 'seated',
     lights: 3,
     brief: {
@@ -148,7 +148,7 @@ export const PUZZLES = [
     id: 'replicant',
     title: 'Replicant',
     shot: 'single',
-    subjects: [{ x: 0, yaw: 0, tint: '#ddd5c6' }],
+    subjects: [{ x: 0, yaw: 0, skin: 'cyborgFemaleA' }],
     set: 'scifi', pose: 'seated',
     lights: 2,
     brief: {
@@ -166,8 +166,8 @@ export const PUZZLES = [
     title: 'Candlelight',
     shot: 'two',
     subjects: [
-      { x: -0.62, yaw: -32, tint: '#c9b2a0' },
-      { x: 0.62, yaw: 32, tint: '#8a6a4a' },
+      { x: -0.62, yaw: -32, skin: 'humanFemaleA' },
+      { x: 0.62, yaw: 32, skin: 'humanMaleA' },
     ],
     set: 'dinner', pose: 'seated',
     lights: 2,
@@ -185,7 +185,7 @@ export const PUZZLES = [
     id: 'golden-hour',
     title: 'Golden Hour',
     shot: 'single',
-    subjects: [{ x: 0, yaw: -8, tint: '#b5704f' }],
+    subjects: [{ x: 0, yaw: -8, skin: 'skaterFemaleA' }],
     set: 'park', pose: 'seated',
     lights: 2,
     brief: {
@@ -202,7 +202,7 @@ export const PUZZLES = [
     id: 'headshot',
     title: 'The Headshot',
     shot: 'single',
-    subjects: [{ x: 0, yaw: 0, tint: '#8a6a4a' }],
+    subjects: [{ x: 0, yaw: 0, skin: 'humanFemaleA' }],
     set: 'headshot', pose: 'seated',
     lights: 3,
     brief: {
@@ -220,7 +220,7 @@ export const PUZZLES = [
     id: 'lineup',
     title: 'The Lineup',
     shot: 'single',
-    subjects: [{ x: 0, yaw: 0, tint: '#8f8f8b' }],
+    subjects: [{ x: 0, yaw: 0, skin: 'criminalMaleA' }],
     set: 'lineup', pose: 'standing',
     lights: 1,
     brief: {
@@ -236,7 +236,7 @@ export const PUZZLES = [
     id: 'music-video',
     title: 'Music Video',
     shot: 'single',
-    subjects: [{ x: 0, yaw: 10, tint: '#55504c' }],
+    subjects: [{ x: 0, yaw: 10, skin: 'skaterMaleA' }],
     set: 'warehouse', pose: 'standing',
     lights: 2,
     brief: {
@@ -254,8 +254,8 @@ export const PUZZLES = [
     title: 'The Bar',
     shot: 'two',
     subjects: [
-      { x: -0.68, yaw: -22, tint: '#ddd5c6' },
-      { x: 0.68, yaw: 20, tint: '#c8a98a' },
+      { x: -0.68, yaw: -22, skin: 'survivorMaleB' },
+      { x: 0.68, yaw: 20, skin: 'skaterFemaleA' },
     ],
     set: 'bar', pose: 'seated',
     lights: 3,
@@ -274,7 +274,7 @@ export const PUZZLES = [
     id: 'streamer',
     title: 'The Streamer',
     shot: 'single',
-    subjects: [{ x: 0, yaw: -4, tint: '#c8a98a' }],
+    subjects: [{ x: 0, yaw: -4, skin: 'skaterMaleA' }],
     set: 'bedroom', pose: 'seated',
     lights: 3,
     brief: {
@@ -292,7 +292,7 @@ export const PUZZLES = [
     id: 'villain',
     title: 'The Villain',
     shot: 'single',
-    subjects: [{ x: 0, yaw: 0, tint: '#ddd5c6' }],
+    subjects: [{ x: 0, yaw: 0, skin: 'criminalMaleA' }],
     set: 'campfire', pose: 'seated',
     lights: 2,
     brief: {
@@ -310,9 +310,9 @@ export const PUZZLES = [
     title: 'The Verdict',
     shot: 'three',
     subjects: [
-      { x: -1.05, yaw: 6, tint: '#8a6a4a' },
-      { x: 0, yaw: 0, tint: '#ddd5c6' },
-      { x: 1.05, yaw: -6, tint: '#c9b2a0' },
+      { x: -1.05, yaw: 6, skin: 'humanMaleA' },
+      { x: 0, yaw: 0, skin: 'humanFemaleA' },
+      { x: 1.05, yaw: -6, skin: 'skaterMaleA' },
     ],
     set: 'courtroom', pose: 'seated',
     lights: 3,

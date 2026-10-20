@@ -10,69 +10,44 @@ const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 const sph = (r, s = 16) => new THREE.SphereGeometry(r, s, Math.max(8, s / 2));
 const cap = (r, l) => new THREE.CapsuleGeometry(r, l, 4, 12);
 
-/* ───────────── mannequin ───────────── */
-// A Mixamo X Bot body (CC0-style sample from the three.js examples) posed by bone, with the
-// Lee Perry-Smith head scan mounted on its neck so faces actually take light.
+/* ───────────── NPCs ───────────── */
+// Kenney "Animated Characters" (CC0): one rigged body, many painted skins. Posed by bone at runtime.
 import { clone as skelClone } from 'three/addons/utils/SkeletonUtils.js';
 const D = PI / 180;
-export let SEAT = 0.64; // seat height, measured from the posed model's hips (set by prepareMannequin)
-export function trimHead(headMesh, cut = 0.17, height = 0.46) {
-  const src = headMesh.geometry.index ? headMesh.geometry.toNonIndexed() : headMesh.geometry.clone();
-  src.applyMatrix4(headMesh.matrixWorld);
-  const bb = new THREE.Box3().setFromBufferAttribute(src.attributes.position); const sc = height / (bb.max.y - bb.min.y); src.scale(sc, sc, sc); src.computeBoundingBox();
-  const y0 = src.boundingBox.min.y + cut, pos = src.attributes.position, nrm = src.attributes.normal, uv = src.attributes.uv; const P = [], N = [], U = [];
-  for (let i = 0; i < pos.count; i += 3) {
-    if (pos.getY(i) < y0 || pos.getY(i + 1) < y0 || pos.getY(i + 2) < y0) continue;
-    for (let j = 0; j < 3; j++) { P.push(pos.getX(i + j), pos.getY(i + j), pos.getZ(i + j)); N.push(nrm.getX(i + j), nrm.getY(i + j), nrm.getZ(i + j)); if (uv) U.push(uv.getX(i + j), uv.getY(i + j)); }
-  }
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); if (uv) g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
-  g.computeBoundingBox(); const b = g.boundingBox; g.translate(-(b.min.x + b.max.x) / 2, -b.min.y, -(b.min.z + b.max.z) / 2);
-  return g;
-}
-export function mannequin({ body, headGeo, normalMap, tint, pose, yaw }) {
-  const rig = skelClone(body);
-  const base = new THREE.Color(tint);
-  const surf = mat(base, { roughness: 0.58 }), jnt = mat(base.clone().multiplyScalar(0.78), { roughness: 0.45 });
-  rig.traverse(o => { if (o.isMesh || o.isSkinnedMesh) { o.castShadow = o.receiveShadow = true; o.frustumCulled = false; o.material = /joint/i.test(o.name) ? jnt : surf; } });
-  const B = {}; rig.traverse(o => { if (o.isBone) B[o.name.replace('mixamorig', '')] = o; });
+const NPC_SCALE = 0.45; // the FBX is ~3.77 units tall; this makes a ~1.7 m character
+export let SEAT = 0.5;  // seat height, measured from the posed model's hips (set by prepareNpc)
+export function npc({ body, skin, pose, yaw }) {
+  const rig = skelClone(body); rig.scale.setScalar(NPC_SCALE);
+  const m = new THREE.MeshStandardMaterial({ map: skin, roughness: 0.82, metalness: 0 });
+  rig.traverse(o => { if (o.isMesh || o.isSkinnedMesh) { o.castShadow = o.receiveShadow = true; o.frustumCulled = false; o.material = m; } });
+  const B = {}; rig.traverse(o => { if (o.isBone) B[o.name] = o; });
   const P = (b, x, y, z) => { if (B[b]) B[b].rotation.set(x * D, y * D, z * D); };
   const seated = pose !== 'standing';
-  const bodyYaw = yaw * 0.55, neckYaw = yaw - bodyYaw;
-  P('Neck', -4, neckYaw, 0);
+  const bodyYaw = yaw * 0.5, neckYaw = yaw - bodyYaw;
+  // this rig's bone axes differ per side: right arm drops about z, left arm about x
+  P('Neck', 2, neckYaw, 0);
   if (seated) {
-    P('LeftArm', 8, 0, -72); P('RightArm', 8, 0, 72);
-    P('LeftForeArm', 0, -62, 0); P('RightForeArm', 0, 62, 0);
-    P('LeftUpLeg', -84, 0, 4); P('RightUpLeg', -84, 0, -4);
-    P('LeftLeg', 86, 0, 0); P('RightLeg', 86, 0, 0);
-    P('LeftFoot', 0, 0, 0); P('RightFoot', 0, 0, 0);
-    P('Spine', 4, 0, 0);
+    P('RightArm', 0, 0, -68); P('LeftArm', -68, 0, 0);
+    P('RightForeArm', 0, -55, 0); P('LeftForeArm', 0, 0, 55);
+    P('RightUpLeg', 84, 0, -4); P('LeftUpLeg', 84, 0, 4);
+    P('RightLeg', 84, 0, 0); P('LeftLeg', 84, 0, 0);
+    P('Spine', 3, 0, 0);
   } else {
-    P('LeftArm', 0, 0, -76); P('RightArm', 0, 0, 76);
-    P('LeftForeArm', 0, -10, 0); P('RightForeArm', 0, 10, 0);
-    P('LeftUpLeg', 0, 0, 3); P('RightUpLeg', 0, 0, -3);
-  }
-  // swap heads
-  if (headGeo && B.Head && B.Neck) {
-    B.Head.scale.setScalar(0.001);
-    const holder = new THREE.Group(); B.Neck.add(holder);
-    const ws = new THREE.Vector3(); rig.updateMatrixWorld(true); B.Neck.getWorldScale(ws); holder.scale.setScalar(1 / ws.y);
-    holder.position.set(0, 0.05, 0.0);
-    const hm = new THREE.Mesh(headGeo, mat(base, { roughness: 0.52, normalMap, normalScale: new THREE.Vector2(0.55, 0.55) })); hm.castShadow = hm.receiveShadow = true;
-    holder.add(hm);
+    P('RightArm', 0, 0, -78); P('LeftArm', -78, 0, 0);
+    P('RightForeArm', 0, -8, 0); P('LeftForeArm', 0, 0, 8);
   }
   rig.updateMatrixWorld(true);
-  // ground the figure: lowest of the foot bones minus the sole
+  // ground the figure on the lowest foot bone
   const v = new THREE.Vector3(); let minY = 9;
-  for (const n of ['LeftFoot', 'RightFoot', 'LeftToeBase', 'RightToeBase', 'LeftToe_End', 'RightToe_End']) if (B[n]) { B[n].getWorldPosition(v); minY = Math.min(minY, v.y); }
-  const sole = seated ? 0.06 : 0.1;
+  for (const n of ['LeftFoot', 'RightFoot', 'LeftToes', 'RightToes']) if (B[n]) { B[n].getWorldPosition(v); minY = Math.min(minY, v.y); }
+  const sole = 0.05 * NPC_SCALE / 0.45;
   const g = new THREE.Group(); g.add(rig); rig.position.y = -(minY - sole); g.rotation.y = bodyYaw * D; g.updateMatrixWorld(true);
-  B.Head.getWorldPosition(v); const eyeY = v.y + 0.09; B.Hips.getWorldPosition(v); const hipY = v.y;
-  return { group: g, eyeY, hipY };
+  B.Head.getWorldPosition(v); const headY = v.y; B.Hips.getWorldPosition(v); const hipY = v.y;
+  return { group: g, eyeY: headY + 0.17, hipY };
 }
-export function prepareMannequin(parts, pose) {
-  // measure a reference figure so the camera, lights and seats agree with the model
-  const m = mannequin({ ...parts, tint: '#888', pose, yaw: 0 });
-  SEAT = m.hipY - 0.07;
+export function prepareNpc(body, pose) {
+  const m = npc({ body, skin: null, pose, yaw: 0 });
+  SEAT = m.hipY - 0.04;
   return { HY: m.eyeY, hipY: m.hipY };
 }
 
@@ -138,13 +113,14 @@ function chair(g, x, z, yaw, { seat = '#3a3a3e', frame = '#1a1a1c', director = f
   if (director) for (const sx of [-1, 1]) c.add(mesh(box(0.04, 0.03, 0.4), fm, sx * 0.24, h + 0.22, 0.02));
   g.add(c);
 }
-function table(g, x, z, { r = 0.5, color = '#3a2a1e', h = 0.74 } = {}) {
+function table(g, x, z, { r = 0.5, color = '#3a2a1e', h = SEAT + 0.3 } = {}) {
   const m = mat(color, { roughness: 0.5 });
   g.add(mesh(cyl(r, r, 0.05, 32), m, x, h, z)); g.add(mesh(cyl(0.05, 0.1, h - 0.05, 12), m, x, (h - 0.05) / 2, z));
 }
 function desk(g, x, z, w = 2.6, color = '#2b2b30', front = '#1f2a44') {
-  g.add(mesh(box(w, 0.06, 0.7), mat(color, { roughness: 0.35 }), x, 0.98, z));
-  g.add(mesh(box(w, 0.96, 0.08), mat(front, { roughness: 0.5 }), x, 0.49, z + 0.34));
+  const h = SEAT + 0.32;
+  g.add(mesh(box(w, 0.06, 0.7), mat(color, { roughness: 0.35 }), x, h, z));
+  g.add(mesh(box(w, h - 0.02, 0.08), mat(front, { roughness: 0.5 }), x, (h - 0.02) / 2, z + 0.34));
 }
 function cstand(g, x, z, h = 2.2, withFlag = false) {
   const m = mat('#1c1c20', { roughness: 0.5, metalness: 0.6 });
@@ -226,7 +202,7 @@ export const SETS = {
   noir(g, p, HY) {
     room(g, { w: 6, wall: '#2a2c2e', floor: '#1c1c1e', ceiling: '#1a1a1a', back: -2.4, h: 2.9 });
     windowFrame(g, -2.95, 1.7, -0.6, 1.4, 1.1, { blinds: true, yaw: PI / 2 });
-    table(g, 0, 0.55, { r: 0.55, color: '#3a3330', h: 0.76 });
+    table(g, 0, 0.7, { r: 0.45, color: '#3a3330' });
     g.add(mesh(cyl(0.004, 0.004, 1.0, 6), mat('#222'), 0, 2.4, 0.2, false)); g.add(mesh(cyl(0.05, 0.035, 0.08, 10), mat('#222'), 0, 1.86, 0.2, false));
     seatsFor(g, p, HY, 'chair');
     chair(g, -1.6, 1.0, 120, { seat: '#2e2e33' });
@@ -237,7 +213,7 @@ export const SETS = {
     g.add(mesh(box(5.5, 2.4, 0.06), emis('#1e3a7a', 0.9), 0, 1.6, -3.0, false));
     g.add(mesh(new THREE.TorusGeometry(0.9, 0.05, 8, 48), emis('#ff9a3c', 1.6), 0, 1.7, -2.9, false));
     desk(g, 0, 0.5, 2.8, '#2b2b30', '#1f2a44');
-    g.add(mesh(box(2.8, 0.04, 0.05), emis('#5fb7ff', 1.5), 0, 0.5, 0.86, false));
+    g.add(mesh(box(2.8, 0.04, 0.05), emis('#5fb7ff', 1.5), 0, SEAT * 0.6, 0.86, false));
     for (const x of [-2.6, 2.6]) { monitor(g, x, 1.4, -2.0, 0.9, 0.5, '#2f6bff', x > 0 ? -0.5 : 0.5); cstand(g, x, -2.3, 2.6); }
     seatsFor(g, p, HY, 'chair');
     return { bg: '#0b1020', sky: '#3f5a9a', ground: '#1a1a22', amb: 0.2 };
@@ -259,8 +235,8 @@ export const SETS = {
     const wood = mat('#6b4a2e', { roughness: 0.85 });
     g.add(mesh(box(0.05, 2.0, 0.05), wood, 1.9, 1.0, -0.9)); g.add(mesh(box(0.05, 2.0, 0.05), wood, 2.4, 1.0, -0.8)); g.add(mesh(box(0.05, 2.2, 0.05), wood, 2.15, 1.1, -1.4));
     const canvas = mesh(box(0.8, 1.0, 0.03), mat('#e8dcc4', { roughness: 0.95 }), 2.15, 1.3, -0.82); canvas.rotation.y = -0.1; g.add(canvas);
-    table(g, -1.6, 0.3, { r: 0.35, color: '#5a3f28', h: 0.8 });
-    g.add(mesh(cyl(0.12, 0.14, 0.3, 10), mat('#8a6a48', { roughness: 0.9 }), -1.5, 0.95, 0.25));
+    table(g, -1.6, 0.3, { r: 0.35, color: '#5a3f28' });
+    g.add(mesh(cyl(0.12, 0.14, 0.3, 10), mat('#8a6a48', { roughness: 0.9 }), -1.5, SEAT + 0.45, 0.25));
     seatsFor(g, p, HY, 'wood');
     return { bg: '#1a140f', sky: '#8a8070', ground: '#3a2a1a', amb: 0.14 };
   },
@@ -268,7 +244,7 @@ export const SETS = {
     const fl = mesh(new THREE.PlaneGeometry(14, 14), mat('#1e1f26', { roughness: 0.3, metalness: 0.1 })); fl.rotation.x = -PI / 2; fl.castShadow = false; g.add(fl);
     cityWall(g, -3.3, 12, 3.2, seeded(7));
     desk(g, 0, 0.6, 2.4, '#2a2a30', '#2a1a38');
-    g.add(mesh(box(2.4, 0.05, 0.06), emis('#ff6a9a', 1.4), 0, 0.98, 0.95, false));
+    g.add(mesh(box(2.4, 0.05, 0.06), emis('#ff6a9a', 1.4), 0, SEAT + 0.32, 0.95, false));
     seatsFor(g, p, HY, 'chair');
     return { bg: '#070912', sky: '#4a4a7a', ground: '#15151a', amb: 0.16 };
   },
@@ -276,15 +252,15 @@ export const SETS = {
     room(g, { w: 7, wall: '#16181c', floor: '#101114', ceiling: '#101114', back: -3.0, h: 3.0 });
     for (const x of [-3.4, 3.4]) for (let z = -2.5; z < 2.5; z += 1.2) g.add(mesh(box(0.04, 2.4, 0.08), emis(x < 0 ? '#ff8a2a' : '#3a8cff', 1.4), x, 1.5, z, false));
     for (let x = -2.5; x <= 2.5; x += 1.25) g.add(mesh(box(0.6, 0.02, 0.06), emis('#9ad0ff', 0.8), x, 2.95, -2.0, false));
-    table(g, 0, 0.6, { r: 0.6, color: '#1c1e22', h: 0.78 });
+    table(g, 0, 0.95, { r: 0.42, color: '#1c1e22' });
     seatsFor(g, p, HY, 'chair');
     return { bg: '#06070a', sky: '#2a3a5a', ground: '#101010', amb: 0.12 };
   },
   dinner(g, p, HY) {
     room(g, { w: 7, wall: '#2a1f16', floor: '#1e1510', ceiling: '#1a120d', back: -2.8, h: 3.0 });
-    table(g, 0, 0.25, { r: 0.7, color: '#4a3220', h: 0.76 });
-    g.add(mesh(box(1.5, 0.01, 1.5), mat('#e8e0cc', { roughness: 0.98 }), 0, 0.79, 0.25, false));
-    for (const [x, z] of [[-0.12, 0.2], [0.1, 0.32], [0.0, 0.12]]) candle(g, x, z, 0.79);
+    table(g, 0, 0.3, { r: 0.6, color: '#4a3220' });
+    g.add(mesh(box(1.3, 0.01, 1.3), mat('#e8e0cc', { roughness: 0.98 }), 0, SEAT + 0.33, 0.3, false));
+    for (const [x, z] of [[-0.12, 0.25], [0.1, 0.37], [0.0, 0.17]]) candle(g, x, z, SEAT + 0.33);
     g.add(mesh(box(0.9, 1.6, 0.4), mat('#3a2818', { roughness: 0.8 }), -2.6, 0.8, -2.4));
     windowFrame(g, 2.0, 1.8, -2.72, 1.1, 1.4, { glow: '#0f1a30' });
     seatsFor(g, p, HY, 'wood');
@@ -330,15 +306,15 @@ export const SETS = {
     for (let i = 0; i < 3; i++) g.add(mesh(box(3.0, 0.04, 0.25), mat('#4a3020', { roughness: 0.6 }), -1.2, 1.5 + i * 0.45, -2.7, false));
     for (let i = 0; i < 16; i++) g.add(mesh(cyl(0.035, 0.045, 0.3, 8), mat(['#7a3a1a', '#3a6a3a', '#2a3a7a', '#9a7a2a'][i % 4], { roughness: 0.2, metalness: 0.1 }), -2.6 + (i % 8) * 0.36, 1.67 + Math.floor(i / 8) * 0.45, -2.7, false));
     g.add(mesh(box(3.0, 0.03, 0.03), emis('#ffb060', 2), -1.2, 2.45, -2.62, false));
-    table(g, 0, 0.3, { r: 0.45, color: '#2a1a10', h: 0.76 });
+    table(g, 0, 0.4, { r: 0.4, color: '#2a1a10' });
     windowFrame(g, 2.0, 1.75, -2.72, 1.3, 1.3, { glow: '#120a1e' }); neon(g, 1.75, 1.95, -2.6, '#ff2a8a');
     seatsFor(g, p, HY, 'stool');
     return { bg: '#0a0705', sky: '#3a2a30', ground: '#1a120c', amb: 0.1 };
   },
   bedroom(g, p, HY) {
     room(g, { w: 6, wall: '#2a2e3a', floor: '#2a2420', ceiling: '#22242c', back: -2.6, h: 2.7 });
-    desk(g, 0, 0.75, 1.8, '#3a3a40', '#2a2a30'); monitor(g, 0.78, 1.28, 0.55, 0.6, 0.36, '#7fb0ff', PI - 0.6);
-    g.add(mesh(box(0.3, 0.02, 0.1), mat('#111'), -0.4, 1.02, 0.6, false));
+    desk(g, 0, 0.75, 1.8, '#3a3a40', '#2a2a30'); monitor(g, 0.78, SEAT + 0.62, 0.55, 0.6, 0.36, '#7fb0ff', PI - 0.6);
+    g.add(mesh(box(0.3, 0.02, 0.1), mat('#111'), -0.4, SEAT + 0.36, 0.6, false));
     g.add(mesh(box(1.2, 0.3, 0.3), mat('#3a3a44'), -1.9, 1.9, -2.45, false)); g.add(mesh(box(1.2, 0.3, 0.3), mat('#3a3a44'), -1.9, 1.3, -2.45, false));
     for (let i = 0; i < 9; i++) g.add(mesh(box(0.05, 0.22, 0.16), mat(['#b05030', '#3a6a9a', '#d0b060', '#3a8a5a'][i % 4]), -2.4 + i * 0.12, 2.17, -2.45, false));
     g.add(mesh(box(2.2, 0.02, 0.02), emis('#6a3aff', 2), -1.9, 2.08, -2.3, false));
@@ -361,7 +337,7 @@ export const SETS = {
     room(g, { w: 9, wall: '#4a3826', floor: '#3a2e22', ceiling: '#3a3028', back: -3.0, h: 3.6 });
     for (let x = -4.2; x <= 4.2; x += 0.6) g.add(mesh(box(0.5, 2.2, 0.04), mat('#5a4530', { roughness: 0.8 }), x, 1.1, -2.95, false));
     g.add(mesh(box(9, 0.12, 0.08), mat('#2a1e14'), 0, 2.26, -2.93, false));
-    g.add(mesh(box(3.8, 0.08, 0.12), mat('#5a4530', { roughness: 0.6 }), 0, 1.02, 0.65)); for (const x of [-1.8, -0.6, 0.6, 1.8]) g.add(mesh(box(0.08, 1.0, 0.08), mat('#5a4530'), x, 0.5, 0.65));
+    g.add(mesh(box(3.8, 0.08, 0.12), mat('#5a4530', { roughness: 0.6 }), 0, SEAT + 0.3, 0.65)); for (const x of [-1.8, -0.6, 0.6, 1.8]) g.add(mesh(box(0.08, SEAT + 0.28, 0.08), mat('#5a4530'), x, (SEAT + 0.28) / 2, 0.65));
     g.add(mesh(box(0.8, 1.6, 0.06), mat('#c0b090', { roughness: 0.9 }), -3.8, 1.5, -2.5, false)); g.add(mesh(cyl(0.02, 0.02, 2.4, 8), mat('#d4b060', { metalness: 0.7, roughness: 0.3 }), -4.2, 1.2, -2.4, false));
     seatsFor(g, p, HY, 'wood');
     return { bg: '#120d08', sky: '#8a7a60', ground: '#3a2a1a', amb: 0.16 };
