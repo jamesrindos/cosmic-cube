@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PUZZLES, FIXTURES, GELS, EPOCH } from './puzzles.js';
-import { SETS, npc, prepareNpc, fixtureGizmo, placeGizmo, mat, mesh } from './sets.js';
+import { SETS, PROPS, npc, prepareNpc, fixtureGizmo, placeGizmo, mat, mesh } from './sets.js';
 
 /* ───────────────────────── utils ───────────────────────── */
 const $ = (s, el = document) => el.querySelector(s);
@@ -277,7 +277,7 @@ let bodyTemplate = null, skins = {}, skyDome = null;
 const gizmos = [null, null, null];
 function buildSet(p) {
   while (setGroup.children.length) setGroup.remove(setGroup.children[0]);
-  const env = (SETS[p.set] || SETS.interview)(setGroup, p, HY);
+  const env = (SETS[p.set] || SETS.interview).build(setGroup, p);
   scene.background = new THREE.Color(env.bg); CEIL = env.outdoor ? 99 : (env.ceil ?? 3.0); OUTDOOR = !!env.outdoor;
   hemi.color.set(env.sky); hemi.groundColor.set(env.ground); hemi.intensity = env.amb;
   scene.fog = env.fog ? new THREE.FogExp2(new THREE.Color(env.bg), env.fog) : null;
@@ -299,10 +299,12 @@ function fallbackFigure(s) {
 }
 async function loadModels() {
   try {
-    const tl = new THREE.TextureLoader(), names = [...new Set(puzzle.subjects.map(s => s.skin))];
-    const [body, ...texs] = await Promise.all([new GLTFLoader().loadAsync('assets/npc.glb'), ...names.map(n => tl.loadAsync(`assets/skins/${n}.png`))]);
+    const tl = new THREE.TextureLoader(), gl = new GLTFLoader(), names = [...new Set(puzzle.subjects.map(s => s.skin))], propNames = (SETS[puzzle.set] || SETS.interview).props || [];
+    const [body, ...texs] = await Promise.all([gl.loadAsync('assets/npc.glb'), ...names.map(n => tl.loadAsync(`assets/skins/${n}.png`))]);
     texs.forEach((t, i) => { t.colorSpace = THREE.SRGBColorSpace; t.flipY = false; skins[names[i]] = t; });
     bodyTemplate = body.scene;
+    const props = await Promise.allSettled(propNames.map(n => gl.loadAsync(`assets/props/${n}.glb`)));
+    props.forEach((r, i) => { if (r.status === 'fulfilled') PROPS[propNames[i]] = r.value.scene; else console.warn('prop missing', propNames[i]); });
   } catch (e) { console.warn('models failed to load, using fallback', e); }
 }
 function applyRig(p, rig) {
@@ -600,4 +602,4 @@ resize();
 $('#loading').remove();
 
 // debug hooks
-window.__lightdle = { puzzle, score: (m = mode) => score(puzzle, rig(), m), solutionScore: (m = mode) => score(puzzle, puzzle.solution, m), rig, setRig: r => { rigs[mode] = r; update(); }, PUZZLES, FIXTURES, analyse: r => analyse(puzzle, r || rig()), scoreFor: (p, r, m) => score(p, r, m) };
+window.__lightdle = { puzzle, HY: () => HY, score: (m = mode) => score(puzzle, rig(), m), solutionScore: (m = mode) => score(puzzle, puzzle.solution, m), rig, setRig: r => { rigs[mode] = r; update(); }, PUZZLES, FIXTURES, analyse: r => analyse(puzzle, r || rig()), scoreFor: (p, r, m) => score(p, r, m) };

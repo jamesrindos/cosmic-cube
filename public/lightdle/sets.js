@@ -91,6 +91,26 @@ export function placeGizmo(g, pos, tgt, fx, ceiling = 3) {
   else { const len = Math.max(0.05, pos[1]); stand.scale.y = len; stand.position.set(pos[0], len / 2, pos[2]); base.position.set(pos[0], 0, pos[2]); }
 }
 
+/* ───────────── props (Kenney kits, CC0) ───────────── */
+// Models are loaded by app.js into PROPS (name → gltf scene). Each set lists the names it needs.
+export const PROPS = {};
+const _pcache = {};
+function propInfo(name) {
+  if (_pcache[name]) return _pcache[name];
+  const src = PROPS[name]; if (!src) return null;
+  const bb = new THREE.Box3().setFromObject(src);
+  return (_pcache[name] = { cx: (bb.min.x + bb.max.x) / 2, cz: (bb.min.z + bb.max.z) / 2, minY: bb.min.y, h: bb.max.y - bb.min.y });
+}
+// place a prop with its footprint centred on (x, z), standing on y. rot in degrees. Returns the group (or null if the model is missing).
+function prop(g, name, x, z, { rot = 0, s = 1, y = 0, shadow = true } = {}) {
+  const src = PROPS[name], info = propInfo(name); if (!src) return null;
+  const o = src.clone(true);
+  o.traverse(m => { if (m.isMesh) { m.castShadow = shadow; m.receiveShadow = true; if (m.material) { m.material = m.material.clone(); m.material.roughness = Math.max(0.6, m.material.roughness ?? 0.8); m.material.metalness = 0; } } });
+  const w = new THREE.Group(); w.position.set(x, y, z); w.rotation.y = rot * PI / 180; w.scale.setScalar(s);
+  o.position.set(-info.cx, -info.minY, -info.cz); w.add(o); g.add(w); return w;
+}
+const propH = (name, s = 1) => (propInfo(name)?.h || 0) * s;
+
 /* ───────────── environment pieces ───────────── */
 function room(g, { w = 9, d = 7, h = 3.2, wall, floor, ceiling = null, back = -3.2 }) {
   const fl = mesh(new THREE.PlaneGeometry(w, d + 6), mat(floor, { roughness: 0.92 }), 0, 0, (back + 3) / 2); fl.rotation.x = -PI / 2; fl.castShadow = false; g.add(fl);
@@ -99,28 +119,10 @@ function room(g, { w = 9, d = 7, h = 3.2, wall, floor, ceiling = null, back = -3
   g.add(mesh(box(0.2, h, d + 6), mat(wall, { roughness: 0.95 }), w / 2, h / 2, (back + 3) / 2, false));
   if (ceiling) { const c = mesh(box(w, 0.2, d + 6), mat(ceiling, { roughness: 1 }), 0, h + 0.1, (back + 3) / 2, false); g.add(c); }
 }
-function stool(g, x, z, yaw, color = '#2a2a2e') {
-  const m = mat(color, { roughness: 0.5, metalness: 0.3 }); const s = new THREE.Group(); s.position.set(x, 0, z); s.rotation.y = yaw * PI / 180; const h = SEAT;
-  s.add(mesh(cyl(0.19, 0.19, 0.04, 24), m, 0, h, 0)); s.add(mesh(cyl(0.025, 0.025, h - 0.02, 8), m, 0, h / 2, 0)); s.add(mesh(cyl(0.22, 0.22, 0.02, 24), m, 0, 0.01, 0)); g.add(s);
-}
-function chair(g, x, z, yaw, { seat = '#3a3a3e', frame = '#1a1a1c', director = false } = {}) {
-  const c = new THREE.Group(); c.position.set(x, 0, z); c.rotation.y = yaw * PI / 180; const h = SEAT;
-  const fm = mat(frame, { roughness: 0.5, metalness: 0.4 }), sm = mat(seat, { roughness: 0.85 });
-  c.add(mesh(box(0.46, 0.05, 0.46), sm, 0, h, 0));
-  c.add(mesh(box(0.46, director ? 0.22 : 0.5, 0.04), sm, 0, h + (director ? 0.38 : 0.26), -0.22));
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) c.add(mesh(cyl(0.015, 0.015, h, 8), fm, sx * 0.2, h / 2, sz * 0.2));
-  for (const sx of [-1, 1]) c.add(mesh(cyl(0.015, 0.015, 0.52, 8), fm, sx * 0.2, h + 0.26, -0.22));
-  if (director) for (const sx of [-1, 1]) c.add(mesh(box(0.04, 0.03, 0.4), fm, sx * 0.24, h + 0.22, 0.02));
-  g.add(c);
-}
-function table(g, x, z, { r = 0.5, color = '#3a2a1e', h = SEAT + 0.3 } = {}) {
-  const m = mat(color, { roughness: 0.5 });
-  g.add(mesh(cyl(r, r, 0.05, 32), m, x, h, z)); g.add(mesh(cyl(0.05, 0.1, h - 0.05, 12), m, x, (h - 0.05) / 2, z));
-}
-function desk(g, x, z, w = 2.6, color = '#2b2b30', front = '#1f2a44') {
-  const h = SEAT + 0.32;
-  g.add(mesh(box(w, 0.06, 0.7), mat(color, { roughness: 0.35 }), x, h, z));
-  g.add(mesh(box(w, h - 0.02, 0.08), mat(front, { roughness: 0.5 }), x, (h - 0.02) / 2, z + 0.34));
+// a seat for every seated subject, from a Kenney chair model (its seat sits at about half its height)
+function seatsFor(g, p, name, { s = 1, dz = 0.03 } = {}) {
+  if (p.pose === 'standing') return;
+  p.subjects.forEach(sub => prop(g, name, sub.x, dz, { rot: sub.yaw * 0.5, s }));
 }
 function cstand(g, x, z, h = 2.2, withFlag = false) {
   const m = mat('#1c1c20', { roughness: 0.5, metalness: 0.6 });
@@ -137,19 +139,6 @@ function windowFrame(g, x, y, z, w, h, { blinds = false, glow = null, yaw = 0 } 
   if (blinds) for (let yy = -h / 2 + 0.05; yy < h / 2; yy += 0.09) { const s = mesh(box(w, 0.025, 0.04), mat('#8a8a86', { roughness: 0.7 }), 0, yy, 0.02); s.rotation.x = 0.35; f.add(s); }
   g.add(f);
 }
-function tree(g, x, z, { trunk = '#3b2a1a', leaves = '#3f6b32', h = 3.5, r = 1.2 } = {}) {
-  g.add(mesh(cyl(0.08, 0.14, h * 0.45, 8), mat(trunk, { roughness: 0.9 }), x, h * 0.225, z));
-  const lm = mat(leaves, { roughness: 0.9 });
-  g.add(mesh(sph(r, 10), lm, x, h * 0.55, z)); g.add(mesh(sph(r * 0.8, 10), lm, x + r * 0.5, h * 0.7, z - r * 0.3)); g.add(mesh(sph(r * 0.75, 10), lm, x - r * 0.5, h * 0.72, z + r * 0.2));
-}
-function bench(g, x, z, yaw) {
-  const b = new THREE.Group(); b.position.set(x, 0, z); b.rotation.y = yaw * PI / 180;
-  const w = mat('#5a3f28', { roughness: 0.8 }), m = mat('#2a2a2a', { roughness: 0.6, metalness: 0.4 });
-  const h = SEAT; for (let i = 0; i < 3; i++) b.add(mesh(box(1.6, 0.04, 0.12), w, 0, h, -0.08 + i * 0.14));
-  for (let i = 0; i < 2; i++) b.add(mesh(box(1.6, 0.12, 0.04), w, 0, h + 0.25 + i * 0.16, -0.24));
-  for (const sx of [-1, 1]) { b.add(mesh(box(0.06, h, 0.5), m, sx * 0.7, h / 2, 0.02)); b.add(mesh(box(0.06, 0.5, 0.04), m, sx * 0.7, h + 0.25, -0.24)); }
-  g.add(b);
-}
 function cityWall(g, z, w = 10, h = 3.2, rnd) {
   g.add(mesh(box(w, h, 0.1), mat('#05070d', { roughness: 1 }), 0, h / 2, z, false));
   const wm = emis('#ffd9a0', 0.9), wm2 = emis('#9ec5ff', 0.7);
@@ -161,185 +150,245 @@ function cityWall(g, z, w = 10, h = 3.2, rnd) {
     x += bw + 0.08;
   }
 }
-function neon(g, x, y, z, color, text = 'zig') {
+function neon(g, x, y, z, color) {
   const m = emis(color, 2.2); const n = new THREE.Group(); n.position.set(x, y, z);
   const pts = [new THREE.Vector3(-0.5, 0.15, 0), new THREE.Vector3(-0.2, -0.15, 0), new THREE.Vector3(0.1, 0.15, 0), new THREE.Vector3(0.4, -0.15, 0), new THREE.Vector3(0.6, 0.1, 0)];
   const curve = new THREE.CatmullRomCurve3(pts); n.add(mesh(new THREE.TubeGeometry(curve, 40, 0.018, 8), m, 0, 0, 0, false));
   n.add(mesh(new THREE.TorusGeometry(0.22, 0.018, 8, 32), m, 0.95, 0, 0, false));
   g.add(n);
 }
-function candle(g, x, z, h = 0.78) {
-  g.add(mesh(cyl(0.012, 0.014, 0.14, 8), mat('#f2e8d0', { roughness: 0.8 }), x, h + 0.07, z));
-  g.add(mesh(sph(0.02, 8).scale(0.6, 1.4, 0.6), emis('#ffb347', 3), x, h + 0.17, z, false));
+function candle(g, x, z, h) {
+  g.add(mesh(cyl(0.012, 0.014, 0.12, 8), mat('#f2e8d0', { roughness: 0.8 }), x, h + 0.06, z));
+  g.add(mesh(sph(0.018, 8).scale(0.6, 1.4, 0.6), emis('#ffb347', 3), x, h + 0.15, z, false));
 }
-function monitor(g, x, y, z, w = 0.6, h = 0.36, color = '#8fb4ff', yaw = 0) {
-  const s = new THREE.Group(); s.position.set(x, y, z); s.rotation.y = yaw;
-  s.add(mesh(box(w + 0.03, h + 0.03, 0.03), mat('#111114', { roughness: 0.6 }), 0, 0, 0, false));
-  s.add(mesh(box(w, h, 0.01), emis(color, 1.2), 0, 0, 0.02, false));
-  s.add(mesh(cyl(0.03, 0.08, 0.12, 8), mat('#111114'), 0, -h / 2 - 0.06, -0.02, false));
-  g.add(s);
-}
-function seatsFor(g, p, HY, style) {
-  // one seat per seated subject
-  if (p.pose === 'standing') return;
-  p.subjects.forEach(s => { if (style === 'chair') chair(g, s.x, 0, s.yaw, { seat: '#2e2e33', frame: '#1a1a1c' }); else if (style === 'director') chair(g, s.x, 0, s.yaw, { seat: '#141416', frame: '#6b5a44', director: true }); else if (style === 'wood') chair(g, s.x, 0, s.yaw, { seat: '#5a3f28', frame: '#3a2a1a' }); else stool(g, s.x, 0, s.yaw); });
+function screenGlow(g, x, y, z, w, h, color, yaw = 0) { const s = mesh(box(w, h, 0.01), emis(color, 1.2), x, y, z, false); s.rotation.y = yaw; g.add(s); }
+function hangingBulb(g, x, z, y = 1.9, ceil = 2.8) {
+  g.add(mesh(cyl(0.004, 0.004, ceil - y, 6), mat('#222'), x, (ceil + y) / 2, z, false));
+  prop(g, 'lampSquareCeiling', x, z, { y: y - 0.23, s: 1.2, shadow: false });
 }
 function seeded(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function outdoors(g, color, size = 40) { const fl = mesh(new THREE.PlaneGeometry(size, size), mat(color, { roughness: 1 })); fl.rotation.x = -PI / 2; fl.castShadow = false; g.add(fl); }
 
 /* ───────────── environments ───────────── */
-// each returns { bg, sky, ground, ambient } for the renderer; g is the set group
+// each entry: props to preload, and build(g, p) → { bg, sky, ground, amb, ... } for the renderer
 export const SETS = {
-  interview(g, p, HY) {
-    room(g, { wall: '#3d4249', floor: '#2a2b2e', back: -3.2 });
-    // seamless backdrop stand + roll
-    g.add(mesh(cyl(0.05, 0.05, 5.4, 12).rotateZ(PI / 2), mat('#1a1a1c', { metalness: 0.6, roughness: 0.4 }), 0, 2.75, -2.6, false));
-    g.add(mesh(box(5.2, 2.75, 0.04), mat('#4a4e55', { roughness: 0.98 }), 0, 1.375, -2.62, false));
-    seatsFor(g, p, HY, 'director');
-    chair(g, -1.35, 0.55, 118, { seat: '#141416', frame: '#6b5a44', director: true }); // the interviewer, camera-left
-    cstand(g, -2.4, -1.4, 2.3, true); cstand(g, 2.6, -1.9, 2.0); g.add(mesh(box(0.5, 0.2, 0.3), mat('#8a6d4a', { roughness: 0.9 }), 2.2, 0.1, -1.2));
-    return { bg: '#111214', sky: '#aab4c4', ground: '#2a2420', amb: 0.16 };
+  interview: {
+    props: ['chairModernCushion', 'pottedPlant', 'cardboardBoxClosed'],
+    build(g, p) {
+      room(g, { wall: '#3d4249', floor: '#2a2b2e', back: -3.2 });
+      g.add(mesh(cyl(0.05, 0.05, 5.4, 12).rotateZ(PI / 2), mat('#1a1a1c', { metalness: 0.6, roughness: 0.4 }), 0, 2.75, -2.6, false));
+      g.add(mesh(box(5.2, 2.75, 0.04), mat('#4a4e55', { roughness: 0.98 }), 0, 1.375, -2.62, false));
+      seatsFor(g, p, 'chairModernCushion');
+      prop(g, 'chairModernCushion', -1.3, 0.6, { rot: 120 }); // the producer, camera-left
+      prop(g, 'pottedPlant', 2.1, -1.9, { s: 1.6 }); prop(g, 'pottedPlant', -2.4, -2.1, { s: 1.3 });
+      cstand(g, -2.4, -1.4, 2.3, true); cstand(g, 2.6, -1.9, 2.0);
+      prop(g, 'cardboardBoxClosed', 2.5, -0.8, { s: 1.6, rot: 20 }); prop(g, 'cardboardBoxClosed', 2.7, -0.8, { s: 1.6, y: 0.45, rot: -10 });
+      return { bg: '#111214', sky: '#aab4c4', ground: '#2a2420', amb: 0.16 };
+    },
   },
-  noir(g, p, HY) {
-    room(g, { w: 6, wall: '#2a2c2e', floor: '#1c1c1e', ceiling: '#1a1a1a', back: -2.4, h: 2.9 });
-    windowFrame(g, -2.95, 1.7, -0.6, 1.4, 1.1, { blinds: true, yaw: PI / 2 });
-    table(g, 0, 0.7, { r: 0.45, color: '#3a3330' });
-    g.add(mesh(cyl(0.004, 0.004, 1.0, 6), mat('#222'), 0, 2.4, 0.2, false)); g.add(mesh(cyl(0.05, 0.035, 0.08, 10), mat('#222'), 0, 1.86, 0.2, false));
-    seatsFor(g, p, HY, 'chair');
-    chair(g, -1.6, 1.0, 120, { seat: '#2e2e33' });
-    return { bg: '#0a0a0b', sky: '#5a6070', ground: '#1a1512', amb: 0.1, ceil: 2.9 };
+  noir: {
+    props: ['chair', 'table', 'lampSquareCeiling', 'radio'],
+    build(g, p) {
+      room(g, { w: 6, wall: '#2a2c2e', floor: '#1c1c1e', ceiling: '#1a1a1a', back: -2.4, h: 2.9 });
+      windowFrame(g, -2.95, 1.7, -0.6, 1.4, 1.1, { blinds: true, yaw: PI / 2 });
+      prop(g, 'table', 0, 1.05, { s: 1.15, rot: 90 });
+      seatsFor(g, p, 'chair');
+      prop(g, 'chair', -1.5, 1.1, { rot: 125 });
+      hangingBulb(g, 0, 0.2, 1.85, 2.9);
+      prop(g, 'radio', 2.6, -2.1, { s: 1.4, rot: -30 });
+      return { bg: '#0a0a0b', sky: '#5a6070', ground: '#1a1512', amb: 0.1, ceil: 2.9 };
+    },
   },
-  tvstudio(g, p, HY) {
-    room(g, { wall: '#162445', floor: '#2a2d36', back: -3.2 });
-    g.add(mesh(box(5.5, 2.4, 0.06), emis('#1e3a7a', 0.9), 0, 1.6, -3.0, false));
-    g.add(mesh(new THREE.TorusGeometry(0.9, 0.05, 8, 48), emis('#ff9a3c', 1.6), 0, 1.7, -2.9, false));
-    desk(g, 0, 0.5, 2.8, '#2b2b30', '#1f2a44');
-    g.add(mesh(box(2.8, 0.04, 0.05), emis('#5fb7ff', 1.5), 0, SEAT * 0.6, 0.86, false));
-    for (const x of [-2.6, 2.6]) { monitor(g, x, 1.4, -2.0, 0.9, 0.5, '#2f6bff', x > 0 ? -0.5 : 0.5); cstand(g, x, -2.3, 2.6); }
-    seatsFor(g, p, HY, 'chair');
-    return { bg: '#0b1020', sky: '#3f5a9a', ground: '#1a1a22', amb: 0.2 };
+  tvstudio: {
+    props: ['chairDesk', 'kitchenBar', 'kitchenBarEnd', 'televisionModern', 'computerScreen', 'pottedPlant'],
+    build(g, p) {
+      room(g, { wall: '#162445', floor: '#2a2d36', back: -3.2 });
+      g.add(mesh(box(5.5, 2.4, 0.06), emis('#1e3a7a', 0.9), 0, 1.6, -3.0, false));
+      g.add(mesh(new THREE.TorusGeometry(0.9, 0.05, 8, 48), emis('#ff9a3c', 1.6), 0, 1.7, -2.9, false));
+      // a curved news desk from kitchen-bar sections
+      for (let i = -3; i <= 3; i++) prop(g, i === -3 ? 'kitchenBarEnd' : 'kitchenBar', i * 0.52, 0.62, { s: 1.25, rot: i === -3 ? 180 : 0 });
+      g.add(mesh(box(3.9, 0.04, 0.05), emis('#5fb7ff', 1.5), 0, 0.2, 0.9, false));
+      seatsFor(g, p, 'chairDesk', { s: 0.9 });
+      for (const x of [-2.6, 2.6]) { prop(g, 'televisionModern', x, -2.0, { s: 1.6, y: 1.1, rot: x > 0 ? -30 : 30 }); screenGlow(g, x, 1.46, -2.0, 1.0, 0.6, '#2f6bff', (x > 0 ? -30 : 30) * PI / 180); cstand(g, x, -2.3, 2.6); }
+      prop(g, 'pottedPlant', -3.4, -1.0, { s: 1.6 });
+      return { bg: '#0b1020', sky: '#3f5a9a', ground: '#1a1a22', amb: 0.2 };
+    },
   },
-  basement(g, p, HY) {
-    room(g, { w: 6, wall: '#2a2a26', floor: '#1b1b19', ceiling: '#1c1c1a', back: -2.6, h: 2.8 });
-    const pipe = mat('#4a4642', { roughness: 0.6, metalness: 0.5 });
-    g.add(mesh(cyl(0.06, 0.06, 6, 10).rotateZ(PI / 2), pipe, 0, 2.3, -1.6, false)); g.add(mesh(cyl(0.04, 0.04, 6, 10).rotateZ(PI / 2), pipe, 0, 2.15, -2.3, false));
-    g.add(mesh(cyl(0.004, 0.004, 0.6, 6), mat('#111'), 0, 2.2, 0.1, false));
-    for (const [x, z, s] of [[-2.2, -1.8, 0.6], [-1.7, -2.1, 0.5], [2.3, -1.5, 0.7], [2.0, -1.5, 0.45]]) g.add(mesh(box(s, s * 0.7, s), mat('#6b5a3e', { roughness: 0.95 }), x, s * 0.35, z));
-    windowFrame(g, 2.0, 2.1, -2.55, 0.8, 0.45, { glow: '#2a3a5a' });
-    seatsFor(g, p, HY, 'wood');
-    return { bg: '#080807', sky: '#3a4050', ground: '#1a1512', amb: 0.1, ceil: 2.8 };
+  basement: {
+    props: ['chairRounded', 'cardboardBoxClosed', 'cardboardBoxOpen', 'washer', 'dryer', 'lampSquareCeiling', 'bookcaseOpen', 'barrel'],
+    build(g, p) {
+      room(g, { w: 6, wall: '#2a2a26', floor: '#1b1b19', ceiling: '#1c1c1a', back: -2.6, h: 2.8 });
+      const pipe = mat('#4a4642', { roughness: 0.6, metalness: 0.5 });
+      g.add(mesh(cyl(0.06, 0.06, 6, 10).rotateZ(PI / 2), pipe, 0, 2.3, -1.6, false)); g.add(mesh(cyl(0.04, 0.04, 6, 10).rotateZ(PI / 2), pipe, 0, 2.15, -2.3, false));
+      hangingBulb(g, 0, 0.1, 2.0, 2.8);
+      prop(g, 'washer', -2.3, -2.2, { s: 1.6 }); prop(g, 'dryer', -1.6, -2.2, { s: 1.6 });
+      prop(g, 'cardboardBoxClosed', 2.2, -2.0, { s: 1.7 }); prop(g, 'cardboardBoxOpen', 2.4, -1.5, { s: 1.6, rot: 25 }); prop(g, 'cardboardBoxClosed', 2.2, -2.0, { s: 1.5, y: 0.48, rot: 15 });
+      prop(g, 'barrel', -2.6, -1.3, { s: 1.5 }); prop(g, 'bookcaseOpen', 1.4, -2.35, { s: 1.6 });
+      windowFrame(g, 2.0, 2.1, -2.55, 0.8, 0.45, { glow: '#2a3a5a' });
+      seatsFor(g, p, 'chairRounded');
+      return { bg: '#080807', sky: '#3a4050', ground: '#1a1512', amb: 0.1, ceil: 2.8 };
+    },
   },
-  atelier(g, p, HY) {
-    room(g, { w: 7, wall: '#4a3b2c', floor: '#5a4330', back: -2.8, h: 3.4 });
-    windowFrame(g, -2.3, 2.1, -2.72, 1.2, 1.9, { glow: '#9aa9b8' });
-    // easel + canvas, camera-right
-    const wood = mat('#6b4a2e', { roughness: 0.85 });
-    g.add(mesh(box(0.05, 2.0, 0.05), wood, 1.9, 1.0, -0.9)); g.add(mesh(box(0.05, 2.0, 0.05), wood, 2.4, 1.0, -0.8)); g.add(mesh(box(0.05, 2.2, 0.05), wood, 2.15, 1.1, -1.4));
-    const canvas = mesh(box(0.8, 1.0, 0.03), mat('#e8dcc4', { roughness: 0.95 }), 2.15, 1.3, -0.82); canvas.rotation.y = -0.1; g.add(canvas);
-    table(g, -1.6, 0.3, { r: 0.35, color: '#5a3f28' });
-    g.add(mesh(cyl(0.12, 0.14, 0.3, 10), mat('#8a6a48', { roughness: 0.9 }), -1.5, SEAT + 0.45, 0.25));
-    seatsFor(g, p, HY, 'wood');
-    return { bg: '#1a140f', sky: '#8a8070', ground: '#3a2a1a', amb: 0.14 };
+  atelier: {
+    props: ['chair', 'sideTable', 'pottedPlant', 'bookcaseOpen', 'lampRoundFloor', 'books'],
+    build(g, p) {
+      room(g, { w: 7, wall: '#4a3b2c', floor: '#5a4330', back: -2.8, h: 3.4 });
+      windowFrame(g, -2.3, 2.1, -2.72, 1.2, 1.9, { glow: '#9aa9b8' });
+      const wood = mat('#6b4a2e', { roughness: 0.85 });
+      g.add(mesh(box(0.05, 2.0, 0.05), wood, 1.9, 1.0, -0.9)); g.add(mesh(box(0.05, 2.0, 0.05), wood, 2.4, 1.0, -0.8)); g.add(mesh(box(0.05, 2.2, 0.05), wood, 2.15, 1.1, -1.4));
+      const canvas = mesh(box(0.8, 1.0, 0.03), mat('#e8dcc4', { roughness: 0.95 }), 2.15, 1.3, -0.82); canvas.rotation.y = -0.1; g.add(canvas);
+      prop(g, 'sideTable', -1.5, 0.3, { s: 1.4 }); prop(g, 'books', -1.5, 0.3, { s: 1.3, y: propH('sideTable', 1.4) });
+      prop(g, 'bookcaseOpen', 0.8, -2.65, { s: 1.6 }); prop(g, 'pottedPlant', -2.8, -1.5, { s: 1.6 }); prop(g, 'lampRoundFloor', 2.9, -2.2, { s: 1.6 });
+      seatsFor(g, p, 'chair');
+      return { bg: '#1a140f', sky: '#8a8070', ground: '#3a2a1a', amb: 0.14 };
+    },
   },
-  latenight(g, p, HY) {
-    const fl = mesh(new THREE.PlaneGeometry(14, 14), mat('#1e1f26', { roughness: 0.3, metalness: 0.1 })); fl.rotation.x = -PI / 2; fl.castShadow = false; g.add(fl);
-    cityWall(g, -3.3, 12, 3.2, seeded(7));
-    desk(g, 0, 0.6, 2.4, '#2a2a30', '#2a1a38');
-    g.add(mesh(box(2.4, 0.05, 0.06), emis('#ff6a9a', 1.4), 0, SEAT + 0.32, 0.95, false));
-    seatsFor(g, p, HY, 'chair');
-    return { bg: '#070912', sky: '#4a4a7a', ground: '#15151a', amb: 0.16 };
+  latenight: {
+    props: ['chairDesk', 'desk', 'pottedPlant', 'loungeChair'],
+    build(g, p) {
+      const fl = mesh(new THREE.PlaneGeometry(14, 14), mat('#1e1f26', { roughness: 0.3, metalness: 0.1 })); fl.rotation.x = -PI / 2; fl.castShadow = false; g.add(fl);
+      cityWall(g, -3.3, 12, 3.2, seeded(7));
+      prop(g, 'desk', 0.2, 0.7, { s: 1.5, rot: 0 });
+      g.add(mesh(box(1.1, 0.05, 0.06), emis('#ff6a9a', 1.4), 0.2, propH('desk', 1.5), 1.0, false));
+      seatsFor(g, p, 'chairDesk', { s: 0.9 });
+      prop(g, 'loungeChair', -1.7, 0.4, { s: 1.5, rot: 110 }); prop(g, 'pottedPlant', 2.6, -1.2, { s: 1.8 });
+      return { bg: '#070912', sky: '#4a4a7a', ground: '#15151a', amb: 0.16 };
+    },
   },
-  scifi(g, p, HY) {
-    room(g, { w: 7, wall: '#16181c', floor: '#101114', ceiling: '#101114', back: -3.0, h: 3.0 });
-    for (const x of [-3.4, 3.4]) for (let z = -2.5; z < 2.5; z += 1.2) g.add(mesh(box(0.04, 2.4, 0.08), emis(x < 0 ? '#ff8a2a' : '#3a8cff', 1.4), x, 1.5, z, false));
-    for (let x = -2.5; x <= 2.5; x += 1.25) g.add(mesh(box(0.6, 0.02, 0.06), emis('#9ad0ff', 0.8), x, 2.95, -2.0, false));
-    table(g, 0, 0.95, { r: 0.42, color: '#1c1e22' });
-    seatsFor(g, p, HY, 'chair');
-    return { bg: '#06070a', sky: '#2a3a5a', ground: '#101010', amb: 0.12 };
+  scifi: {
+    props: ['chairModernCushion', 'tableCoffee', 'metal-panel'],
+    build(g, p) {
+      room(g, { w: 7, wall: '#16181c', floor: '#101114', ceiling: '#101114', back: -3.0, h: 3.0 });
+      for (const x of [-3.4, 3.4]) for (let z = -2.5; z < 2.5; z += 1.2) g.add(mesh(box(0.04, 2.4, 0.08), emis(x < 0 ? '#ff8a2a' : '#3a8cff', 1.4), x, 1.5, z, false));
+      for (let x = -2.5; x <= 2.5; x += 1.25) g.add(mesh(box(0.6, 0.02, 0.06), emis('#9ad0ff', 0.8), x, 2.95, -2.0, false));
+      for (let x = -3; x <= 3; x += 1) prop(g, 'metal-panel', x, -2.88, { s: 2.0, rot: 0 });
+      prop(g, 'tableCoffee', 0, 1.0, { s: 1.5, rot: 90 });
+      seatsFor(g, p, 'chairModernCushion');
+      return { bg: '#06070a', sky: '#2a3a5a', ground: '#101010', amb: 0.12 };
+    },
   },
-  dinner(g, p, HY) {
-    room(g, { w: 7, wall: '#2a1f16', floor: '#1e1510', ceiling: '#1a120d', back: -2.8, h: 3.0 });
-    table(g, 0, 0.3, { r: 0.6, color: '#4a3220' });
-    g.add(mesh(box(1.3, 0.01, 1.3), mat('#e8e0cc', { roughness: 0.98 }), 0, SEAT + 0.33, 0.3, false));
-    for (const [x, z] of [[-0.12, 0.25], [0.1, 0.37], [0.0, 0.17]]) candle(g, x, z, SEAT + 0.33);
-    g.add(mesh(box(0.9, 1.6, 0.4), mat('#3a2818', { roughness: 0.8 }), -2.6, 0.8, -2.4));
-    windowFrame(g, 2.0, 1.8, -2.72, 1.1, 1.4, { glow: '#0f1a30' });
-    seatsFor(g, p, HY, 'wood');
-    return { bg: '#0a0806', sky: '#3a2a20', ground: '#1a120c', amb: 0.08 };
+  dinner: {
+    props: ['chair', 'tableCloth', 'bookcaseClosedWide', 'lampRoundTable', 'sideTable', 'bottle'],
+    build(g, p) {
+      room(g, { w: 7, wall: '#2a1f16', floor: '#1e1510', ceiling: '#1a120d', back: -2.8, h: 3.0 });
+      prop(g, 'tableCloth', 0, 0.42, { s: 1.4, rot: 90 });
+      const th = propH('tableCloth', 1.4);
+      for (const [x, z] of [[-0.1, 0.35], [0.1, 0.5], [0.0, 0.25]]) candle(g, x, z, th);
+      prop(g, 'bottle', 0.3, 0.3, { s: 1.4, y: th }); prop(g, 'bottle', -0.3, 0.55, { s: 1.4, y: th });
+      prop(g, 'bookcaseClosedWide', -2.5, -2.5, { s: 1.6 }); prop(g, 'sideTable', 2.4, -2.4, { s: 1.5 }); prop(g, 'lampRoundTable', 2.4, -2.4, { s: 1.5, y: propH('sideTable', 1.5), shadow: false });
+      windowFrame(g, 2.0, 1.8, -2.72, 1.1, 1.4, { glow: '#0f1a30' });
+      seatsFor(g, p, 'chair');
+      return { bg: '#0a0806', sky: '#3a2a20', ground: '#1a120c', amb: 0.08 };
+    },
   },
-  park(g, p, HY) {
-    const fl = mesh(new THREE.PlaneGeometry(40, 40), mat('#4a6b35', { roughness: 1 })); fl.rotation.x = -PI / 2; fl.castShadow = false; g.add(fl);
-    const path = mesh(new THREE.PlaneGeometry(2.2, 40), mat('#8a8070', { roughness: 1 }), 0, 0.005, 0); path.rotation.x = -PI / 2; path.rotation.z = 0.25; path.castShadow = false; g.add(path);
-    for (const [x, z, s] of [[-3.2, -3.5, 1.0], [2.8, -4.2, 1.2], [-6, -6, 1.4], [5.5, -7, 1.3], [8, -3, 1.0], [-8.5, -2, 1.1], [0.5, -9, 1.5], [-4, -9.5, 1.3], [4.5, -9.5, 1.2], [9, -8, 1.4]]) tree(g, x, z, { h: 3.5 * s, r: 1.2 * s, leaves: ['#3f6b32', '#4e7a3a', '#5a8a3e'][Math.floor((x * 7 + z * 3 + 100) % 3)] });
-    if (p.pose !== 'standing') bench(g, 0, -0.22, 0);
-    for (const [x, z] of [[-2.2, 1.5], [2.6, -1.2], [-1.5, -2.6]]) g.add(mesh(sph(0.3, 8).scale(1, 0.5, 1), mat('#3a5a2a', { roughness: 1 }), x, 0.1, z));
-    return { bg: '#f3c99a', sky: '#ffd9b0', ground: '#4a6b35', amb: 0.55, outdoor: true, skyTop: '#6fa2d9', skyBottom: '#ffd0a0' };
+  park: {
+    props: ['bench', 'tree_default', 'tree_oak', 'tree_detailed', 'tree_fat', 'plant_bush', 'plant_bushLarge', 'flower_redA', 'flower_yellowA', 'flower_purpleA', 'grass_large', 'rock_smallA', 'path_stone'],
+    build(g, p) {
+      outdoors(g, '#4a6b35');
+      for (let i = -6; i <= 6; i++) prop(g, 'path_stone', i * 0.5 + 0.1, 1.6 - i * 0.12, { s: 1.6, rot: i * 7, shadow: false });
+      const trees = [['tree_default', -3.2, -3.5, 2.6], ['tree_oak', 2.8, -4.2, 3.0], ['tree_detailed', -6, -6, 3.2], ['tree_fat', 5.5, -7, 3.4], ['tree_default', 8, -3, 2.8], ['tree_oak', -8.5, -2, 3.0], ['tree_detailed', 0.5, -9, 3.6], ['tree_fat', -4, -9.5, 3.3], ['tree_default', 4.5, -9.5, 3.0], ['tree_oak', 9, -8, 3.4]];
+      for (const [n, x, z, s] of trees) prop(g, n, x, z, { s, rot: (x * 37) % 360 });
+      if (p.pose !== 'standing') prop(g, 'bench', 0, -0.1, { s: 2.2 });
+      for (const [n, x, z] of [['plant_bush', -2.2, 1.5], ['plant_bushLarge', 2.6, -1.2], ['plant_bush', -1.5, -2.6], ['plant_bushLarge', 3.5, 0.8]]) prop(g, n, x, z, { s: 2.0 });
+      for (const [n, x, z] of [['flower_redA', -1.6, 0.9], ['flower_yellowA', 1.9, 0.3], ['flower_purpleA', -2.6, -0.8], ['flower_redA', 2.2, -2.4], ['flower_yellowA', -3.0, 0.5]]) prop(g, n, x, z, { s: 1.8 });
+      for (let i = 0; i < 14; i++) prop(g, 'grass_large', Math.sin(i * 2.4) * 3.5, -1.5 + Math.cos(i * 1.7) * 3, { s: 1.6, rot: i * 50, shadow: false });
+      prop(g, 'rock_smallA', 3.2, -2.8, { s: 1.6 });
+      return { bg: '#f3c99a', sky: '#ffd9b0', ground: '#4a6b35', amb: 0.55, outdoor: true, skyTop: '#6fa2d9', skyBottom: '#ffd0a0' };
+    },
   },
-  headshot(g, p, HY) {
-    room(g, { wall: '#5c6068', floor: '#3a3c40', back: -3.2 });
-    g.add(mesh(box(4, 3, 0.03), mat('#8a8e95', { roughness: 0.98 }), 0, 1.5, -2.4, false));
-    g.add(mesh(cyl(0.04, 0.04, 4.2, 10).rotateZ(PI / 2), mat('#1a1a1c', { metalness: 0.6, roughness: 0.4 }), 0, 3.0, -2.4, false));
-    cstand(g, -2.5, -0.5, 2.4); cstand(g, 2.6, -1.2, 2.1, true);
-    g.add(mesh(new THREE.TorusGeometry(0.22, 0.04, 8, 32), mat('#ddd', { roughness: 0.5 }), -2.5, 2.4, -0.5, false));
-    seatsFor(g, p, HY, 'stool');
-    return { bg: '#1a1b1e', sky: '#c0c4cc', ground: '#2a2a2a', amb: 0.2 };
+  headshot: {
+    props: ['stoolBar', 'lampSquareFloor', 'pottedPlant', 'cardboardBoxClosed'],
+    build(g, p) {
+      room(g, { wall: '#5c6068', floor: '#3a3c40', back: -3.2 });
+      g.add(mesh(box(4, 3, 0.03), mat('#8a8e95', { roughness: 0.98 }), 0, 1.5, -2.4, false));
+      g.add(mesh(cyl(0.04, 0.04, 4.2, 10).rotateZ(PI / 2), mat('#1a1a1c', { metalness: 0.6, roughness: 0.4 }), 0, 3.0, -2.4, false));
+      cstand(g, -2.5, -0.5, 2.4); cstand(g, 2.6, -1.2, 2.1, true);
+      g.add(mesh(new THREE.TorusGeometry(0.22, 0.04, 8, 32), mat('#ddd', { roughness: 0.5 }), -2.5, 2.4, -0.5, false));
+      prop(g, 'lampSquareFloor', 2.9, 0.4, { s: 1.6 }); prop(g, 'pottedPlant', -3.0, -1.8, { s: 1.6 });
+      seatsFor(g, p, 'stoolBar', { s: 1.15 });
+      return { bg: '#1a1b1e', sky: '#c0c4cc', ground: '#2a2a2a', amb: 0.2 };
+    },
   },
-  lineup(g, p, HY) {
-    room(g, { w: 7, wall: '#3a3b3a', floor: '#232323', ceiling: '#202020', back: -1.0, h: 2.8 });
-    const m = mat('#9a9a9a', { roughness: 0.9 });
-    for (let y = 0.6; y <= 2.2; y += 0.2) g.add(mesh(box(y % 0.4 < 0.01 ? 5.5 : 4.5, 0.02, 0.01), m, 0, y, -0.89, false));
-    for (let x = -2.5; x <= 2.5; x += 1.0) g.add(mesh(box(0.02, 2.0, 0.01), mat('#5a5a5a'), x, 1.5, -0.89, false));
-    g.add(mesh(box(0.04, 2.8, 8), mat('#101010', { roughness: 0.1, metalness: 0.9 }), 3.45, 1.4, 0, false));
-    return { bg: '#0d0d0d', sky: '#404040', ground: '#1a1a1a', amb: 0.14 };
+  lineup: {
+    props: [],
+    build(g, p) {
+      room(g, { w: 7, wall: '#3a3b3a', floor: '#232323', ceiling: '#202020', back: -1.0, h: 2.8 });
+      const m = mat('#9a9a9a', { roughness: 0.9 });
+      for (let y = 0.4; y <= 2.0; y += 0.2) g.add(mesh(box(y % 0.4 < 0.01 ? 5.5 : 4.5, 0.02, 0.01), m, 0, y, -0.89, false));
+      for (let x = -2.5; x <= 2.5; x += 1.0) g.add(mesh(box(0.02, 1.8, 0.01), mat('#5a5a5a'), x, 1.3, -0.89, false));
+      g.add(mesh(box(0.04, 2.8, 8), mat('#101010', { roughness: 0.1, metalness: 0.9 }), 3.45, 1.4, 0, false));
+      return { bg: '#0d0d0d', sky: '#404040', ground: '#1a1a1a', amb: 0.14 };
+    },
   },
-  warehouse(g, p, HY) {
-    room(g, { w: 12, d: 10, wall: '#17171a', floor: '#121214', ceiling: '#0e0e10', back: -5.0, h: 4.5 });
-    const pm = mat('#2a2a2e', { roughness: 0.9 });
-    for (const x of [-3.5, 3.5]) for (const z of [-4, -1.5, 1.5]) g.add(mesh(box(0.4, 4.5, 0.4), pm, x, 2.25, z));
-    g.add(mesh(box(3.2, 3.2, 0.1), mat('#202024', { roughness: 0.7, metalness: 0.3 }), 0, 1.6, -4.9, false));
-    for (let y = 0.3; y < 3.2; y += 0.4) g.add(mesh(box(3.2, 0.02, 0.12), mat('#141416'), 0, y, -4.85, false));
-    for (let i = 0; i < 6; i++) g.add(mesh(box(0.9, 0.9, 0.9), mat('#2a2622', { roughness: 0.95 }), -4.5 + (i % 3) * 0.95, 0.45 + Math.floor(i / 3) * 0.9, -3.8));
-    return { bg: '#050506', sky: '#2a2a3a', ground: '#101010', amb: 0.1, fog: 0.06 };
+  warehouse: {
+    props: ['cardboardBoxClosed', 'box-large', 'box', 'barrel', 'metal-panel', 'workbench', 'chest'],
+    build(g, p) {
+      room(g, { w: 12, d: 10, wall: '#17171a', floor: '#121214', ceiling: '#0e0e10', back: -5.0, h: 4.5 });
+      const pm = mat('#2a2a2e', { roughness: 0.9 });
+      for (const x of [-3.5, 3.5]) for (const z of [-4, -1.5, 1.5]) g.add(mesh(box(0.4, 4.5, 0.4), pm, x, 2.25, z));
+      for (let x = -3; x <= 3; x += 1) prop(g, 'metal-panel', x, -4.9, { s: 2.2 });
+      for (let i = 0; i < 6; i++) prop(g, 'box-large', -4.5 + (i % 3) * 0.6, -3.8, { s: 2.2, y: Math.floor(i / 3) * 0.55, rot: 90 });
+      for (const [x, z] of [[4.2, -3.5], [4.6, -3.0], [4.0, -2.9]]) prop(g, 'barrel', x, z, { s: 2.0 });
+      prop(g, 'cardboardBoxClosed', 2.5, -4.0, { s: 2.2 }); prop(g, 'box', -2.0, -4.2, { s: 2.2, rot: 30 }); prop(g, 'workbench', 1.0, -4.3, { s: 2.0 }); prop(g, 'chest', -4.6, -1.8, { s: 2.0, rot: 60 });
+      return { bg: '#050506', sky: '#2a2a3a', ground: '#101010', amb: 0.1, fog: 0.06 };
+    },
   },
-  bar(g, p, HY) {
-    room(g, { w: 7, wall: '#241c18', floor: '#1a130f', ceiling: '#15100c', back: -2.8, h: 3.0 });
-    g.add(mesh(box(3.2, 1.0, 0.6), mat('#3a2616', { roughness: 0.6 }), -1.2, 0.5, -2.1, false)); g.add(mesh(box(3.4, 0.06, 0.7), mat('#5a3a20', { roughness: 0.35 }), -1.2, 1.03, -2.1, false));
-    for (let i = 0; i < 3; i++) g.add(mesh(box(3.0, 0.04, 0.25), mat('#4a3020', { roughness: 0.6 }), -1.2, 1.5 + i * 0.45, -2.7, false));
-    for (let i = 0; i < 16; i++) g.add(mesh(cyl(0.035, 0.045, 0.3, 8), mat(['#7a3a1a', '#3a6a3a', '#2a3a7a', '#9a7a2a'][i % 4], { roughness: 0.2, metalness: 0.1 }), -2.6 + (i % 8) * 0.36, 1.67 + Math.floor(i / 8) * 0.45, -2.7, false));
-    g.add(mesh(box(3.0, 0.03, 0.03), emis('#ffb060', 2), -1.2, 2.45, -2.62, false));
-    table(g, 0, 0.4, { r: 0.4, color: '#2a1a10' });
-    windowFrame(g, 2.0, 1.75, -2.72, 1.3, 1.3, { glow: '#120a1e' }); neon(g, 1.75, 1.95, -2.6, '#ff2a8a');
-    seatsFor(g, p, HY, 'stool');
-    return { bg: '#0a0705', sky: '#3a2a30', ground: '#1a120c', amb: 0.1 };
+  bar: {
+    props: ['stoolBar', 'tableRound', 'kitchenBar', 'kitchenBarEnd', 'bookcaseOpen', 'bottle', 'bottle-large', 'lampSquareCeiling'],
+    build(g, p) {
+      room(g, { w: 7, wall: '#241c18', floor: '#1a130f', ceiling: '#15100c', back: -2.8, h: 3.0 });
+      for (let i = -3; i <= 1; i++) prop(g, i === -3 ? 'kitchenBarEnd' : 'kitchenBar', i * 0.52 - 0.6, -2.0, { s: 1.4, rot: i === -3 ? 180 : 0 });
+      for (const x of [-2.4, -1.75, -1.1, -0.45]) { prop(g, 'bookcaseOpen', x, -2.65, { s: 1.6 }); for (let k = 0; k < 3; k++) prop(g, k === 1 ? 'bottle-large' : 'bottle', x - 0.2 + k * 0.2, -2.65, { s: 1.5, y: 0.5 }); for (let k = 0; k < 3; k++) prop(g, k === 0 ? 'bottle-large' : 'bottle', x - 0.2 + k * 0.2, -2.65, { s: 1.5, y: 0.98 }); }
+      g.add(mesh(box(3.0, 0.03, 0.03), emis('#ffb060', 2), -1.4, 2.45, -2.62, false));
+      hangingBulb(g, 0, 0.5, 2.1, 3.0);
+      prop(g, 'tableRound', 0, 0.55, { s: 1.0 });
+      windowFrame(g, 2.0, 1.75, -2.72, 1.3, 1.3, { glow: '#120a1e' }); neon(g, 1.75, 1.95, -2.6, '#ff2a8a');
+      seatsFor(g, p, 'stoolBar', { s: 1.15 });
+      return { bg: '#0a0705', sky: '#3a2a30', ground: '#1a120c', amb: 0.1 };
+    },
   },
-  bedroom(g, p, HY) {
-    room(g, { w: 6, wall: '#2a2e3a', floor: '#2a2420', ceiling: '#22242c', back: -2.6, h: 2.7 });
-    desk(g, 0, 0.75, 1.8, '#3a3a40', '#2a2a30'); monitor(g, 0.78, SEAT + 0.62, 0.55, 0.6, 0.36, '#7fb0ff', PI - 0.6);
-    g.add(mesh(box(0.3, 0.02, 0.1), mat('#111'), -0.4, SEAT + 0.36, 0.6, false));
-    g.add(mesh(box(1.2, 0.3, 0.3), mat('#3a3a44'), -1.9, 1.9, -2.45, false)); g.add(mesh(box(1.2, 0.3, 0.3), mat('#3a3a44'), -1.9, 1.3, -2.45, false));
-    for (let i = 0; i < 9; i++) g.add(mesh(box(0.05, 0.22, 0.16), mat(['#b05030', '#3a6a9a', '#d0b060', '#3a8a5a'][i % 4]), -2.4 + i * 0.12, 2.17, -2.45, false));
-    g.add(mesh(box(2.2, 0.02, 0.02), emis('#6a3aff', 2), -1.9, 2.08, -2.3, false));
-    g.add(mesh(box(1.6, 0.5, 2.0), mat('#4a4a6a', { roughness: 0.95 }), 2.2, 0.25, -1.5)); g.add(mesh(box(1.6, 0.9, 0.1), mat('#3a3a50'), 2.2, 0.75, -2.5, false));
-    seatsFor(g, p, HY, 'chair');
-    return { bg: '#0b0c12', sky: '#4a5a8a', ground: '#1a1a20', amb: 0.16 };
+  bedroom: {
+    props: ['chairDesk', 'desk', 'computerScreen', 'computerKeyboard', 'bedSingle', 'bookcaseOpen', 'lampSquareTable', 'pottedPlant', 'rugRound', 'speakerSmall', 'pillow', 'books'],
+    build(g, p) {
+      room(g, { w: 6, wall: '#2a2e3a', floor: '#2a2420', ceiling: '#22242c', back: -2.6, h: 2.7 });
+      prop(g, 'rugRound', 0, 0.3, { s: 2.6 });
+      prop(g, 'desk', 0, 0.85, { s: 1.5, rot: 180 }); const dh = propH('desk', 1.5);
+      prop(g, 'computerScreen', 0.55, 0.7, { s: 1.4, y: dh, rot: 150 }); screenGlow(g, 0.5, dh + 0.2, 0.74, 0.46, 0.3, '#7fb0ff', 150 * PI / 180);
+      prop(g, 'computerKeyboard', -0.25, 0.75, { s: 1.4, y: dh, rot: 180 }); prop(g, 'speakerSmall', -1.75, 0.3, { s: 1.0, rot: 30 });
+      prop(g, 'bedSingle', 2.2, -1.6, { s: 1.6, rot: 90 }); prop(g, 'pillow', 2.2, -2.2, { s: 1.5, y: 0.5, rot: 90 });
+      prop(g, 'bookcaseOpen', -1.9, -2.45, { s: 1.6 }); prop(g, 'books', -1.9, -2.45, { s: 1.4, y: 0.52 }); prop(g, 'books', -1.9, -2.45, { s: 1.4, y: 1.0 });
+      g.add(mesh(box(2.2, 0.02, 0.02), emis('#6a3aff', 2), -1.9, 2.08, -2.3, false));
+      prop(g, 'lampSquareTable', -2.6, -1.0, { s: 1.5, shadow: false }); prop(g, 'pottedPlant', 2.7, 0.2, { s: 1.4 });
+      seatsFor(g, p, 'chairDesk', { s: 0.9 });
+      return { bg: '#0b0c12', sky: '#4a5a8a', ground: '#1a1a20', amb: 0.16 };
+    },
   },
-  campfire(g, p, HY) {
-    const fl = mesh(new THREE.PlaneGeometry(40, 40), mat('#2a3020', { roughness: 1 })); fl.rotation.x = -PI / 2; fl.castShadow = false; g.add(fl);
-    for (const [x, z, s] of [[-3.5, -3.5, 1.1], [3.2, -4.0, 1.3], [-6.5, -5.5, 1.4], [6, -6.5, 1.2], [0.5, -8, 1.5], [-9, -2, 1.1], [9, -2.5, 1.0]]) tree(g, x, z, { h: 4 * s, r: 1.1 * s, leaves: '#1e3a1e', trunk: '#2a1e14' });
-    const logs = mat('#3a2a1a', { roughness: 0.9 });
-    for (let i = 0; i < 4; i++) { const l = mesh(cyl(0.05, 0.05, 0.6, 8).rotateZ(PI / 2), logs, 0, 0.06, 1.1); l.rotation.y = i * 0.8; g.add(l); }
-    g.add(mesh(sph(0.14, 10).scale(1, 1.6, 1), emis('#ff7a1a', 2.5), 0, 0.25, 1.1, false));
-    for (const a of [0, 1, 2, 3, 4, 5]) g.add(mesh(sph(0.16, 8), mat('#4a4a48', { roughness: 1 }), Math.cos(a) * 0.5, 0.08, 1.1 + Math.sin(a) * 0.5));
-    g.add(mesh(cyl(0.2, 0.22, 0.4, 10), mat('#3a2a1a'), -1.2, 0.2, 0.4)); g.add(mesh(cyl(0.2, 0.22, 0.4, 10), mat('#3a2a1a'), 1.3, 0.2, 0.5));
-    if (p.pose !== 'standing') p.subjects.forEach(s => g.add(mesh(cyl(0.24, 0.26, SEAT, 12), mat('#3a2a1a', { roughness: 0.95 }), s.x, SEAT / 2, 0)));
-    return { bg: '#06070c', sky: '#1a2240', ground: '#1a1a14', amb: 0.1, outdoor: true, skyTop: '#05070f', skyBottom: '#1a2240', stars: true };
+  campfire: {
+    props: ['campfire_logs', 'campfire_stones', 'log_large', 'log', 'log_stack', 'tree_pineTallA', 'tree_pineTallB', 'tree_pineRoundA', 'rock_largeA', 'rock_largeC', 'tent', 'grass_large'],
+    build(g, p) {
+      outdoors(g, '#2a3020');
+      for (const [n, x, z, s] of [['tree_pineTallA', -3.5, -3.5, 2.8], ['tree_pineTallB', 3.2, -4.0, 3.2], ['tree_pineRoundA', -6.5, -5.5, 3.4], ['tree_pineTallA', 6, -6.5, 3.0], ['tree_pineTallB', 0.5, -8, 3.6], ['tree_pineRoundA', -9, -2, 2.8], ['tree_pineTallA', 9, -2.5, 2.6], ['tree_pineTallB', -5, -8.5, 3.3]]) prop(g, n, x, z, { s, rot: (x * 53) % 360 });
+      prop(g, 'campfire_stones', 0, 1.7, { s: 1.6 }); prop(g, 'campfire_logs', 0, 1.7, { s: 1.6 });
+      g.add(mesh(sph(0.1, 10).scale(1, 1.8, 1), emis('#ff7a1a', 2.5), 0, 0.22, 1.7, false));
+      prop(g, 'tent', -2.6, -2.2, { s: 3.0, rot: 35 }); prop(g, 'log_stack', 2.4, -1.6, { s: 2.0, rot: -20 });
+      prop(g, 'rock_largeA', 3.0, 0.6, { s: 1.6 }); prop(g, 'rock_largeC', -2.8, 0.9, { s: 1.6, rot: 40 });
+      for (let i = 0; i < 10; i++) prop(g, 'grass_large', Math.sin(i * 2.1) * 3.2, -1 + Math.cos(i * 1.3) * 2.5, { s: 1.6, rot: i * 40, shadow: false });
+      if (p.pose !== 'standing') p.subjects.forEach(s => prop(g, 'log_large', s.x, -0.12, { s: 1.0, rot: 90 }));
+      return { bg: '#06070c', sky: '#1a2240', ground: '#1a1a14', amb: 0.1, outdoor: true, skyTop: '#05070f', skyBottom: '#1a2240', stars: true };
+    },
   },
-  courtroom(g, p, HY) {
-    room(g, { w: 9, wall: '#4a3826', floor: '#3a2e22', ceiling: '#3a3028', back: -3.0, h: 3.6 });
-    for (let x = -4.2; x <= 4.2; x += 0.6) g.add(mesh(box(0.5, 2.2, 0.04), mat('#5a4530', { roughness: 0.8 }), x, 1.1, -2.95, false));
-    g.add(mesh(box(9, 0.12, 0.08), mat('#2a1e14'), 0, 2.26, -2.93, false));
-    g.add(mesh(box(3.8, 0.08, 0.12), mat('#5a4530', { roughness: 0.6 }), 0, SEAT + 0.3, 0.65)); for (const x of [-1.8, -0.6, 0.6, 1.8]) g.add(mesh(box(0.08, SEAT + 0.28, 0.08), mat('#5a4530'), x, (SEAT + 0.28) / 2, 0.65));
-    g.add(mesh(box(0.8, 1.6, 0.06), mat('#c0b090', { roughness: 0.9 }), -3.8, 1.5, -2.5, false)); g.add(mesh(cyl(0.02, 0.02, 2.4, 8), mat('#d4b060', { metalness: 0.7, roughness: 0.3 }), -4.2, 1.2, -2.4, false));
-    seatsFor(g, p, HY, 'wood');
-    return { bg: '#120d08', sky: '#8a7a60', ground: '#3a2a1a', amb: 0.16 };
+  courtroom: {
+    props: ['benchCushion', 'paneling', 'tableCloth', 'coatRackStanding'],
+    build(g, p) {
+      room(g, { w: 9, wall: '#4a3826', floor: '#3a2e22', ceiling: '#3a3028', back: -3.0, h: 3.6 });
+      for (let x = -4.2; x <= 4.2; x += 0.6) g.add(mesh(box(0.5, 2.2, 0.04), mat('#5a4530', { roughness: 0.8 }), x, 1.1, -2.95, false));
+      g.add(mesh(box(9, 0.12, 0.08), mat('#2a1e14'), 0, 2.26, -2.93, false));
+      // jury rail
+      g.add(mesh(box(3.8, 0.08, 0.12), mat('#5a4530', { roughness: 0.6 }), 0, SEAT + 0.3, 0.65)); for (const x of [-1.8, -0.6, 0.6, 1.8]) g.add(mesh(box(0.08, SEAT + 0.28, 0.08), mat('#5a4530'), x, (SEAT + 0.28) / 2, 0.65));
+      g.add(mesh(box(0.8, 1.6, 0.06), mat('#c0b090', { roughness: 0.9 }), -3.8, 1.5, -2.5, false)); g.add(mesh(cyl(0.02, 0.02, 2.4, 8), mat('#d4b060', { metalness: 0.7, roughness: 0.3 }), -4.2, 1.2, -2.4, false));
+      prop(g, 'coatRackStanding', 3.8, -2.4, { s: 1.6 });
+      seatsFor(g, p, 'benchCushion', { s: 1.0 });
+      return { bg: '#120d08', sky: '#8a7a60', ground: '#3a2a1a', amb: 0.16 };
+    },
   },
 };

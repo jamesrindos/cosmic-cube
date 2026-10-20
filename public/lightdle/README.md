@@ -5,8 +5,9 @@ Daily lighting puzzle at `/lightdle`. Static, self-contained (same pattern as `/
 - `index.html` — markup + CSS
 - `app.js` — Three.js set, illumination model, scoring, floor plan, UI, localStorage stats
 - `puzzles.js` — the scene library (`PUZZLES`), fixture and gel tables, and `EPOCH` (the date of Lightdle #1)
-- `sets.js` — mannequin builder, visible light fixtures, and the environment library (`SETS`: interview, noir, tvstudio, basement, atelier, latenight, scifi, dinner, park, headshot, lineup, warehouse, bar, bedroom, campfire, courtroom)
+- `sets.js` — NPC builder, prop placer, visible light fixtures, and the environment library (`SETS`: interview, noir, tvstudio, basement, atelier, latenight, scifi, dinner, park, headshot, lineup, warehouse, bar, bedroom, campfire, courtroom)
 - `assets/npc.glb` — the character: Kenney "Animated Characters" body (CC0, kenney.nl), converted from FBX with FBX2glTF; posed by bone at runtime (`sets.js › npc`). `assets/skins/*.png` are Kenney's painted skins, one per character; a scene's `subjects[].skin` picks one
+- `assets/props/*.glb` — set dressing from Kenney's Furniture Kit, Nature Kit and Survival Kit (CC0); each entry in `SETS` lists the props it needs and only those are fetched. `Textures/colormap.png` is the Survival Kit's shared palette
 
 ## Adding a scene
 
