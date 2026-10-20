@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>if(!/\/$|\.html$/.test(location.pathname))location.replace(location.pathname+"/"+location.search+location.hash)</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="A daily lighting puzzle. Read the director's brief, rig three lights on a virtual set, roll camera, get graded.">
+<meta name="theme-color" content="#0d0d0f">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lightdle">
+<meta property="og:title" content="Lightdle — the daily lighting puzzle">
+<meta property="og:description" content="Read the director's brief, rig three lights on a virtual set, roll camera, get graded.">
+<meta name="twitter:card" content="summary_large_image">
+<title>Lightdle — the daily lighting puzzle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0d0d0f; --panel:#151518; --panel-2:#1c1c21; --line:#2a2a31; --line-2:#3a3a44;
+  --ink:#ececf0; --ink-2:#a9a9b4; --ink-3:#6c6c78;
+  --warm:#ffb458; --cool:#8fc0ff; --good:#5fd38a; --mid:#f2c94c; --bad:#ff6b6b;
+  --f-b:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-m:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  --r:10px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-b);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default;opacity:.5}
+:focus-visible{outline:2px solid var(--warm);outline-offset:2px}
+.mono{font-family:var(--f-m);font-weight:500;letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:20;background:rgba(13,13,15,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hdr-in{max-width:1400px;margin:0 auto;padding:0 20px;height:58px;display:flex;align-items:center;gap:16px}
+.wordmark{font-weight:700;font-size:22px;letter-spacing:-.02em;text-decoration:none;display:flex;align-items:center;gap:8px}
+.wordmark i{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--warm) 45%,#7a4a10);box-shadow:0 0 12px rgba(255,180,88,.6)}
+.daynum{color:var(--ink-3)}
+.modes{display:flex;gap:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px;margin-left:auto}
+.modes button{border:0;background:none;border-radius:999px;padding:6px 14px;color:var(--ink-2);font-size:13px;font-weight:500}
+.modes button.on{background:var(--ink);color:var(--bg)}
+.modes button .done{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good);margin-left:6px;vertical-align:middle}
+.icons{display:flex;gap:4px}
+.icons button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--ink-2);font-weight:600;display:grid;place-items:center}
+.icons button:hover{border-color:var(--line-2);color:var(--ink)}
+
+/* layout */
+.main{max-width:1400px;margin:0 auto;padding:16px 20px 120px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);color:var(--ink-2)}
+.card-b{padding:14px}
+
+/* viewport */
+.vp{position:relative;aspect-ratio:16/9;background:#000;border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+.vp canvas{display:block;width:100%!important;height:100%!important}
+.vp .frame{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.vp .rec{position:absolute;top:10px;left:12px;display:flex;align-items:center;gap:8px;color:#fff;opacity:.75;text-shadow:0 1px 2px #000}
+.vp .rec i{width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 8px var(--bad)}
+.vp .tc{position:absolute;top:10px;right:12px;color:#fff;opacity:.6;text-shadow:0 1px 2px #000}
+.vp .shotinfo{position:absolute;bottom:10px;left:12px;color:#fff;opacity:.6;text-shadow:0 1px 2px #000}
+.vp .cmp{position:absolute;bottom:10px;right:12px;display:flex;gap:2px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:3px}
+.vp .cmp button{border:0;background:none;color:#fff;opacity:.6;padding:4px 10px;border-radius:999px;font-size:12px}
+.vp .cmp button.on{background:#fff;color:#000;opacity:1}
+.vp .loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3)}
+
+/* brief */
+.brief .who{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.brief .who b{font-size:17px;letter-spacing:-.01em}
+.brief .tag{border:1px solid var(--line-2);border-radius:999px;padding:2px 9px;color:var(--ink-2)}
+.brief p{margin:0 0 10px;color:var(--ink);font-size:15.5px;line-height:1.55}
+.brief p:last-child{margin-bottom:0}
+.brief .spec{margin-top:12px;border-top:1px dashed var(--line-2);padding-top:10px;color:var(--ink-2);font-family:var(--f-m);font-size:12px;line-height:1.7}
+.brief .spec b{color:var(--ink);font-weight:600}
+.brief .inspired{color:var(--ink-3);font-size:13px;margin-top:8px}
+
+/* result */
+.result{border-color:var(--line-2)}
+.score-row{display:flex;align-items:flex-end;gap:16px;padding:16px 14px 8px}
+.score-big{font-size:64px;font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.score-big small{font-size:22px;color:var(--ink-3);font-weight:500;letter-spacing:0}
+.verdict{color:var(--ink-2);font-size:15px;padding-bottom:6px}
+.verdict b{color:var(--ink);display:block;font-size:17px;margin-bottom:2px}
+.metrics{display:flex;flex-direction:column;gap:8px;padding:8px 14px 14px}
+.met{display:grid;grid-template-columns:120px 1fr auto;gap:10px;align-items:center;font-size:13.5px}
+.met .lab{color:var(--ink-2)}
+.met .bar{height:8px;background:var(--panel-2);border-radius:999px;overflow:hidden}
+.met .bar i{display:block;height:100%;border-radius:999px;background:var(--good);transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.met .bar i.mid{background:var(--mid)}
+.met .bar i.bad{background:var(--bad)}
+.met .val{color:var(--ink-3);font-family:var(--f-m);font-size:11px;min-width:34px;text-align:right}
+.met .note{grid-column:1/-1;color:var(--ink-2);font-size:13px;margin:-4px 0 2px;padding-left:2px}
+.lesson{padding:10px 14px 14px;color:var(--ink-2);font-size:14px;line-height:1.55}
+.topnote{margin:0;padding:0 14px 10px;color:var(--ink);font-size:15px;line-height:1.5}
+.topnote:empty{display:none}
+.disclose{display:flex;gap:16px;padding:4px 14px 12px;flex-wrap:wrap}
+.link{border:0;background:none;padding:0;color:var(--ink-2);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.link:hover{color:var(--ink)}
+.actions{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
+
+/* buttons */
+.btn{border:1px solid var(--line-2);background:var(--panel-2);border-radius:8px;padding:9px 14px;font-weight:600;font-size:14px;color:var(--ink);display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary:hover{background:#fff}
+.btn.warm{background:var(--warm);color:#1a1000;border-color:var(--warm)}
+.btn.big{padding:14px 22px;font-size:16px;border-radius:12px;width:100%;justify-content:center}
+
+/* minimap */
+.plan svg{display:block;width:100%;height:auto;touch-action:none;user-select:none}
+.plan .hint{color:var(--ink-3);font-size:12px;padding:0 14px 12px;margin-top:-4px}
+
+/* light cards */
+.lights{display:flex;flex-direction:column;gap:10px}
+.light{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:opacity .2s}
+.light.off .lb{opacity:.35;pointer-events:none}
+.light.off .lh{opacity:.6}
+.light.locked{pointer-events:none}
+.light.locked .lb{opacity:.75}
+.lh{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.lh .dot{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:0 0 10px currentColor}
+.lh .nm{font-weight:600;flex:1;font-size:14px}
+.lh .nm small{color:var(--ink-3);font-weight:500;margin-left:6px;font-family:var(--f-m);font-size:11px}
+.sw{position:relative;width:38px;height:22px;border-radius:999px;background:var(--line-2);border:0;flex:none}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw.on{background:var(--good)}
+.sw.on::after{transform:translateX(16px)}
+.lb{padding:10px 12px 12px;display:grid;gap:9px}
+.row{display:grid;grid-template-columns:78px 1fr 58px;gap:10px;align-items:center;font-size:13px}
+.row label{color:var(--ink-2)}
+.row output{color:var(--ink);font-family:var(--f-m);font-size:12px;text-align:right}
+.row.sel{grid-template-columns:78px 1fr}
+.seg{display:flex;gap:3px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:3px}
+.seg button{flex:1;border:0;background:none;border-radius:6px;padding:5px 6px;font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+.seg button.on{background:var(--line-2);color:var(--ink)}
+select{appearance:none;-webkit-appearance:none;width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 28px 6px 10px;font:inherit;font-size:13px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a9a9b4' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:none;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--line-2)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line-2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ink);margin-top:-7px;border:0;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--ink);border:0}
+input[type=range].kelvin::-webkit-slider-runnable-track{background:linear-gradient(90deg,#ff8a2a,#ffd39a 35%,#fff 55%,#bcd6ff 75%,#7faaff)}
+input[type=range].kelvin::-moz-range-track{background:linear-gradient(90deg,#ff8a2a,#ffd39a 35%,#fff 55%,#bcd6ff 75%,#7faaff)}
+.fxdesc{grid-column:2/-1;color:var(--ink-3);font-size:12px;margin-top:-5px}
+
+/* sticky roll bar */
+.rollbar{position:sticky;bottom:12px;z-index:5}
+.rollbar.static{position:static}
+.rollbar .btn{box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.rollbar .sub{text-align:center;color:var(--ink-3);font-size:12px;margin-top:6px}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:16px}
+.modal .box{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;max-width:560px;width:100%;max-height:88vh;overflow:auto}
+.modal .box-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+.modal .box-h b{font-size:18px}
+.modal .box-b{padding:16px 18px;color:var(--ink-2);font-size:14.5px;line-height:1.6}
+.modal .box-b h4{color:var(--ink);margin:14px 0 4px;font-size:14px}
+.modal .box-b h4:first-child{margin-top:0}
+.modal .box-b p{margin:0 0 10px}
+.modal .box-b dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.modal .box-b dt{color:var(--ink);font-weight:600;white-space:nowrap}
+.modal .box-b dd{margin:0}
+.x{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--ink-2)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--panel-2);border-radius:8px;padding:10px;text-align:center}
+.stat b{display:block;font-size:26px;color:var(--ink);letter-spacing:-.02em}
+.stat span{font-size:11px;color:var(--ink-3)}
+.hist{display:grid;gap:5px}
+.hist .hr{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center;font-family:var(--f-m);font-size:11px;color:var(--ink-3)}
+.hist .hr i{display:block;height:14px;background:var(--line-2);border-radius:3px;min-width:4px}
+.hist .hr i.me{background:var(--warm)}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;transition:.25s;z-index:60;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+@media (max-width:980px){
+  .main{grid-template-columns:1fr;padding:12px 12px 100px}
+  .hdr-in{padding:0 12px;gap:10px}
+  .modes button{padding:6px 10px;font-size:12px}
+  .wordmark span{display:none}
+  .row{grid-template-columns:70px 1fr 52px}
+  .score-big{font-size:52px}
+  .score-row{flex-direction:column;align-items:flex-start;gap:4px}
+  .met{grid-template-columns:96px 1fr auto}
+}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-in">
+    <a class="wordmark" href="./"><i></i>Lightdle <span class="daynum mono" id="daynum"></span></a>
+    <div class="modes" role="tablist" aria-label="Difficulty">
+      <button data-mode="easy">Easy</button>
+      <button data-mode="medium">Medium</button>
+      <button data-mode="expert">Expert</button>
+    </div>
+    <div class="icons">
+      <button id="btn-stats" title="Stats" aria-label="Stats">▮▮</button>
+      <button id="btn-help" title="How to play" aria-label="How to play">?</button>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="col">
+    <div class="vp" id="vp">
+      <div class="loading" id="loading">Loading set…</div>
+      <div class="frame"></div>
+      <div class="rec mono"><i></i><span id="rec-label">Rehearsal</span></div>
+      <div class="tc mono" id="tc">00:00:00:00</div>
+      <div class="shotinfo mono" id="shotinfo"></div>
+      <div class="cmp" id="cmp" hidden>
+        <button data-view="mine" class="on">Yours</button>
+        <button data-view="theirs">Director's</button>
+      </div>
+    </div>
+
+    <section class="card brief" id="brief">
+      <div class="card-h"><span class="mono">Director's brief</span><span class="mono" id="brief-mode"></span></div>
+      <div class="card-b">
+        <div class="who"><b id="p-title"></b><span class="tag mono" id="p-shot"></span></div>
+        <p id="p-brief"></p>
+        <div class="spec" id="p-spec" hidden></div>
+      </div>
+    </section>
+
+    <section class="card result" id="result" hidden>
+      <div class="score-row">
+        <div class="score-big"><span id="score-n">0</span><small>/100</small></div>
+        <div class="verdict"><b id="verdict-h"></b><span id="verdict-p"></span></div>
+      </div>
+      <p class="topnote" id="topnote"></p>
+      <div class="disclose"><button class="link" id="btn-breakdown">See the breakdown</button><button class="link" id="btn-why">What the director was going for</button></div>
+      <div class="metrics" id="metrics" hidden></div>
+      <div class="lesson" id="lesson" hidden></div>
+      <div class="actions">
+        <button class="btn primary" id="btn-share">Share result</button>
+        <button class="btn" id="btn-tweak">Keep tweaking</button>
+        <button class="btn" id="btn-next-mode" hidden>Try the next mode →</button>
+        <button class="btn" id="btn-practice">Practice another scene</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="card plan">
+      <div class="card-h"><span class="mono">Floor plan</span><span class="mono" id="plan-live"></span></div>
+      <svg id="plan" viewBox="0 0 400 400" aria-label="Top-down floor plan. Drag a light to move it."></svg>
+      <div class="hint">Drag a light to place it — angle and distance come from the plan, height from the slider. Camera is at the bottom.</div>
+    </section>
+
+    <div class="lights" id="lights"></div>
+
+    <div class="rollbar">
+      <button class="btn warm big" id="btn-roll">Roll camera</button>
+      <div class="sub" id="roll-sub">One take per mode per day. Make it count.</div>
+    </div>
+  </div>
+</main>
+
+<div class="modal" id="m-help" hidden>
+  <div class="box">
+    <div class="box-h"><b>How to play</b><button class="x" data-close>✕</button></div>
+    <div class="box-b">
+      <p>A new scene and a director's brief every day. Drag your lights around the floor plan, set height, output and colour, then <b>roll camera</b>. One take per difficulty per day, graded 0–100 against the director's own rig.</p>
+      <dl>
+        <dt>Easy</dt><dd>Spec sheet included, fixtures pre-chosen, forgiving.</dd>
+        <dt>Medium</dt><dd>A director's note in plain language. Hard or soft.</dd>
+        <dt>Expert</dt><dd>Scene and mood only. Every fixture, distance and gel. Strict.</dd>
+      </dl>
+      <h4>Cheat sheet</h4>
+      <dl>
+        <dt>Key</dt><dd>The main light. Its angle decides where shadows fall.</dd>
+        <dt>Fill</dt><dd>Weaker, opposite side, lifts the shadows.</dd>
+        <dt>Ratio</dt><dd>Lit side vs shadow side. 2:1 friendly, 4:1 cinematic, 8:1+ drama.</dd>
+        <dt>Back / rim</dt><dd>From behind, edges the subject off the background.</dd>
+        <dt>Kelvin</dt><dd>2000–3200K candle/tungsten, 5600K daylight, 7000K+ blue.</dd>
+      </dl>
+      <p style="margin-top:12px;font-size:13px;color:var(--ink-3)">Characters by Kenney (kenney.nl, CC0). Built with three.js.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="m-stats" hidden>
+  <div class="box">
+    <div class="box-h"><b>Your stats</b><button class="x" data-close>✕</button></div>
+    <div class="box-b">
+      <div class="stats" id="stats-grid"></div>
+      <h4>Scores by mode</h4>
+      <div class="hist" id="stats-hist"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
