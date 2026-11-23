@@ -112,6 +112,13 @@ main { padding-bottom: 48px; }
   padding: 10px 16px 12px; font-size: 0.8125rem; color: var(--muted);
 }
 .linkmode .meta { border-top: 1px solid var(--line); align-items: center; }
+.embedmode .meta { justify-content: flex-start; align-items: center; }
+.embedmode .meta a { margin-left: auto; }
+.replay {
+  border: 1px solid var(--ink); background: transparent; color: var(--ink);
+  border-radius: 999px; padding: 3px 12px; font-size: 0.8125rem; font-weight: 700; cursor: pointer;
+}
+.replay:hover { background: var(--ink); color: var(--bg); }
 .meta a { color: var(--muted); overflow-wrap: anywhere; }
 .meta a:hover { color: var(--ink); }
 
@@ -150,7 +157,7 @@ main { padding-bottom: 48px; }
   ];
   var main = document.getElementById('main');
   var nav = document.getElementById('nav');
-  if (!EMBED) document.body.className = 'linkmode';
+  document.body.className = EMBED ? 'embedmode' : 'linkmode';
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -175,9 +182,11 @@ main { padding-bottom: 48px; }
     if (d.t) text.appendChild(el('p', 'said', d.t));
     a.appendChild(text);
 
+    var frame = null;
     if (EMBED && d.e !== 'x') {
       var box = el('div', 'player');
       var f = document.createElement('iframe');
+      frame = f;
       f.setAttribute('loading', 'lazy');
       f.setAttribute('allowfullscreen', '');
       f.setAttribute('scrolling', 'no');
@@ -194,6 +203,14 @@ main { padding-bottom: 48px; }
     }
 
     var meta = el('div', 'meta');
+    if (frame && d.e === 'v') {
+      // Instagram's player ends on a "Watch again on Instagram" screen. Reloading the frame brings the play button back.
+      var rb = el('button', 'replay', '↻ Replay');
+      rb.type = 'button';
+      rb.title = 'Reset the player so the video plays here again';
+      rb.addEventListener('click', function () { frame.src = url + 'embed/'; });
+      meta.appendChild(rb);
+    }
     meta.appendChild(el('span', null, d.by + ' · ' + d.on));
     if (EMBED) {
       var h = el('a', null, '@' + d.h);
